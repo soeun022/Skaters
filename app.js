@@ -1220,30 +1220,16 @@ function startApp() {
             if (firstDayIndex === -1) firstDayIndex = 6;
 
             const totalDays = lastDayOfMonth.getDate();
-            const prevMonthLastDay = new Date(year, month, 0).getDate();
-
-            // 上個月 filler
-            for (let i = firstDayIndex; i > 0; i--) {
-                const dayNum = prevMonthLastDay - i + 1;
-                grid.appendChild(createDayCell(dayNum, true, year, month - 1));
+            // 上個月空白對齊格 (無重複日期數字，僅用於對齊星期欄位)
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty-day-cell';
+                grid.appendChild(emptyCell);
             }
 
-            // 當月
+            // 當月所有日期 (1 ~ totalDays)
             for (let i = 1; i <= totalDays; i++) {
                 grid.appendChild(createDayCell(i, false, year, month));
-            }
-
-            // 補齊或裁切格數，精確為 35 格 (5 行)
-            const currentCellCount = grid.children.length;
-            if (currentCellCount < 35) {
-                const remainingCells = 35 - currentCellCount;
-                for (let i = 1; i <= remainingCells; i++) {
-                    grid.appendChild(createDayCell(i, true, year, month + 1));
-                }
-            } else if (currentCellCount > 35) {
-                while (grid.children.length > 35) {
-                    grid.removeChild(grid.lastChild);
-                }
             }
 
             monthBlock.appendChild(grid);

@@ -533,6 +533,13 @@ body {
     -webkit-user-select: none;
 }
 
+.day-cell.empty-day-cell {
+    background-color: var(--bg-color);
+    border: none;
+    cursor: default;
+    pointer-events: none;
+}
+
 .schedule-more {
     font-size: 13px;
     color: var(--text-secondary);
