@@ -69,8 +69,8 @@
 .type-tag input[type="radio"]:checked + span {
     opacity: 1;
     transform: scale(1.05);
-    border-color: #e8cfcb;
-    box-shadow: 0 0 0 2px #e8cfcb;
+    border-color: #d7c9c9;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4);
     font-weight: 700;
 }
 
@@ -704,26 +704,27 @@ body {
 
 .schedule-item.focused {
     outline: none !important;
-    box-shadow: 0 0 0 2px #e8cfcb, 0 2px 8px rgba(232, 207, 203, 0.6) !important;
+    border-color: #d7c9c9 !important;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
     transform: scale(1.02);
     z-index: 2;
 }
 
 /* 連貫排程被選取時，移除左右連接處的邊框線，並取消放大效果以保持連貫 */
 .schedule-item.span-start.focused {
-    box-shadow: inset 0 2px 0 #e8cfcb, inset 0 -2px 0 #e8cfcb, inset 2px 0 0 #e8cfcb, 0 2px 8px rgba(232, 207, 203, 0.6) !important;
+    box-shadow: inset 0 2px 0 #d7c9c9, inset 0 -2px 0 #d7c9c9, inset 2px 0 0 #d7c9c9, 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
     transform: none;
     z-index: 12; /* Higher than middle to let text flow */
 }
 
 .schedule-item.span-middle.focused {
-    box-shadow: inset 0 2px 0 #e8cfcb, inset 0 -2px 0 #e8cfcb, 0 2px 8px rgba(232, 207, 203, 0.6) !important;
+    box-shadow: inset 0 2px 0 #d7c9c9, inset 0 -2px 0 #d7c9c9, 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
     transform: none;
     z-index: 11; /* Higher than end */
 }
 
 .schedule-item.span-end.focused {
-    box-shadow: inset 0 2px 0 #e8cfcb, inset 0 -2px 0 #e8cfcb, inset -2px 0 0 #e8cfcb, 0 2px 8px rgba(232, 207, 203, 0.6) !important;
+    box-shadow: inset 0 2px 0 #d7c9c9, inset 0 -2px 0 #d7c9c9, inset -2px 0 0 #d7c9c9, 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
     transform: none;
     z-index: 10;
 }
@@ -1307,10 +1308,13 @@ body {
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
     outline: none !important;
-    border-color: #e8cfcb !important;
-    box-shadow: 0 0 0 2px #e8cfcb !important;
+    border-color: #d7c9c9 !important;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
 }
 
 .custom-select-wrapper {
@@ -1667,8 +1671,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 .ai-chat-input-area input:focus {
-    border-color: #d7c9c9;
-    outline: 1px solid #d7c9c9;
+    border-color: #d7c9c9 !important;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
+    outline: none !important;
 }
 
 /* 自訂 DatePicker 觸發按鈕與彈窗 */
