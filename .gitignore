@@ -1,0 +1,6 @@
+.DS_Store
+*.pyc
+__pycache__/
+*.log
+enlarge_font_sizes.py
+update_icons.py

@@ -1,0 +1,28 @@
+{
+  "name": "Skaters 運動排程",
+  "short_name": "Skaters",
+  "description": "精美莫蘭迪風格個人運動、課程與購物紀錄 Web App",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7edeb",
+  "theme_color": "#f7edeb",
+  "icons": [
+    {
+      "src": "favicon-64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "Skater icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

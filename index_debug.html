@@ -1,0 +1,3880 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Ê∏¨Ë©¶?§ÈåØ?®Ô??îÊà™‰∏¶È°ØÁ§?JavaScript ?ØË™§ -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            var errorDiv = document.createElement('div');
+            errorDiv.style.position = 'fixed';
+            errorDiv.style.top = '0';
+            errorDiv.style.left = '0';
+            errorDiv.style.width = '100%';
+            errorDiv.style.backgroundColor = 'rgba(255, 0, 0, 0.9)';
+            errorDiv.style.color = 'white';
+            errorDiv.style.padding = '20px';
+            errorDiv.style.zIndex = '999999';
+            errorDiv.style.fontSize = '14px';
+            errorDiv.style.whiteSpace = 'pre-wrap';
+            errorDiv.innerHTML = '<h3>?ºÁèæ JavaScript ?ØË™§ÔºÅË?Â∞áÊ≠§?´Èù¢?™Â?Ôº?/h3>' + 
+                '<p><b>?ØË™§Ë®äÊÅØ:</b> ' + message + '</p>' +
+                '<p><b>‰æÜÊ?Ê™îÊ?:</b> ' + source + ' (Á¨?' + lineno + ' Ë°?</p>' +
+                '<p><b>Ë©≥Á¥∞ËøΩËπ§:</b><br/>' + (error ? error.stack : '') + '</p>';
+            if (document.body) {
+                document.body.appendChild(errorDiv);
+            } else {
+                window.onload = function() { document.body.appendChild(errorDiv); };
+            }
+        };
+    </script>
+    <title>?ãÂ??íÁ?</title>
+    <!-- ‰ΩøÁî® Google Fonts: Noto Serif TC (Â∞çÊ? Hoefler Text ?§ÂÖ∏Ë•ØÁ??éÈ?È¢®Ê†º) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ?ÇÈÉ®Â∞éË¶Ω??-->
+    <header class="navbar">
+        <!-- ‰∏≠È??à‰ªΩ/Âπ¥‰ªΩ?∏ÊµÆÊ©¢Â?ÊØõÁéª?ÉÈÅ∏??-->
+        <div id="top-month-dock" class="top-month-dock">
+            <button id="prev-month-btn" class="icon-btn" title="‰∏ä‰???>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div id="month-title-wrapper" class="month-title-wrapper" title="ÈªûÊ??áÊ?Âπ¥Ê?/?àÊ?">
+                <h1 id="month-title">September 2026</h1>
+            </div>
+            <button id="next-month-btn" class="icon-btn" title="‰∏ã‰???>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+
+        <!-- ?≥ÂÅ¥?úÂ??áÊñ∞Â¢ûÁç®Á´ãÊá∏ÊµÆÊ©¢?ìÊ??ªÁ??∏ÂñÆ -->
+        <div id="top-action-dock" class="top-action-dock">
+            <button id="search-btn" class="icon-btn" title="?úÂ?">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+            <button id="top-add-btn" class="icon-btn" title="?∞Â?">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- ?àÊ?Ë¶ñÂ?‰∏ªÂÆπ??-->
+    <div id="calendar-view-container" class="page-view-container">
+        <!-- Á≥ªÁµ±?êÈ? -->
+        <div id="system-alert-container" style="padding: 12px 16px; margin: 10px 16px; background-color: #fcebd2; color: #826233; border-radius: 8px; font-size: 13px; font-weight: 500; display: none;">
+        </div>
+        <!-- ?üÊ???-->
+        <div id="weekdays-bar" class="weekdays">
+            <div>Mon.</div>
+            <div>Tue.</div>
+            <div>Wed.</div>
+            <div>Thu.</div>
+            <div>Fri.</div>
+            <div>Sat.</div>
+            <div>Sun.</div>
+        </div>
+
+        <!-- ?àÊ?Á∂≤Ê†º -->
+        <main id="calendar-grid" class="calendar-grid">
+            <!-- JS ?ÉÂú®?ôË£°?ïÊ??¢Á??•Ê? -->
+        </main>
+
+        <!-- Âπ¥Ê?Ë¶ñÂ?Á∂≤Ê†º (?êË®≠?±È?) -->
+        <div id="year-calendar-view" class="year-calendar-view" style="display: none;">
+            <!-- JS ?ÉÂú®?ôË£°?ïÊ??¢Á? 12 ?ãÊ?‰ªΩËø∑‰Ω†Ê???-->
+        </div>
+    </div>
+
+    <!-- ?ï‰?Á∑¥Á?ÂΩ±Á?Ë≥áÊ?Â∫?View -->
+    <div id="database-view" class="page-view-container video-db-container" style="display: none;">
+        <div class="video-db-header">
+            <div class="video-db-title-area">
+                <h2 class="video-db-title">?ï‰?Á∑¥Á?ÂΩ±Á?Â∫?/h2>
+                <span class="video-db-subtitle">?ï‰??ÄË°ìÊ?Ëß??Á∑¥Á?ÂΩ±Á??∂Ë?</span>
+            </div>
+            <button id="add-video-btn" class="btn btn-primary btn-sm" style="border-radius: 9999px; padding: 6px 16px; display: flex; align-items: center; gap: 4px; border: none; background-color: #715a57; color: #ffffff; cursor: pointer; font-size: 13px; font-weight: 500;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                ?∞Â?ÂΩ±Á?
+            </button>
+        </div>
+
+        <!-- ?úÂ??áÂ?È°ûÊ??ïÂ? -->
+        <div class="video-filter-bar">
+            <div class="video-search-box">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#715a57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="video-search-input" placeholder="?úÂ?ÂΩ±Á??çÁ®±?ñÈ??µÂ?...">
+            </div>
+            
+            <div class="video-category-pills" id="video-category-pills">
+                <button class="video-cat-pill active" data-category="ALL">?®ÈÉ®</button>
+                <button class="video-cat-pill" data-category="Ë∑≥Ë?">Ë∑≥Ë?</button>
+                <button class="video-cat-pill" data-category="?ãË?">?ãË?</button>
+                <button class="video-cat-pill" data-category="Ê≠•Ê?">Ê≠•Ê?</button>
+                <button class="video-cat-pill" data-category="ÊªëË??∫Á?">ÊªëË??∫Á?</button>
+                <button class="video-cat-pill" data-category="?∏‰?Ë®ìÁ∑¥">?∏‰?Ë®ìÁ∑¥</button>
+                <button class="video-cat-pill" data-category="?∂‰?">?∂‰?</button>
+            </div>
+        </div>
+
+        <!-- ÂΩ±Á?Á∂≤Ê†º Cards Grid -->
+        <div id="video-grid" class="video-grid"></div>
+    </div>
+
+    <!-- Áµ±Ë?Ë¶ñÂ? (Stats Dashboard View) -->
+    <div id="stats-view" class="page-view-container stats-dashboard" style="display: none;">
+        <div class="dashboard-header">
+            <div class="dashboard-month-selector">
+                <button id="stats-prev-month" class="icon-btn" title="‰∏äÂÄãÊ?">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span id="stats-month-label" class="stats-month-label">September 2026</span>
+                <button id="stats-next-month" class="icon-btn" title="‰∏ãÂÄãÊ?">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+
+            <div class="custom-select-wrapper" id="stats-mode-wrapper" style="width: auto;">
+                <input type="hidden" id="stats-mode-select" value="ÊØèÊ?Á∏ΩË¶Ω">
+                <div class="stats-mode-trigger" id="stats-mode-trigger" tabindex="0">
+                    <span id="stats-mode-display">ÊØèÊ?Á∏ΩË¶Ω</span>
+                    <svg class="custom-select-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="custom-select-menu stats-mode-menu" id="stats-mode-menu">
+                    <div class="custom-select-option selected" data-value="ÊØèÊ?Á∏ΩË¶Ω">ÊØèÊ?Á∏ΩË¶Ω</div>
+                    <div class="custom-select-option" data-value="Âπ¥Â∫¶Á∏ΩË¶Ω">Âπ¥Â∫¶Á∏ΩË¶Ω</div>
+                    <div class="custom-select-option" data-value="?®Ê??ìÁ∏ΩË¶?>?®Ê??ìÁ∏ΩË¶?/div>
+                    <div class="custom-select-option" data-value="?ãÈä∑Á∏ΩË¶Ω">?ãÈä∑Á∏ΩË¶Ω</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÊØèÊ?Á∏ΩË¶Ω?ßÂÆπ (Monthly Overview Content) -->
+        <div id="stats-monthly-content" style="display: block;">
+            <!-- 3Â§ßÊ†∏ÂøÉÊ?Ê®ôÂç°??(Metric Cards) -->
+            <div class="metric-cards-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">?∂Ê??ÇÊï∏ / Á∑¥Á?</span>
+                    </div>
+                    <div id="metric-sessions" class="metric-value">0 ??/div>
+                    <div id="metric-sessions-sub" class="metric-subtext">?òË™≤ 0 | ÁßÅË™≤ 0 | Á∑¥Á? 0</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Á∏ΩÈ??ïÊ???/span>
+                    </div>
+                    <div id="metric-hours" class="metric-value">0 Â∞èÊ?</div>
+                    <div id="metric-hours-sub" class="metric-subtext">Âπ≥Â?ÊØèÂ? 0 Â∞èÊ?</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Á∏ΩÈ??ïËä±Ë≤?/span>
+                    </div>
+                    <div id="metric-cost" class="metric-value">NT$ 0</div>
+                    <div id="metric-cost-sub" class="metric-subtext">?ÖÂê´Ë™≤Á??áË™≤?°Ë≤ª??/div>
+                </div>
+            </div>
+
+            <!-- ?∏Ê??ñË°®?Ä??(Charts Container) -->
+            <div class="charts-grid" style="margin-top: 18px;">
+                <!-- ?àÂ∫¶Ë∂®Âã¢?ñË°®?°Á? -->
+                <div class="chart-card">
+                    <h3 class="chart-title">Ëø?6 ?ãÊ??ãÂ??ÇÊï∏?áÊ??∏Ë∂®??/h3>
+                    <div id="monthly-bar-chart" class="bar-chart-container"></div>
+                </div>
+
+                <!-- ?ãÂ?È°ûÂ?‰ΩîÊ??ìÁí∞?ñÂç°??-->
+                <div class="chart-card">
+                    <h3 class="chart-title">?ãÂ?È°ûÂ??ÜÂ?‰ΩîÊ?</h3>
+                    <div id="type-donut-chart" class="donut-chart-container"></div>
+                </div>
+            </div>
+
+            <!-- ?¨Ê?Ë©≥Á¥∞?óË°®?°Á? -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">?¨Ê?Ë™≤Á??áÁ∑¥ÁøíÁ???/h3>
+                <div id="stats-log-list" class="stats-log-list"></div>
+            </div>
+        </div>
+
+        <!-- Ê®°Â??áÊ??ôÁôΩ?êÁ??Ä (Other Overview Modes Blank Content) -->
+        <div id="stats-placeholder-content" style="display: none; min-height: 250px; border-radius: 16px; background-color: var(--bg-white); border: 1px dashed rgba(113, 90, 87, 0.2); align-items: center; justify-content: center; color: var(--text-secondary); font-size: 14px; margin-top: 12px; padding: 40px 20px; text-align: center;">
+        </div>
+
+        <!-- ?ãÈä∑Á∏ΩË¶Ω?ßÂÆπ (Expense Overview Content) -->
+        <div id="stats-expense-content" style="display: none; flex-direction: column; gap: 18px; width: 100%;">
+            <!-- ?ãÈä∑?∏Â??áÊ??°Á? -->
+            <div class="metric-cards-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Á¥ØÁ?Ë≥ºË™≤Á∏ΩËä±Ë≤?/span>
+                    </div>
+                    <div id="expense-total-cost" class="metric-value">NT$ 0</div>
+                    <div id="expense-total-cost-sub" class="metric-subtext">?Ä?âË™≤?°Ë??ÆÊ¨°?•Â†¥Ë≤ªÁî®</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Ë≥ºË™≤Á∏ΩÁ???/span>
+                    </div>
+                    <div id="expense-total-count" class="metric-value">0 Á≠?/div>
+                    <div id="expense-total-count-sub" class="metric-subtext">?ÖÂê´?àÂç°?ÅÂ??°Ë??ÆÊ¨°??/div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">‰ΩøÁî®‰∏?/ ?âÊ?Ë™≤Âç°</span>
+                    </div>
+                    <div id="expense-active-cards" class="metric-value">0 Âº?/div>
+                    <div id="expense-active-cards-sub" class="metric-subtext">Â∞öÊú™?∞Ê?‰∏îÂ??âÈ?Â∫?/div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Á¥ØÁ?Ë≥ºÁâ©Á∏ΩËä±Ë≤?/span>
+                    </div>
+                    <div id="expense-shopping-total-cost" class="metric-value">NT$ 0</div>
+                    <div id="expense-shopping-total-sub" class="metric-subtext">?ÖÂê´?∞Â??ã„ÄÅË≠∑?∑„ÄÅÈ?‰ª∂Ë?Ë®ìÁ∑¥?®ÂÖ∑</div>
+                </div>
+            </div>
+
+            <!-- Ë≥ºË™≤Á¥Ä?ÑÂ?Ë°®Âç°??-->
+            <div class="recent-list-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <h3 class="chart-title">Ë≥ºË™≤?áÂñÆÊ¨°ÂÖ•?¥Á???/h3>
+                    <span style="font-size: 12px; color: var(--text-secondary);">ÈªûÊ??ÖÁõÆ?ØÁ∑®ËºØË™≤??/span>
+                </div>
+                <div id="expense-purchase-list" class="stats-log-list" style="max-height: 360px;"></div>
+            </div>
+
+            <!-- Ë≥ºÁâ©Á¥Ä?ÑÂ?Ë°®Âç°??-->
+            <div class="recent-list-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <h3 class="chart-title">Ë≥ºÁâ©Á¥Ä??/h3>
+                    <span style="font-size: 12px; color: var(--text-secondary);">ÈªûÊ??ÖÁõÆ?ØÁ∑®ËºØË≥º??/span>
+                </div>
+                <div id="expense-shopping-list" class="stats-log-list" style="max-height: 360px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ë®≠Â?Á©∫ÁôΩ?ÅÈù¢ View -->
+    <div id="settings-view" class="page-view-container blank-view" style="display: none;"></div>
+
+    <!-- ?≥‰?Ëß?AI ?©Á??âÈ? -->
+    <button id="ai-btn" class="fab">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#9c9c9c">
+            <!-- Â§ßÊ???-->
+            <path d="M10 4 L12 10 L18 12 L12 14 L10 20 L8 14 L2 12 L8 10 Z"></path>
+            <!-- ‰∏≠Ê???-->
+            <path d="M19 1 L20 4 L23 5 L20 6 L19 9 L18 6 L15 5 L18 4 Z"></path>
+            <!-- Â∞èÊ???-->
+            <path d="M18 16 L18.5 17.5 L20 18 L18.5 18.5 L18 20 L17.5 18.5 L16 18 L17.5 17.5 Z"></path>
+        </svg>
+    </button>
+
+    <!-- ?´Èù¢‰∏ãÊñπ?∏ÊµÆÊ©¢Â??∏ÂñÆ (Floating Oval Bottom Dock - ?ÖÂ?Á§? -->
+    <nav id="bottom-nav-dock" class="bottom-nav-dock">
+        <button class="bottom-nav-item active" data-tab="calendar" title="?àÊ?">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        </button>
+        <button class="bottom-nav-item" data-tab="database" title="Ë≥áÊ?Â∫?>
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                <path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+            </svg>
+        </button>
+        <button class="bottom-nav-item" data-tab="stats" title="Áµ±Ë?">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+        </button>
+        <button class="bottom-nav-item" data-tab="settings" title="Ë®≠Â?">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- ?∞Â??∏È?‰∏ãÊ??∏ÂñÆ -->
+    <div id="add-menu-overlay" class="sidebar-overlay"></div>
+    <div id="add-menu" class="add-menu">
+        <div class="add-menu-item" id="add-card-opt">Ë™≤Âç°</div>
+        <div class="add-menu-item" id="add-schedule-opt">?íÁ?</div>
+        <div class="add-menu-item" id="add-shopping-opt">Ë≥ºÁâ©</div>
+    </div>
+
+    <!-- ?∞Â??íÁ??ÑÂ??∫Ë?Á™?(Modal) -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">?∞Â??íÁ?</h2>
+            <form id="schedule-form">
+                <div class="form-group">
+                    <label>?•Ê??áÊ??ìË®≠ÂÆ?/label>
+                    <div class="custom-date-trigger" id="schedule-date-trigger" tabindex="0">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span id="schedule-date-display">?∏Ê??•Ê??áÊ???/span>
+                        <input type="hidden" id="schedule-date" name="schedule-date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>È°ûÂ?</label>
+                    <div class="type-tags">
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="?±Ê??òË™≤" required checked>
+                            <span style="background-color: #faf7ea; color: #715a57;">?±Ê??òË™≤</span>
+                        </label>
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="?±Ê?ÁßÅË™≤">
+                            <span style="background-color: #4c1130; color: #efdede;">?±Ê?ÁßÅË™≤</span>
+                        </label>
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="?±Ê?Á∑¥Á?">
+                            <span style="background-color: #f4cccc; color: #4c1130;">?±Ê?Á∑¥Á?</span>
+                        </label>
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="?≠Ëïæ">
+                            <span style="background-color: #ead1dc; color: #836a77;">?≠Ëïæ</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="linked-card-group">
+                    <label>??äµË™≤Âç°</label>
+                    <div class="custom-select-wrapper" id="linked-card-wrapper">
+                        <input type="hidden" id="linked-card-select" value="">
+                        <div class="custom-select-trigger" id="linked-card-trigger" tabindex="0">
+                            <span id="linked-card-display">(???ÆÊ¨°‰ªòË≤ª)</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="linked-card-menu"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schedule-note">?ôË®ª (?∏Â°´)</label>
+                    <textarea id="schedule-note" rows="5"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">?™Èô§</button>
+                    <button type="button" id="cancel-btn" class="btn btn-secondary">?ñÊ?</button>
+                    <button type="submit" class="btn btn-primary">?≤Â?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ?∞Â?Ë™≤Âç°?ÑÂ??∫Ë?Á™?(Card Modal) -->
+    <div id="card-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="card-modal-title">?∞Â?Ë™≤Âç°</h2>
+            <form id="card-form">
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label>?ãÂ??•Ê?</label>
+                        <div class="custom-date-trigger" id="card-start-date-trigger" tabindex="0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span id="card-start-date-display">?ãÂ??•Ê?</span>
+                            <input type="hidden" id="card-start-date" required>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>?∞Ê??•Ê?</label>
+                        <div class="custom-date-trigger" id="card-end-date-trigger" tabindex="0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span id="card-end-date-display">?∞Ê??•Ê?</span>
+                            <input type="hidden" id="card-end-date" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Ë™≤Âç°È°ûÂ?</label>
+                    <div class="custom-select-wrapper" id="card-type-wrapper">
+                        <input type="hidden" id="card-type-select" name="card-type" value="?àÂç°" required>
+                        <div class="custom-select-trigger" id="card-type-trigger" tabindex="0">
+                            <span id="card-type-display">?àÂç°</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="card-type-menu">
+                            <div class="custom-select-option selected" data-value="?àÂç°">?àÂç°</div>
+                            <div class="custom-select-option" data-value="?ÆÊ¨°?•Â†¥">?ÆÊ¨°?•Â†¥</div>
+                            <div class="custom-select-option" data-value="?òÈ?Ë™≤Âç°(Âπ?">?òÈ?Ë™≤Âç°(Âπ?</div>
+                            <div class="custom-select-option" data-value="?òÈ?Ë™≤Âç°(??">?òÈ?Ë™≤Âç°(??</div>
+                            <div class="custom-select-option" data-value="ÁßÅ‰∫∫Ë™≤Âç°(Âπ?">ÁßÅ‰∫∫Ë™≤Âç°(Âπ?</div>
+                            <div class="custom-select-option" data-value="ÁßÅ‰∫∫Ë™≤Âç°(??">ÁßÅ‰∫∫Ë™≤Âç°(??</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="coach-level-group" style="display: none;">
+                    <label>?ôÁ∑¥?éÁ?</label>
+                    <div class="custom-select-wrapper" id="coach-level-wrapper">
+                        <input type="hidden" id="coach-level-select" name="coach-level" value="‰∏Ä??>
+                        <div class="custom-select-trigger" id="coach-level-trigger" tabindex="0">
+                            <span id="coach-level-display">‰∏Ä??/span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="coach-level-menu">
+                            <div class="custom-select-option selected" data-value="‰∏Ä??>‰∏Ä??/div>
+                            <div class="custom-select-option" data-value="È´òÁ?">È´òÁ?</div>
+                            <div class="custom-select-option" data-value="?ãÂÆ∂Á¥?>?ãÂÆ∂Á¥?/div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>?πÊ†º</label>
+                    <div class="custom-select-wrapper" id="card-price-wrapper">
+                        <input type="hidden" id="card-price-select" name="card-price" value="" required>
+                        <div class="custom-select-trigger" id="card-price-trigger" tabindex="0">
+                            <span id="card-price-display">Ë´ãÈÅ∏?áÂÉπ??/span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="card-price-menu">
+                            <!-- ??JS ?ïÊ??¢Á??πÊ†º?∏È? -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="card-note">?ôË®ª (?∏Â°´)</label>
+                    <textarea id="card-note" rows="3"></textarea>
+                </div>
+                <div class="form-group" id="card-usage-history-group" style="display: none;">
+                    <label>‰ΩøÁî®Á¥Ä??/label>
+                    <div id="card-usage-history-list" class="card-usage-history-list"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="card-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">?™Èô§</button>
+                    <button type="button" id="card-cancel-btn" class="btn btn-secondary">?ñÊ?</button>
+                    <button type="submit" class="btn btn-primary">?≤Â?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ?∞Â?Ë≥ºÁâ©?ÑÂ??∫Ë?Á™?(Shopping Modal) -->
+    <div id="shopping-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="shopping-modal-title">?∞Â?Ë≥ºÁâ©</h2>
+            <form id="shopping-form">
+                <div class="form-group">
+                    <label for="shopping-name">?çÁ®±</label>
+                    <input type="text" id="shopping-name" required placeholder="‰æãÂ?ÔºöEdea ?∞Â???>
+                </div>
+
+                <div class="form-group">
+                    <label>?•Ê?</label>
+                    <div class="custom-date-trigger" id="shopping-date-trigger" tabindex="0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span id="shopping-date-display">?∏Ê??•Ê?</span>
+                        <input type="hidden" id="shopping-date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>È°ûÂ?</label>
+                    <div class="custom-select-wrapper" id="shopping-type-wrapper">
+                        <input type="hidden" id="shopping-type-select" name="shopping-type" value="?∞Â??? required>
+                        <div class="custom-select-trigger" id="shopping-type-trigger" tabindex="0">
+                            <span id="shopping-type-display">?∞Â???/span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="shopping-type-menu">
+                            <div class="custom-select-option selected" data-value="?∞Â???>?∞Â???/div>
+                            <div class="custom-select-option" data-value="Ë≠∑ÂÖ∑">Ë≠∑ÂÖ∑</div>
+                            <div class="custom-select-option" data-value="?ç‰ª∂">?ç‰ª∂</div>
+                            <div class="custom-select-option" data-value="Ë®ìÁ∑¥?®ÂÖ∑">Ë®ìÁ∑¥?®ÂÖ∑</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shopping-price">?ëÈ?</label>
+                    <input type="text" id="shopping-price" required placeholder="‰æãÂ?Ôº?2000">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="shopping-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">?™Èô§</button>
+                    <button type="button" id="shopping-cancel-btn" class="btn btn-secondary">?ñÊ?</button>
+                    <button type="submit" class="btn btn-primary">?≤Â?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ?∞Â?/Á∑®ËºØÂΩ±Á??ÑÂ??∫Ë?Á™?(Video Modal) -->
+    <div id="video-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="video-modal-title">?∞Â?ÂΩ±Á?</h2>
+            <form id="video-form">
+                <div class="form-group">
+                    <label for="video-title">ÂΩ±Á?Ê®ôÈ?</label>
+                    <input type="text" id="video-title" required placeholder="‰æãÂ?ÔºöAxel 1A Ë∑≥Ë?Ëµ∑Ë∑≥Á¥∞Á??ÜËß£">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-url">ÂΩ±Á?Á∂≤Â? (URL)</label>
+                    <input type="url" id="video-url" required placeholder="?ØÊè¥ YouTube, Shorts, IG Reels, Â∞èÁ??∏Á????">
+                </div>
+
+                <div class="form-group">
+                    <label>?ï‰??ÜÈ?</label>
+                    <div class="custom-select-wrapper" id="video-category-wrapper">
+                        <input type="hidden" id="video-category-select" name="video-category" value="Ë∑≥Ë?" required>
+                        <div class="custom-select-trigger" id="video-category-trigger" tabindex="0">
+                            <span id="video-category-display">Ë∑≥Ë?</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="video-category-menu">
+                            <div class="custom-select-option selected" data-value="Ë∑≥Ë?">Ë∑≥Ë?</div>
+                            <div class="custom-select-option" data-value="?ãË?">?ãË?</div>
+                            <div class="custom-select-option" data-value="Ê≠•Ê?">Ê≠•Ê?</div>
+                            <div class="custom-select-option" data-value="ÊªëË??∫Á?">ÊªëË??∫Á?</div>
+                            <div class="custom-select-option" data-value="?∏‰?Ë®ìÁ∑¥">?∏‰?Ë®ìÁ∑¥</div>
+                            <div class="custom-select-option" data-value="?∂‰?">?∂‰?</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-cover">?™Ë?Â∞ÅÈù¢?ñÁ?Á∂≤Â? (?∏Â°´)</label>
+                    <input type="url" id="video-cover" placeholder="?©Áî®??IG / Â∞èÁ??∏Ê?ÂÆ¢Ë£ΩÂ∞ÅÈù¢ (?ôÁ©∫?áËá™?ïÁ???">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-note">Á∑¥Á??ôË®ª (?∏Â°´)</label>
+                    <textarea id="video-note" rows="3" placeholder="Ë®òÈ?Ëµ∑Ë∑≥Èªû„ÄÅÈ?ÂøÉÊéß?∂Á?Á∑¥Á?Ë¶ÅÈ?..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="video-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">?™Èô§</button>
+                    <button type="button" id="video-cancel-btn" class="btn btn-secondary">?ñÊ?</button>
+                    <button type="submit" class="btn btn-primary">?≤Â?</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ?úÂ?Ë¶ñÁ? -->
+    <div id="search-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2>?úÂ??íÁ??áË™≤??/h2>
+            <div class="form-group" style="display: flex; gap: 8px;">
+                <input type="text" id="search-input" placeholder="Ëº∏ÂÖ•?úÈçµÂ≠?.." style="flex: 1;">
+            </div>
+            <div id="search-results" style="max-height: 200px; overflow-y: auto; margin-top: 12px;">
+                <!-- ?úÂ?ÁµêÊ?Â∞áÈ°ØÁ§∫Âú®?ôË£° -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="close-search-btn" class="btn btn-secondary">?úÈ?</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI ?äÂ§©Ë¶ñÁ? -->
+    <div id="ai-chat-window" class="ai-chat-window">
+        <div class="ai-chat-header">
+            <h3>Gemini AI ?©Á?</h3>
+            <button id="close-ai-chat" class="icon-btn" style="padding: 4px;">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div id="ai-chat-messages" class="ai-chat-messages">
+            <!-- Â∞çË©±?ßÂÆπ?ÉÈ°ØÁ§∫Âú®?ôË£° -->
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="ai-chat-input" placeholder="Ë´ãËº∏?•Ë???..">
+            <button id="ai-send-btn" class="btn btn-primary" style="padding: 8px 12px;">?ÅÂá∫</button>
+        </div>
+    </div>
+
+    <!-- ?™Ë£Ω DatePicker ÂΩàÁ? Modal (?ÖÂê´?ãÂ??áÁ??üÊ??ìÈÅ∏?? -->
+    <div id="custom-datepicker-overlay" class="modal-overlay" style="z-index: 3000;">
+        <div class="custom-datepicker-modal">
+            <div class="dp-header">
+                <button type="button" id="dp-prev-month" class="icon-btn" title="‰∏äÂÄãÊ?">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div id="dp-month-year-title" class="dp-title">2026 Âπ?9 ??/div>
+                <button type="button" id="dp-next-month" class="icon-btn" title="‰∏ãÂÄãÊ?">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="dp-weekdays">
+                <div>‰∏Ä</div><div>‰∫?/div><div>‰∏?/div><div>??/div><div>‰∫?/div><div>??/div><div>??/div>
+            </div>
+            <div id="dp-days-grid" class="dp-days-grid">
+                <!-- ?•Ê?Â∞áÁî± JS ?ïÊ??¢Á? -->
+            </div>
+            
+            <!-- ?ÇÈ??∏Ê??ÄÂ°?(?ØÊè¥?¥Êé•?µÂÖ•Á∑®ËºØ?á‰??âÈÅ∏?áÔ??ÇÈï∑?∫Ê∑∫?∞Ëâ≤Â≠óÈ?) -->
+            <div id="dp-time-container" class="dp-time-container" style="flex-direction: column; gap: 8px; border-top: 1px solid #f0e6e4; padding-top: 10px; margin-top: 6px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div class="dp-time-label">?ãÂ??ÇÈ?Ôº?/div>
+                    <div class="dp-time-inputs">
+                        <div class="custom-time-select-wrapper">
+                            <div class="custom-time-input-group">
+                                <input type="text" id="dp-start-time-input" class="custom-time-editable-input" value="17:00" placeholder="17:00" maxlength="5">
+                                <button type="button" id="dp-start-time-dropdown-btn" class="custom-time-btn" title="?∏Ê??ªÂ∫¶?ÇÈ?" tabindex="-1">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                            </div>
+                            <div id="dp-start-time-dropdown" class="custom-time-dropdown"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div class="dp-time-label">ÁµêÊ??ÇÈ?Ôº?/div>
+                    <div class="dp-time-inputs">
+                        <div class="custom-time-select-wrapper">
+                            <div class="custom-time-input-group">
+                                <input type="text" id="dp-end-time-input" class="custom-time-editable-input" value="18:30" placeholder="18:30" maxlength="5">
+                                <span id="dp-end-time-dur-badge" class="duration-text" style="color: #b5a4a2; font-size: 12px; margin-right: 4px; white-space: nowrap;">1.5Â∞èÊ?</span>
+                                <button type="button" id="dp-end-time-dropdown-btn" class="custom-time-btn" title="?∏Ê??ªÂ∫¶?ÇÈ?" tabindex="-1">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                            </div>
+                            <div id="dp-end-time-dropdown" class="custom-time-dropdown"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dp-actions">
+                <button type="button" id="dp-today-btn" class="btn btn-secondary" style="margin-right: auto; padding: 6px 12px; font-size: 13px;">‰ªäÂ§©</button>
+                <button type="button" id="dp-cancel-btn" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">?ñÊ?</button>
+                <button type="button" id="dp-confirm-btn" class="btn btn-primary" style="padding: 6px 14px; font-size: 13px;">Á¢∫Â?</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+function startApp() {
+    // ---- ÂÆâÂÖ®?ßË?Ë≥áÊ?ËºîÂä©?ΩÂ? ----
+    function loadSchedules() {
+        try {
+            const raw = localStorage.getItem('schedules');
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.error('Failed to parse schedules from localStorage:', e);
+            return [];
+        }
+    }
+
+    function saveSchedules(data) {
+        try {
+            localStorage.setItem('schedules', JSON.stringify(data));
+        } catch (e) {
+            console.error('Failed to save schedules to localStorage:', e);
+        }
+    }
+
+    function generateUniqueId() {
+        return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+    }
+
+    function safeGetRadioValue(name) {
+        const select = document.getElementById(`${name}-select`);
+        if (select) return select.value;
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        return checked ? checked.value : '';
+    }
+
+    function safeSetRadioValue(name, value) {
+        if (!value) return;
+        const select = document.getElementById(`${name}-select`);
+        if (select) {
+            select.value = value;
+            const displaySpan = document.getElementById(`${name}-display`);
+            if (displaySpan) displaySpan.textContent = value;
+            const menuEl = document.getElementById(`${name}-menu`);
+            if (menuEl) {
+                menuEl.querySelectorAll('.custom-select-option').forEach(opt => {
+                    if (opt.dataset.value === value) opt.classList.add('selected');
+                    else opt.classList.remove('selected');
+                });
+            }
+            return;
+        }
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        radios.forEach(radio => {
+            if (radio.value === value) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    // ---- ?•Ê??ãÁ?ËºîÂä©?ΩÂ? ----
+    function parseLocalDate(dateStr) {
+        if (!dateStr || typeof dateStr !== 'string') return new Date();
+        const clean = dateStr.trim().split('T')[0].split(' ')[0].replace(/-/g, '/');
+        const parts = clean.split('/');
+        if (parts.length < 3) return new Date();
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+
+    function formatLocalDate(dateObj) {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}/${m}/${d}`;
+    }
+
+    function normalizeDateStr(dateStr) {
+        if (!dateStr || typeof dateStr !== 'string') return '';
+        let clean = dateStr.trim().split('T')[0].split(' ')[0].replace(/-/g, '/');
+        const parts = clean.split('/');
+        if (parts.length < 3) return clean;
+        const y = parts[0];
+        const m = String(parseInt(parts[1], 10)).padStart(2, '0');
+        const d = String(parseInt(parts[2], 10)).padStart(2, '0');
+        return `${y}/${m}/${d}`;
+    }
+
+    function getScheduleMatchOnDate(s, targetDateStr) {
+        if (!s) return { matched: false };
+        const normEnd = normalizeDateStr(s.date);
+        
+        if (normEnd === targetDateStr) {
+            return { matched: true, isStart: true, isEnd: true };
+        }
+        return { matched: false };
+    }
+
+    function addMonthsSafely(startDateStr, monthsToAdd) {
+        const startDate = parseLocalDate(startDateStr);
+        const originalDay = startDate.getDate();
+        
+        const totalMonths = startDate.getFullYear() * 12 + startDate.getMonth() + monthsToAdd;
+        const targetYear = Math.floor(totalMonths / 12);
+        let targetMonth = totalMonths % 12;
+        if (targetMonth < 0) targetMonth += 12;
+        
+        const targetDate = new Date(targetYear, targetMonth, 1);
+        const maxDaysInTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+        
+        targetDate.setDate(Math.min(originalDay, maxDaysInTargetMonth));
+        return formatLocalDate(targetDate);
+    }
+
+    function isHolidayDate(dateInput) {
+        let d;
+        if (dateInput instanceof Date) {
+            d = dateInput;
+        } else if (typeof dateInput === 'string' && dateInput.trim()) {
+            d = parseLocalDate(dateInput);
+        } else {
+            d = new Date();
+        }
+
+        const month = d.getMonth() + 1; // 1-12
+        const dayOfWeek = d.getDay(); // 0 (Sun) - 6 (Sat)
+
+        // ÊØèÂπ¥ 7/1 ~ 8/31 ?∫Â???        if (month === 7 || month === 8) {
+            return true;
+        }
+
+        // ?±ÂÖ≠(6)?áÈÄ±Êó•(0)?∫Â???        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // ---- ?™Ë£Ω DatePicker ?ßÂà∂??----
+    const CustomDatePicker = (() => {
+        const overlay = document.getElementById('custom-datepicker-overlay');
+        const titleEl = document.getElementById('dp-month-year-title');
+        const gridEl = document.getElementById('dp-days-grid');
+        const prevBtn = document.getElementById('dp-prev-month');
+        const nextBtn = document.getElementById('dp-next-month');
+        const timeContainer = document.getElementById('dp-time-container');
+        
+        const startTimeInput = document.getElementById('dp-start-time-input');
+        const startTimeDropdownBtn = document.getElementById('dp-start-time-dropdown-btn');
+        const startTimeDropdown = document.getElementById('dp-start-time-dropdown');
+        
+        const endTimeInput = document.getElementById('dp-end-time-input');
+        const endTimeDurBadge = document.getElementById('dp-end-time-dur-badge');
+        const endTimeDropdownBtn = document.getElementById('dp-end-time-dropdown-btn');
+        const endTimeDropdown = document.getElementById('dp-end-time-dropdown');
+        
+        const confirmBtn = document.getElementById('dp-confirm-btn');
+        const cancelBtn = document.getElementById('dp-cancel-btn');
+        const todayBtn = document.getElementById('dp-today-btn');
+
+        let currentViewDate = new Date();
+        let selectedDate = new Date();
+        let selectedStartTime = '17:00';
+        let selectedEndTime = '18:30';
+        let hasTimePicker = false;
+        let activeTriggerId = null;
+        let onSelectCallback = null;
+
+        function generate15MinTimes() {
+            const times = [];
+            for (let h = 0; h < 24; h++) {
+                for (let m = 0; m < 60; m += 15) {
+                    const hh = String(h).padStart(2, '0');
+                    const mm = String(m).padStart(2, '0');
+                    times.push(`${hh}:${mm}`);
+                }
+            }
+            return times;
+        }
+
+        function roundTo15Min(timeStr) {
+            if (!timeStr) return '00:00';
+            const [h, m] = timeStr.split(':').map(Number);
+            const hVal = isNaN(h) ? 0 : h;
+            const mVal = isNaN(m) ? 0 : m;
+            
+            let roundedM = Math.round(mVal / 15) * 15;
+            let finalH = hVal;
+            if (roundedM >= 60) {
+                roundedM = 0;
+                finalH = (finalH + 1) % 24;
+            }
+            return `${String(finalH).padStart(2, '0')}:${String(roundedM).padStart(2, '0')}`;
+        }
+
+        function getDurationLabel(startTimeStr, endTimeStr) {
+            if (!startTimeStr || !endTimeStr) return '';
+            const [sh, sm] = startTimeStr.split(':').map(Number);
+            const [eh, em] = endTimeStr.split(':').map(Number);
+            if (isNaN(sh) || isNaN(sm) || isNaN(eh) || isNaN(em)) return '';
+            
+            const startMin = sh * 60 + sm;
+            let endMin = eh * 60 + em;
+            
+            if (endMin <= startMin) return '';
+            
+            const diff = endMin - startMin;
+            const hours = Math.floor(diff / 60);
+            const mins = diff % 60;
+            
+            if (hours === 0) {
+                return `${mins}?ÜÈ?`;
+            } else if (mins === 0) {
+                return `${hours}Â∞èÊ?`;
+            } else if (mins === 30) {
+                return `${hours}.5Â∞èÊ?`;
+            } else {
+                return `${hours}Â∞èÊ?${mins}?Ü`;
+            }
+        }
+
+        function closeAllDropdowns() {
+            if (startTimeDropdown) startTimeDropdown.classList.remove('show');
+            if (endTimeDropdown) endTimeDropdown.classList.remove('show');
+        }
+
+        function syncUIFromInputs() {
+            if (startTimeInput) selectedStartTime = startTimeInput.value.trim() || '17:00';
+            if (endTimeInput) selectedEndTime = endTimeInput.value.trim() || '18:30';
+            
+            const durLabel = getDurationLabel(selectedStartTime, selectedEndTime);
+            if (endTimeDurBadge) {
+                endTimeDurBadge.textContent = durLabel;
+            }
+        }
+
+        function renderStartTimeDropdown() {
+            if (!startTimeDropdown) return;
+            startTimeDropdown.innerHTML = '';
+            const times = generate15MinTimes();
+            const roundedSelected = roundTo15Min(selectedStartTime);
+
+            times.forEach(t => {
+                const opt = document.createElement('div');
+                const isSelected = t === roundedSelected || t === selectedStartTime;
+                opt.className = `custom-time-option ${isSelected ? 'selected' : ''}`;
+                opt.innerHTML = `<span class="time-text">${t}</span>`;
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectedStartTime = t;
+                    if (startTimeInput) startTimeInput.value = t;
+                    closeAllDropdowns();
+
+                    const [sh, sm] = selectedStartTime.split(':').map(Number);
+                    const [eh, em] = selectedEndTime.split(':').map(Number);
+                    if (isNaN(eh) || (eh * 60 + em) <= (sh * 60 + sm)) {
+                        const defaultEndMin = (sh * 60 + sm + 90) % (24 * 60);
+                        const defH = String(Math.floor(defaultEndMin / 60)).padStart(2, '0');
+                        const defM = String(defaultEndMin % 60).padStart(2, '0');
+                        selectedEndTime = `${defH}:${defM}`;
+                        if (endTimeInput) endTimeInput.value = selectedEndTime;
+                    }
+                    syncUIFromInputs();
+                });
+                startTimeDropdown.appendChild(opt);
+            });
+        }
+
+        function renderEndTimeDropdown() {
+            if (!endTimeDropdown) return;
+            endTimeDropdown.innerHTML = '';
+            const times = generate15MinTimes();
+            const roundedSelected = roundTo15Min(selectedEndTime);
+
+            const [sh, sm] = (selectedStartTime || '17:00').split(':').map(Number);
+            const startTotalMins = (isNaN(sh) ? 0 : sh) * 60 + (isNaN(sm) ? 0 : sm);
+
+            // ?™‰??ôÊ??ºÈ?ÂßãÊ??ìÁ??ÇÈ??∏È?
+            const validEndTimes = times.filter(t => {
+                const [h, m] = t.split(':').map(Number);
+                const totalMins = h * 60 + m;
+                return totalMins > startTotalMins;
+            });
+
+            validEndTimes.forEach(t => {
+                const opt = document.createElement('div');
+                const isSelected = t === roundedSelected || t === selectedEndTime;
+                opt.className = `custom-time-option ${isSelected ? 'selected' : ''}`;
+                const durLabel = getDurationLabel(selectedStartTime, t);
+                const durSpan = durLabel ? `<span class="duration-text">${durLabel}</span>` : '';
+                opt.innerHTML = `<span class="time-text">${t}</span>${durSpan}`;
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectedEndTime = t;
+                    if (endTimeInput) endTimeInput.value = t;
+                    syncUIFromInputs();
+                    closeAllDropdowns();
+                });
+                endTimeDropdown.appendChild(opt);
+            });
+        }
+
+        // ?™Â?Â∞áÈÅ∏?ñÁ??∏È?ÁΩÆ‰∏≠ÊªæÂ?
+        function scrollToSelectedOption(dropdownEl) {
+            if (!dropdownEl) return;
+            setTimeout(() => {
+                const selectedOpt = dropdownEl.querySelector('.custom-time-option.selected');
+                if (selectedOpt) {
+                    const topPos = selectedOpt.offsetTop - (dropdownEl.clientHeight / 2) + (selectedOpt.clientHeight / 2);
+                    dropdownEl.scrollTop = Math.max(0, topPos);
+                }
+            }, 20);
+        }
+
+        // Á∂ÅÂ?Ëº∏ÂÖ•Ê°ÜÊ?Â≠óË??∏ÂñÆ?âÈ?‰∫ã‰ª∂
+        if (startTimeInput) {
+            startTimeInput.addEventListener('input', () => {
+                syncUIFromInputs();
+            });
+        }
+
+        if (endTimeInput) {
+            endTimeInput.addEventListener('input', () => {
+                syncUIFromInputs();
+            });
+        }
+
+        if (startTimeDropdownBtn) {
+            startTimeDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isShown = startTimeDropdown.classList.contains('show');
+                closeAllDropdowns();
+                if (!isShown) {
+                    renderStartTimeDropdown();
+                    startTimeDropdown.classList.add('show');
+                    scrollToSelectedOption(startTimeDropdown);
+                }
+            });
+        }
+
+        if (endTimeDropdownBtn) {
+            endTimeDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isShown = endTimeDropdown.classList.contains('show');
+                closeAllDropdowns();
+                if (!isShown) {
+                    renderEndTimeDropdown();
+                    endTimeDropdown.classList.add('show');
+                    scrollToSelectedOption(endTimeDropdown);
+                }
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.custom-time-select-wrapper')) {
+                closeAllDropdowns();
+            }
+        });
+
+        function renderGrid() {
+            if (!gridEl || !titleEl) return;
+            gridEl.innerHTML = '';
+            const year = currentViewDate.getFullYear();
+            const month = currentViewDate.getMonth();
+
+            const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            titleEl.textContent = `${monthNamesFull[month]} ${year}`;
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+
+            let firstDayIndex = firstDayOfMonth.getDay() - 1;
+            if (firstDayIndex === -1) firstDayIndex = 6;
+
+            const totalDays = lastDayOfMonth.getDate();
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayNum = prevMonthLastDay - i + 1;
+                const btn = createDayBtn(dayNum, true, year, month - 1);
+                gridEl.appendChild(btn);
+            }
+
+            for (let i = 1; i <= totalDays; i++) {
+                const btn = createDayBtn(i, false, year, month);
+                gridEl.appendChild(btn);
+            }
+
+            const totalCells = gridEl.children.length;
+            const remainingCells = 42 - totalCells;
+            for (let i = 1; i <= remainingCells; i++) {
+                const btn = createDayBtn(i, true, year, month + 1);
+                gridEl.appendChild(btn);
+            }
+        }
+
+        function createDayBtn(dayNum, isOtherMonth, year, month) {
+            const btn = document.createElement('div');
+            btn.className = `dp-day ${isOtherMonth ? 'other-month' : ''}`;
+            btn.textContent = dayNum;
+
+            const d = new Date(year, month, dayNum);
+            const realToday = new Date();
+
+            if (d.getDate() === realToday.getDate() &&
+                d.getMonth() === realToday.getMonth() &&
+                d.getFullYear() === realToday.getFullYear()) {
+                btn.classList.add('today');
+            }
+
+            if (d.getDate() === selectedDate.getDate() &&
+                d.getMonth() === selectedDate.getMonth() &&
+                d.getFullYear() === selectedDate.getFullYear()) {
+                btn.classList.add('selected');
+            }
+
+            btn.addEventListener('click', () => {
+                selectedDate = d;
+                currentViewDate = new Date(year, month, 1);
+                renderGrid();
+            });
+
+            return btn;
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', () => {
+            currentViewDate.setMonth(currentViewDate.getMonth() - 1);
+            renderGrid();
+        });
+
+        if (nextBtn) nextBtn.addEventListener('click', () => {
+            currentViewDate.setMonth(currentViewDate.getMonth() + 1);
+            renderGrid();
+        });
+
+        if (todayBtn) todayBtn.addEventListener('click', () => {
+            selectedDate = new Date();
+            currentViewDate = new Date();
+            renderGrid();
+        });
+
+        if (cancelBtn) cancelBtn.addEventListener('click', close);
+        if (overlay) overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close();
+        });
+
+        if (confirmBtn) confirmBtn.addEventListener('click', () => {
+            const dateStr = formatLocalDate(selectedDate);
+            let finalVal = dateStr;
+            let endTimeStr = '';
+
+            if (hasTimePicker) {
+                finalVal = `${dateStr}T${selectedStartTime}`;
+                endTimeStr = selectedEndTime;
+            }
+
+            if (activeTriggerId) {
+                setValue(activeTriggerId, finalVal, hasTimePicker, endTimeStr);
+            }
+
+            if (onSelectCallback) {
+                onSelectCallback(finalVal, dateStr, endTimeStr);
+            }
+
+            close();
+        });
+
+        function open({ triggerId, initialValue, initialEndTime = '', includeTime = false, onChange = null }) {
+            activeTriggerId = triggerId;
+            hasTimePicker = includeTime;
+            onSelectCallback = onChange;
+
+            if (includeTime) {
+                timeContainer.style.display = 'flex';
+            } else {
+                timeContainer.style.display = 'none';
+            }
+
+            if (initialValue) {
+                if (includeTime && initialValue.includes('T')) {
+                    const [dPart, tPart] = initialValue.split('T');
+                    selectedDate = parseLocalDate(dPart);
+                    if (tPart) {
+                        selectedStartTime = roundTo15Min(tPart);
+                    } else {
+                        selectedStartTime = '17:00';
+                    }
+                } else {
+                    selectedDate = parseLocalDate(initialValue);
+                    selectedStartTime = '17:00';
+                }
+            } else {
+                selectedDate = new Date();
+                selectedStartTime = '17:00';
+            }
+
+            if (initialEndTime) {
+                selectedEndTime = roundTo15Min(initialEndTime);
+            } else {
+                const [sh, sm] = selectedStartTime.split(':').map(Number);
+                const defaultEndMin = (sh * 60 + sm + 90) % (24 * 60);
+                const defH = String(Math.floor(defaultEndMin / 60)).padStart(2, '0');
+                const defM = String(defaultEndMin % 60).padStart(2, '0');
+                selectedEndTime = `${defH}:${defM}`;
+            }
+
+            currentViewDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+
+            if (includeTime) {
+                if (startTimeInput) startTimeInput.value = selectedStartTime;
+                if (endTimeInput) endTimeInput.value = selectedEndTime;
+                syncUIFromInputs();
+            }
+
+            renderGrid();
+            if (overlay) overlay.classList.add('show');
+        }
+
+        function close() {
+            if (overlay) overlay.classList.remove('show');
+        }
+
+        function setValue(triggerId, valueStr, includeTime = false, endTimeStr = '') {
+            const trigger = document.getElementById(triggerId);
+            if (!trigger) return;
+            const hiddenInput = trigger.querySelector('input[type="hidden"]');
+            const displaySpan = trigger.querySelector('span');
+
+            if (!valueStr) {
+                if (hiddenInput) {
+                    hiddenInput.value = '';
+                    hiddenInput.dataset.endtime = '';
+                }
+                if (displaySpan) displaySpan.textContent = includeTime ? '?∏Ê??•Ê??áÊ??? : '?∏Ê??•Ê?';
+                return;
+            }
+
+            if (hiddenInput) {
+                hiddenInput.value = valueStr;
+                if (endTimeStr) {
+                    hiddenInput.dataset.endtime = endTimeStr;
+                }
+            }
+
+            if (displaySpan) {
+                if (includeTime && valueStr.includes('T')) {
+                    const [d, t] = valueStr.split('T');
+                    const normD = normalizeDateStr(d);
+                    const end = endTimeStr || (hiddenInput ? hiddenInput.dataset.endtime : '');
+                    displaySpan.textContent = end ? `${normD} ${t}~${end}` : `${normD} ${t}`;
+                } else {
+                    displaySpan.textContent = normalizeDateStr(valueStr);
+                }
+            }
+        }
+
+        return { open, close, setValue };
+    })();
+
+    // ---- ?®Â??Ä?ãË?Ë¶ñÂ?Ê®°Â? ----
+    let currentDate = new Date();
+    let currentViewMode = 'month'; // 'month' | 'year'
+    let currentTab = 'calendar'; // 'calendar' | 'database' | 'stats' | 'settings'
+    let schedules = loadSchedules();
+    let editingScheduleId = null;
+    let activeFocusedScheduleEl = null;
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.schedule-item')) {
+            if (activeFocusedScheduleEl) {
+                activeFocusedScheduleEl.classList.remove('focused');
+                activeFocusedScheduleEl = null;
+            }
+        }
+        if (!e.target.closest('#linked-card-wrapper')) {
+            const menuEl = document.getElementById('linked-card-menu');
+            const wrapper = document.getElementById('linked-card-wrapper');
+            if (menuEl) menuEl.classList.remove('show');
+            if (wrapper) wrapper.classList.remove('open');
+        }
+    });
+
+    // ?µÁõ§Âø´Êç∑??(Control+D Ë§áË£Ω, Delete/Backspace ?™Èô§?∂Â??öÁÑ¶?íÁ?)
+    document.addEventListener('keydown', (e) => {
+        // Ê™¢Êü•?¶È??ØÂê¶?®Ëº∏?•Ê?/?áÂ??Ä?ü‰∏≠ÔºåÂ??úÂú®Ëº∏ÂÖ•Ê°ÜÊ?Â≠óÂ?‰∏çËß∏?ºÊ?Á®ãÂø´?∑Èçµ
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') {
+            return;
+        }
+
+        // Control + D (??Cmd + D) Ë§áË£Ω?∂Â??öÁÑ¶?ÑÊ?Á®?        if ((e.ctrlKey || e.metaKey) && (e.key === 'd' || e.key === 'D')) {
+            if (activeFocusedScheduleEl) {
+                e.preventDefault(); // ?ªÊ≠¢?èË¶Ω?®È?Ë®≠Â??•Êõ∏Á±§Â?Ë©±Ê?
+                const scheduleId = activeFocusedScheduleEl.dataset.id;
+                const originalSchedule = schedules.find(s => String(s.id) === String(scheduleId));
+                if (originalSchedule) {
+                    const duplicatedSchedule = JSON.parse(JSON.stringify(originalSchedule));
+                    duplicatedSchedule.id = generateUniqueId();
+                    schedules.push(duplicatedSchedule);
+                    saveSchedules(schedules);
+                    renderView();
+
+                    setTimeout(() => {
+                        const newEl = document.querySelector(`.schedule-item[data-id="${duplicatedSchedule.id}"]`);
+                        if (newEl) {
+                            if (activeFocusedScheduleEl) {
+                                activeFocusedScheduleEl.classList.remove('focused');
+                            }
+                            activeFocusedScheduleEl = newEl;
+                            activeFocusedScheduleEl.classList.add('focused');
+                        }
+                    }, 50);
+                }
+            }
+        }
+
+        // Delete ??Backspace ?µÂà™?§Áï∂?çË??¶Á??íÁ?
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            if (activeFocusedScheduleEl) {
+                e.preventDefault();
+                const scheduleId = activeFocusedScheduleEl.dataset.id;
+                schedules = schedules.filter(s => String(s.id) !== String(scheduleId));
+                saveSchedules(schedules);
+                activeFocusedScheduleEl = null;
+                renderView();
+            }
+        }
+    });
+
+    const typeColors = {
+        '?±Ê??òË™≤': { bg: '#f3eaca', text: '#715a57', cardBg: '#faf6eb' },
+        '?±Ê?ÁßÅË™≤': { bg: '#4c1130', text: '#efdede', cardBg: '#f4e3e6' },
+        '?±Ê?Á∑¥Á?': { bg: '#eacaca', text: '#4c1130', cardBg: '#f1e1e1' },
+        '?≠Ëïæ': { bg: '#ead1dc', text: '#836a77', cardBg: '#f4e3ee' },
+        '?àÂç°': { bg: '#faf2e6', text: '#7d6752', cardBg: '#fdf8f0' },
+        '?ÆÊ¨°?•Â†¥': { bg: '#f5e6ea', text: '#7a525d', cardBg: '#faf0f3' },
+        '?òÈ?Ë™≤Âç°(Âπ?': { bg: '#f2e3ed', text: '#78546e', cardBg: '#f8edf4' },
+        '?òÈ?Ë™≤Âç°(??': { bg: '#f7ecd9', text: '#856c4d', cardBg: '#fcf5ea' },
+        'ÁßÅ‰∫∫Ë™≤Âç°(Âπ?': { bg: '#ebdce4', text: '#6e4a5d', cardBg: '#f5ebf0' },
+        'ÁßÅ‰∫∫Ë™≤Âç°(??': { bg: '#ded0d9', text: '#5c4051', cardBg: '#f0e6ed' },
+        '?∞Â???: { bg: '#e0ecf8', text: '#39587c', cardBg: '#f2f7fc' },
+        'Ë≠∑ÂÖ∑': { bg: '#e6f4ea', text: '#1b5e20', cardBg: '#f3faf5' },
+        '?ç‰ª∂': { bg: '#fff0f5', text: '#880e4f', cardBg: '#fff7fa' },
+        'Ë®ìÁ∑¥?®ÂÖ∑': { bg: '#fff3e0', text: '#e65100', cardBg: '#fff8f0' }
+    };
+
+    const CARD_RULES = {
+        '?àÂç°': { durationMonths: 3, maxPractices: Infinity, maxClasses: Infinity, infiniteGroupClass: true, isMonthly: true },
+        '2500?àÂç°': { durationMonths: 3, maxPractices: 20, maxClasses: 0, infiniteGroupClass: false, isMonthly: true },
+        '3000?àÂç°': { durationMonths: 3, maxPractices: 30, maxClasses: 0, infiniteGroupClass: false, isMonthly: true },
+        '7000?àÂç°': { durationMonths: 3, maxPractices: Infinity, maxClasses: Infinity, infiniteGroupClass: true, isMonthly: true },
+        '?òÈ?Ë™≤Âç°(Âπ?': { durationDays: 45, maxPractices: 2, maxClasses: 4, isMonthly: false },
+        '?òÈ?Ë™≤Âç°(??': { durationDays: 45, maxPractices: 2, maxClasses: 4, isMonthly: false },
+        'ÁßÅ‰∫∫Ë™≤Âç°(Âπ?': { durationDays: 45, maxPractices: 2, maxClasses: 4, isMonthly: false },
+        'ÁßÅ‰∫∫Ë™≤Âç°(??': { durationDays: 45, maxPractices: 2, maxClasses: 4, isMonthly: false }
+    };
+
+    function getCardRule(cardOrType) {
+        if (!cardOrType) return null;
+        if (typeof cardOrType === 'string') {
+            if (CARD_RULES[cardOrType]) return CARD_RULES[cardOrType];
+            if (cardOrType === '?àÂç°') {
+                return { durationMonths: 3, maxPractices: Infinity, maxClasses: Infinity, infiniteGroupClass: true, isMonthly: true };
+            }
+            return null;
+        }
+        
+        const type = cardOrType.type;
+        if (type === '?àÂç°') {
+            const p = String(cardOrType.price || '');
+            if (p.includes('2500')) {
+                return { durationMonths: 3, maxPractices: 20, maxClasses: 0, infiniteGroupClass: false, isMonthly: true };
+            } else if (p.includes('3000')) {
+                return { durationMonths: 3, maxPractices: 30, maxClasses: 0, infiniteGroupClass: false, isMonthly: true };
+            } else {
+                return { durationMonths: 3, maxPractices: Infinity, maxClasses: Infinity, infiniteGroupClass: true, isMonthly: true };
+            }
+        }
+        return CARD_RULES[type] || null;
+    }
+    const defaultTypeColor = { bg: '#e2e8f0', text: '#334155', cardBg: '#edf2f7' };
+
+    // DOM ?ÉÁ?
+    const monthTitleWrapper = document.getElementById('month-title-wrapper');
+    const monthTitle = document.getElementById('month-title');
+    const prevMonthBtn = document.getElementById('prev-month-btn');
+    const nextMonthBtn = document.getElementById('next-month-btn');
+    const weekdaysBar = document.getElementById('weekdays-bar');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const yearCalendarView = document.getElementById('year-calendar-view');
+
+    const calendarViewContainer = document.getElementById('calendar-view-container');
+    const databaseView = document.getElementById('database-view');
+    const statsView = document.getElementById('stats-view');
+    const settingsView = document.getElementById('settings-view');
+
+    const aiBtn = document.getElementById('ai-btn');
+    const modalOverlay = document.getElementById('modal-overlay');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const scheduleForm = document.getElementById('schedule-form');
+    const modalTitle = document.getElementById('modal-title');
+    const deleteBtn = document.getElementById('delete-btn');
+    
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const closeSidebarBtn = document.getElementById('close-sidebar');
+
+    const searchBtn = document.getElementById('search-btn');
+    const topAddBtn = document.getElementById('top-add-btn');
+    const searchOverlay = document.getElementById('search-overlay');
+    const closeSearchBtn = document.getElementById('close-search-btn');
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    
+    const addMenuOverlay = document.getElementById('add-menu-overlay');
+    const addMenu = document.getElementById('add-menu');
+    const addCardOpt = document.getElementById('add-card-opt');
+    const addScheduleOpt = document.getElementById('add-schedule-opt');
+    const addShoppingOpt = document.getElementById('add-shopping-opt');
+
+    const shoppingModalOverlay = document.getElementById('shopping-modal-overlay');
+    const shoppingForm = document.getElementById('shopping-form');
+    const shoppingModalTitle = document.getElementById('shopping-modal-title');
+    const shoppingDeleteBtn = document.getElementById('shopping-delete-btn');
+    const shoppingCancelBtn = document.getElementById('shopping-cancel-btn');
+    const shoppingDateTrigger = document.getElementById('shopping-date-trigger');
+
+    const cardModalOverlay = document.getElementById('card-modal-overlay');
+    const cardForm = document.getElementById('card-form');
+    const cardModalTitle = document.getElementById('card-modal-title');
+    const cardNote = document.getElementById('card-note');
+    const cardDeleteBtn = document.getElementById('card-delete-btn');
+    const cardCancelBtn = document.getElementById('card-cancel-btn');
+    const coachLevelGroup = document.getElementById('coach-level-group');
+    const cardPriceContainer = document.getElementById('card-price-container');
+
+    const scheduleDateTrigger = document.getElementById('schedule-date-trigger');
+    const cardStartDateTrigger = document.getElementById('card-start-date-trigger');
+    const cardEndDateTrigger = document.getElementById('card-end-date-trigger');
+
+    if (scheduleDateTrigger) {
+        scheduleDateTrigger.addEventListener('click', () => {
+            const hiddenInput = document.getElementById('schedule-date');
+            const currentVal = hiddenInput ? hiddenInput.value : '';
+            const currentEndTime = hiddenInput ? hiddenInput.dataset.endtime || '' : '';
+            CustomDatePicker.open({
+                triggerId: 'schedule-date-trigger',
+                initialValue: currentVal,
+                initialEndTime: currentEndTime,
+                includeTime: true
+            });
+        });
+    }
+
+    if (cardStartDateTrigger) {
+        cardStartDateTrigger.addEventListener('click', () => {
+            const currentVal = document.getElementById('card-start-date').value;
+            CustomDatePicker.open({
+                triggerId: 'card-start-date-trigger',
+                initialValue: currentVal,
+                includeTime: false,
+                onChange: (val, dateStr) => {
+                    updateCardOptions();
+                }
+            });
+        });
+    }
+
+    if (cardEndDateTrigger) {
+        cardEndDateTrigger.addEventListener('click', () => {
+            const currentVal = document.getElementById('card-end-date').value;
+            CustomDatePicker.open({
+                triggerId: 'card-end-date-trigger',
+                initialValue: currentVal,
+                includeTime: false
+            });
+        });
+    }
+
+    if (shoppingDateTrigger) {
+        shoppingDateTrigger.addEventListener('click', () => {
+            const currentVal = document.getElementById('shopping-date').value;
+            CustomDatePicker.open({
+                triggerId: 'shopping-date-trigger',
+                initialValue: currentVal,
+                includeTime: false
+            });
+        });
+    }
+
+    initCustomSelect('shopping-type-trigger', 'shopping-type-menu', 'shopping-type-wrapper', 'shopping-type-select', 'shopping-type-display');
+
+    const cardPrices = {
+        '?àÂç°': ['2500', '3000', '7000'],
+        '?ÆÊ¨°?•Â†¥': ['200(Âπ≥Êó•)', '220(?áÊó•)'],
+        '?òÈ?Ë™≤Âç°(Âπ?': ['1800', '540(?ÆÊ¨°)'],
+        '?òÈ?Ë™≤Âç°(??': ['2200', '660(?ÆÊ¨°)'],
+        'ÁßÅ‰∫∫Ë™≤Âç°(Âπ?': {
+            '‰∏Ä??: ['3,400(1‰∫?', '2,600(2‰∫?'],
+            'È´òÁ?': ['4,200(1‰∫?', '3,200(2‰∫?'],
+            '?ãÂÆ∂Á¥?: ['5,200(1‰∫?', '4,000(2‰∫?']
+        },
+        'ÁßÅ‰∫∫Ë™≤Âç°(??': {
+            '‰∏Ä??: ['3,800(1‰∫?', '3,000(2‰∫?'],
+            'È´òÁ?': ['4,600(1‰∫?', '3,600(2‰∫?'],
+            '?ãÂÆ∂Á¥?: ['5,600(1‰∫?', '4,400(2‰∫?']
+        }
+    };
+
+    // ---- ÈªûÊ?Ê®ôÈ??áÊ??àÊ?/Âπ¥Ê? (?ÖÂú®?àÊ??ÜÈ??üÊ?) ----
+    if (monthTitleWrapper) {
+        monthTitleWrapper.addEventListener('click', () => {
+            if (currentTab === 'calendar') {
+                currentViewMode = currentViewMode === 'month' ? 'year' : 'month';
+                renderView();
+            }
+        });
+    }
+
+    // ---- ?àÊ??áÂπ¥?ÜÂ??õÊ??ï‰?‰ª?----
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            if (currentViewMode === 'month') {
+                currentDate.setDate(1);
+                currentDate.setMonth(currentDate.getMonth() - 1);
+            } else {
+                currentDate.setFullYear(currentDate.getFullYear() - 1);
+            }
+            renderView();
+        });
+    }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            if (currentViewMode === 'month') {
+                currentDate.setDate(1);
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            } else {
+                currentDate.setFullYear(currentDate.getFullYear() + 1);
+            }
+            renderView();
+        });
+    }
+
+    // Áµ±‰?Ê∏≤Ê??ßÂà∂
+    function updateSystemAlert() {
+        const alertContainer = document.getElementById('system-alert-container');
+        if (!alertContainer) return;
+        
+        const today = new Date();
+        const nextWeek = new Date();
+        nextWeek.setDate(today.getDate() + 7);
+        const todayStr = formatLocalDate(today);
+        const nextWeekStr = formatLocalDate(nextWeek);
+        
+        const expiringCards = schedules.filter(s => {
+            if (!s.isCard) return false;
+            if (!CARD_RULES[s.type]) return false;
+            const endDate = normalizeDateStr(s.date);
+            return endDate >= todayStr && endDate <= nextWeekStr;
+        });
+
+        if (expiringCards.length === 0) {
+            alertContainer.style.display = 'none';
+            return;
+        }
+
+        let alertHTML = '<strong>Á≥ªÁµ±?êÈ?Ôº?/strong><br/>';
+        expiringCards.forEach(card => {
+            const rule = CARD_RULES[card.type];
+            const usage = getCardUsage(card.id);
+            const remainingClasses = rule.maxClasses - usage.classes;
+            const remainingPractices = rule.maxPractices - usage.practices;
+            
+            const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+            
+            let statusText = '';
+            if (!isInfinite) {
+                if (remainingClasses <= 0 && remainingPractices <= 0) return; // All used up, no need to alert
+                statusText = ` (?©È?: ${remainingClasses}Ë™≤Á?, ${remainingPractices}Á∑¥Á?)`;
+            } else {
+                statusText = ' (?°È?Ê¨°Êï∏)';
+            }
+
+            alertHTML += `???®Á???{card.displayTitle || card.type}?çÂ???${normalizeDateStr(card.date)} ?∞Ê?${statusText}<br/>`;
+        });
+        
+        // If all expiring cards were already used up, hide the alert
+        if (alertHTML === '<strong>Á≥ªÁµ±?êÈ?Ôº?/strong><br/>') {
+            alertContainer.style.display = 'none';
+        } else {
+            alertContainer.innerHTML = alertHTML;
+            alertContainer.style.display = 'block';
+        }
+    }
+
+    function renderView() {
+        try {
+            updateSystemAlert();
+        } catch (e) {
+            console.error('Error updating system alert:', e);
+        }
+
+        try {
+            if (currentTab === 'calendar') {
+                if (calendarViewContainer) calendarViewContainer.style.display = 'block';
+                if (databaseView) databaseView.style.display = 'none';
+                if (statsView) statsView.style.display = 'none';
+                if (settingsView) settingsView.style.display = 'none';
+
+                if (currentViewMode === 'month') {
+                    if (monthTitleWrapper) monthTitleWrapper.classList.remove('year-mode');
+                    if (weekdaysBar) weekdaysBar.style.display = 'grid';
+                    if (calendarGrid) calendarGrid.style.display = 'grid';
+                    if (yearCalendarView) yearCalendarView.style.display = 'none';
+                    renderCalendar();
+                } else {
+                    if (monthTitleWrapper) monthTitleWrapper.classList.add('year-mode');
+                    if (weekdaysBar) weekdaysBar.style.display = 'none';
+                    if (calendarGrid) calendarGrid.style.display = 'none';
+                    if (yearCalendarView) yearCalendarView.style.display = 'grid';
+                    renderYearCalendar();
+                }
+            } else if (currentTab === 'database') {
+                if (calendarViewContainer) calendarViewContainer.style.display = 'none';
+                if (databaseView) databaseView.style.display = 'block';
+                if (statsView) statsView.style.display = 'none';
+                if (settingsView) settingsView.style.display = 'none';
+                renderDatabaseView();
+            } else if (currentTab === 'stats') {
+                if (calendarViewContainer) calendarViewContainer.style.display = 'none';
+                if (databaseView) databaseView.style.display = 'none';
+                if (statsView) statsView.style.display = 'flex';
+                if (settingsView) settingsView.style.display = 'none';
+                const modeSelect = document.getElementById('stats-mode-select');
+                const currentMode = modeSelect ? modeSelect.value : 'ÊØèÊ?Á∏ΩË¶Ω';
+                if (currentMode === '?ãÈä∑Á∏ΩË¶Ω') {
+                    renderExpenseDashboard();
+                } else if (currentMode === 'ÊØèÊ?Á∏ΩË¶Ω') {
+                    renderStatsDashboard();
+                }
+            } else if (currentTab === 'settings') {
+                if (calendarViewContainer) calendarViewContainer.style.display = 'none';
+                if (databaseView) databaseView.style.display = 'none';
+                if (statsView) statsView.style.display = 'none';
+                if (settingsView) settingsView.style.display = 'block';
+            }
+        } catch (e) {
+            console.error('Error rendering view:', e);
+        }
+    }
+
+    // ?ùÂ??ñÊ∏≤?ìË???    renderView();
+
+    // ---- ?àÊ?Ê∏≤Ê??èËºØ (Month View) ----
+    function renderCalendar() {
+        calendarGrid.innerHTML = '';
+        
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        if (monthTitle) {
+            monthTitle.textContent = `${monthNames[month]} ${year}`;
+        }
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        
+        let firstDayIndex = firstDayOfMonth.getDay() - 1;
+        if (firstDayIndex === -1) firstDayIndex = 6;
+        
+        const totalDays = lastDayOfMonth.getDate();
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+        for (let i = firstDayIndex; i > 0; i--) {
+            const dayNum = prevMonthLastDay - i + 1;
+            calendarGrid.appendChild(createDayCell(dayNum, true, year, month - 1));
+        }
+        
+        for (let i = 1; i <= totalDays; i++) {
+            calendarGrid.appendChild(createDayCell(i, false, year, month));
+        }
+        
+        const totalCells = calendarGrid.children.length;
+        const remainingCells = 42 - totalCells;
+        for (let i = 1; i <= remainingCells; i++) {
+            calendarGrid.appendChild(createDayCell(i, true, year, month + 1));
+        }
+    }
+
+    function createDayCell(dayNumber, isOtherMonth, year, month) {
+        const cell = document.createElement('div');
+        cell.className = `day-cell ${isOtherMonth ? 'other-month' : ''}`;
+        
+        const dayLabel = document.createElement('div');
+        dayLabel.className = 'day-number';
+        dayLabel.textContent = dayNumber;
+        cell.appendChild(dayLabel);
+
+        const actualDate = new Date(year, month, dayNumber);
+        const dateString = formatLocalDate(actualDate);
+        
+        const realToday = new Date();
+        if (actualDate.getDate() === realToday.getDate() && 
+            actualDate.getMonth() === realToday.getMonth() && 
+            actualDate.getFullYear() === realToday.getFullYear()) {
+            dayLabel.classList.add('today');
+        }
+        
+        const daySchedules = [];
+        schedules.forEach(schedule => {
+            const match = getScheduleMatchOnDate(schedule, dateString);
+            if (match.matched) {
+                daySchedules.push({ schedule, match });
+            }
+        });
+        daySchedules.sort((a, b) => (a.schedule.time || '').localeCompare(b.schedule.time || ''));
+        
+        const todayStr = formatLocalDate(realToday);
+
+        daySchedules.forEach(({ schedule, match }) => {
+            const item = document.createElement('div');
+            item.className = 'schedule-item';
+            item.dataset.id = schedule.id;
+
+            // ?•Ë©≤?•ÁÇ∫Â∑≤Á??éÁ??•Ê?ÔºåÂ???.past È°ûÂà•‰ΩøËâ≤ÂΩ©È°ØÁ§∫Â??¥Ê∑∫
+            if (dateString < todayStr) {
+                item.classList.add('past');
+            }
+            
+            if (schedule.isCard) {
+                item.textContent = `${schedule.displayTitle || schedule.type} ?∞Ê?`;
+            } else {
+                item.innerHTML = '';
+                if (schedule.time) {
+                    const timeSpan = document.createElement('span');
+                    timeSpan.className = 'schedule-time';
+                    timeSpan.textContent = schedule.endTime ? `${schedule.time}~${schedule.endTime} ` : `${schedule.time} `;
+                    item.appendChild(timeSpan);
+                }
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'schedule-type';
+                typeSpan.textContent = schedule.type;
+                item.appendChild(typeSpan);
+            }
+
+            const colors = typeColors[schedule.type] || defaultTypeColor;
+            item.style.backgroundColor = colors.bg;
+            item.style.color = colors.text;
+            
+            let hoverText = schedule.note || '';
+            if (schedule.isCard && CARD_RULES[schedule.type]) {
+                const rule = CARD_RULES[schedule.type];
+                const usage = getCardUsage(schedule.id);
+                const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+                if (!isInfinite) {
+                    hoverText += `\n[‰ΩøÁî®?ÄÊ≥? ${usage.classes}/${rule.maxClasses}Ë™? ${usage.practices}/${rule.maxPractices}Á∑¥]`;
+                } else {
+                    hoverText += `\n[‰ΩøÁî®?ÄÊ≥? ?°È?Ê¨°Êï∏]`;
+                }
+            } else if (!schedule.isCard && schedule.linkedCardId) {
+                const linkedCard = schedules.find(s => String(s.id) === String(schedule.linkedCardId));
+                if (linkedCard) {
+                    hoverText += `\n(??äµ: ${linkedCard.displayTitle || linkedCard.type})`;
+                }
+            }
+            
+            if (hoverText) {
+                item.title = hoverText.trim();
+            }
+
+            // ?üÁî®?ñÊãΩ (Drag & Drop)
+            item.setAttribute('draggable', 'true');
+            item.addEventListener('dragstart', (e) => {
+                item.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', schedule.id);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+            });
+            
+            cell.appendChild(item);
+        });
+
+        // ??ÅΩ?•Ê??ºÂ??ñÊîæ?ÆÊ? (Drop Target)
+        cell.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            cell.classList.add('drag-over');
+        });
+
+        cell.addEventListener('dragleave', () => {
+            cell.classList.remove('drag-over');
+        });
+
+        cell.addEventListener('drop', (e) => {
+            e.preventDefault();
+            cell.classList.remove('drag-over');
+            const scheduleId = e.dataTransfer.getData('text/plain');
+            if (!scheduleId) return;
+
+            const scheduleIndex = schedules.findIndex(s => String(s.id) === String(scheduleId));
+            if (scheduleIndex > -1) {
+                const targetSchedule = schedules[scheduleIndex];
+                if (targetSchedule.isCard) {
+                    const oldEnd = parseLocalDate(normalizeDateStr(targetSchedule.date));
+                    const oldStart = parseLocalDate(normalizeDateStr(targetSchedule.startDate || targetSchedule.date));
+                    const diffDays = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 3600 * 24));
+
+                    const newStart = parseLocalDate(dateString);
+                    const newEnd = new Date(newStart.getTime() + diffDays * 24 * 3600 * 1000);
+
+                    targetSchedule.startDate = dateString;
+                    targetSchedule.date = formatLocalDate(newEnd);
+                } else {
+                    targetSchedule.date = dateString;
+                }
+
+                saveSchedules(schedules);
+                renderView();
+            }
+        });
+
+        cell.addEventListener('click', (e) => {
+            const scheduleItem = e.target.closest('.schedule-item');
+            if (scheduleItem) {
+                e.stopPropagation();
+                // ?•È??äÁ??ØÂ∑≤Ë¢´Ë??¶Á??íÁ? -> Á¨¨‰?Ê¨°È??äÈ??üÁ∑®ËºØË?Á™?                if (activeFocusedScheduleEl === scheduleItem) {
+                    const scheduleId = scheduleItem.dataset.id;
+                    const schedule = schedules.find(s => String(s.id) === String(scheduleId));
+                    if (schedule) {
+                        editingScheduleId = schedule.id;
+                        if (schedule.isCard) {
+                            openCardModalForEdit(schedule);
+                        } else if (schedule.isShopping) {
+                            openShoppingModalForEdit(schedule);
+                        } else {
+                            openScheduleModalForEdit(schedule);
+                        }
+                    }
+                } else {
+                    // Á¨¨‰?Ê¨°È???-> ?àÈÄ≤Ë??öÁÑ¶ (Highlight)
+                    if (activeFocusedScheduleEl) {
+                        activeFocusedScheduleEl.classList.remove('focused');
+                    }
+                    activeFocusedScheduleEl = scheduleItem;
+                    activeFocusedScheduleEl.classList.add('focused');
+                }
+            } else {
+                if (activeFocusedScheduleEl) {
+                    activeFocusedScheduleEl.classList.remove('focused');
+                    activeFocusedScheduleEl = null;
+                }
+            }
+        });
+
+        return cell;
+    }
+
+    // ---- Âπ¥Ê?Ë¶ñÂ?Ê∏≤Ê??èËºØ (Year View) ----
+    function renderYearCalendar() {
+        if (!yearCalendarView) return;
+        yearCalendarView.innerHTML = '';
+
+        const year = currentDate.getFullYear();
+        if (monthTitle) {
+            monthTitle.textContent = `${year}`;
+        }
+
+        const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        // ?∂È??âË??ôÁ??•Ê??ÜÂ?‰ª•Âà©?àËÉΩÊØîÂ?
+        const datesWithSchedules = new Set(schedules.map(s => normalizeDateStr(s.date)));
+        const realToday = new Date();
+
+        for (let m = 0; m < 12; m++) {
+            const card = document.createElement('div');
+            card.className = 'mini-month-card';
+            if (realToday.getFullYear() === year && realToday.getMonth() === m) {
+                card.classList.add('current-month');
+            }
+
+            const title = document.createElement('div');
+            title.className = 'mini-month-title';
+            title.textContent = monthNamesFull[m];
+            card.appendChild(title);
+
+            const daysGrid = document.createElement('div');
+            daysGrid.className = 'mini-days-grid';
+
+            const firstDayOfMonth = new Date(year, m, 1);
+            const lastDayOfMonth = new Date(year, m + 1, 0);
+
+            let firstDayIndex = firstDayOfMonth.getDay() - 1;
+            if (firstDayIndex === -1) firstDayIndex = 6;
+
+            const totalDays = lastDayOfMonth.getDate();
+            const prevMonthLastDay = new Date(year, m, 0).getDate();
+
+            // ‰∏äÂÄãÊ? filler
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayNum = prevMonthLastDay - i + 1;
+                const miniDay = document.createElement('div');
+                miniDay.className = 'mini-day other-month';
+                miniDay.textContent = dayNum;
+                daysGrid.appendChild(miniDay);
+            }
+
+            // ?ôÂÄãÊ?
+            for (let d = 1; d <= totalDays; d++) {
+                const miniDay = document.createElement('div');
+                miniDay.className = 'mini-day';
+                miniDay.textContent = d;
+
+                const actualDate = new Date(year, m, d);
+                const dateStr = formatLocalDate(actualDate);
+
+                const todayStr = formatLocalDate(realToday);
+
+                if (actualDate.getDate() === realToday.getDate() &&
+                    actualDate.getMonth() === realToday.getMonth() &&
+                    actualDate.getFullYear() === realToday.getFullYear()) {
+                    miniDay.classList.add('today');
+                } else if (dateStr < todayStr) {
+                    miniDay.classList.add('past-day');
+                }
+
+                // Ê™¢Êü•Ë©≤Êó•?üÊòØ?¶Ê??íÁ?/Ë™≤Âç°Ôºå‰Ωø?®Ë©≤?íÁ??ÑÊ?Á±§Â??≤È?‰∫?                const matchingSchedules = schedules.filter(s => getScheduleMatchOnDate(s, dateStr).matched);
+                if (matchingSchedules.length > 0) {
+                    const primarySchedule = matchingSchedules[0];
+                    const colors = typeColors[primarySchedule.type] || defaultTypeColor;
+                    miniDay.style.backgroundColor = colors.bg;
+                    miniDay.style.color = colors.text;
+                    miniDay.style.fontWeight = '600';
+                    miniDay.title = matchingSchedules.map(s => (s.displayTitle || s.type)).join('\n');
+                }
+
+                daysGrid.appendChild(miniDay);
+            }
+
+            card.appendChild(daysGrid);
+
+            // ÈªûÊ?Ëø∑‰??àÊ??°Á??áÊ??ûË©≤?à‰ªΩ?ÑË©≥Á¥∞Ê?Ë¶ñÂ?
+            card.addEventListener('click', () => {
+                currentDate = new Date(year, m, 1);
+                currentViewMode = 'month';
+                renderView();
+            });
+
+            yearCalendarView.appendChild(card);
+        }
+
+        if (currentTab === 'stats') {
+            const modeSelect = document.getElementById('stats-mode-select');
+            const currentMode = modeSelect ? modeSelect.value : 'ÊØèÊ?Á∏ΩË¶Ω';
+            if (currentMode === '?ãÈä∑Á∏ΩË¶Ω') {
+                renderExpenseDashboard();
+            } else if (currentMode === 'ÊØèÊ?Á∏ΩË¶Ω') {
+                renderStatsDashboard();
+            }
+        }
+    }
+
+    function getCardUsage(cardId) {
+        const usage = { classes: 0, practices: 0 };
+        schedules.forEach(s => {
+            if (!s.isCard && String(s.linkedCardId) === String(cardId)) {
+                if (s.type === '?±Ê?Á∑¥Á?') usage.practices++;
+                else usage.classes++;
+            }
+        });
+        return usage;
+    }
+
+    function populateLinkedCardSelect(selectedCardId = '') {
+        const hiddenInput = document.getElementById('linked-card-select');
+        const displaySpan = document.getElementById('linked-card-display');
+        const menuEl = document.getElementById('linked-card-menu');
+        const wrapper = document.getElementById('linked-card-wrapper');
+        const trigger = document.getElementById('linked-card-trigger');
+
+        if (!hiddenInput || !menuEl) return;
+
+        menuEl.innerHTML = '';
+        hiddenInput.value = selectedCardId || '';
+        
+        const buildCardOptionHtml = (mainText, subText) => {
+            if (!subText) {
+                return `<div class="select-opt-main">${mainText}</div>`;
+            }
+            return `<div class="select-opt-main">${mainText}</div><div class="select-opt-sub">${subText}</div>`;
+        };
+
+        let selectedDisplayHtml = buildCardOptionHtml('(???ÆÊ¨°‰ªòË≤ª)', '');
+
+        // Âª∫Á??êË®≠?∏È?
+        const defaultOpt = document.createElement('div');
+        defaultOpt.className = `custom-select-option ${!selectedCardId ? 'selected' : ''}`;
+        defaultOpt.innerHTML = buildCardOptionHtml('(???ÆÊ¨°‰ªòË≤ª)', '');
+        defaultOpt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hiddenInput.value = '';
+            if (displaySpan) displaySpan.innerHTML = buildCardOptionHtml('(???ÆÊ¨°‰ªòË≤ª)', '');
+            if (menuEl) menuEl.classList.remove('show');
+            if (wrapper) wrapper.classList.remove('open');
+            menuEl.querySelectorAll('.custom-select-option').forEach(el => el.classList.remove('selected'));
+            defaultOpt.classList.add('selected');
+        });
+        menuEl.appendChild(defaultOpt);
+
+        const activeCards = schedules.filter(s => s.isCard);
+        
+        activeCards.sort((a, b) => {
+            const dateA = normalizeDateStr(a.startDate || a.date);
+            const dateB = normalizeDateStr(b.startDate || b.date);
+            return dateA.localeCompare(dateB);
+        });
+
+        activeCards.forEach(card => {
+            const rule = getCardRule(card);
+            const usage = getCardUsage(card.id);
+
+            const isInfinite = rule && (rule.maxClasses === Infinity || rule.maxPractices === Infinity);
+            let remainingClasses = 0;
+            let remainingPractices = 0;
+            let isDepleted = false;
+
+            if (rule && !isInfinite) {
+                remainingClasses = rule.maxClasses - usage.classes;
+                remainingPractices = rule.maxPractices - usage.practices;
+                if (remainingClasses <= 0 && remainingPractices <= 0) {
+                    isDepleted = true;
+                }
+            }
+
+            let mainText = `${card.displayTitle || card.type} `;
+            if (card.price && !mainText.includes(String(card.price))) {
+                mainText += `${card.price} `;
+            }
+            if (card.startDate && card.startDate !== card.date) {
+                mainText += `(${normalizeDateStr(card.startDate)} ~ ${normalizeDateStr(card.date)})`;
+            } else {
+                mainText += `(${normalizeDateStr(card.date)})`;
+            }
+
+            let subText = '';
+            if (!rule) {
+                const totalUsed = usage.classes + usage.practices;
+                if (totalUsed > 0) {
+                    subText = `Â∑≤Êäµ?? ${totalUsed}Ê¨°`;
+                }
+            } else if (!isInfinite) {
+                subText = `?©È?Ôº?{remainingClasses}?ÇË™≤ / ${remainingPractices}?ÇÁ∑¥Áøí`;
+            } else if (card.type === '7000?àÂç°' || (card.type === '?àÂç°' && String(card.price).includes('7000'))) {
+                subText = `?òÈ?Ë™≤Â?Ë≤? ?°È?Á∑¥Á?`;
+            }
+
+            const isSelected = String(card.id) === String(selectedCardId);
+            const optHtml = buildCardOptionHtml(mainText, subText);
+            if (isSelected) {
+                selectedDisplayHtml = optHtml;
+            }
+
+            // ?•Ë©≤Ë™≤Âç°Â∑≤Á??µÊâ£ÂÆåÁï¢ (?©È?Ë™≤Â??áÁ∑¥ÁøíÁ? <= 0)ÔºåÁõ¥?•Â??∏ÂñÆ?∏È?‰∏≠Èö±??            if (isDepleted) {
+                return;
+            }
+
+            const opt = document.createElement('div');
+            opt.className = `custom-select-option ${isSelected ? 'selected' : ''}`;
+            opt.innerHTML = optHtml;
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hiddenInput.value = card.id;
+                if (displaySpan) displaySpan.innerHTML = optHtml;
+                if (menuEl) menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+                menuEl.querySelectorAll('.custom-select-option').forEach(el => el.classList.remove('selected'));
+                opt.classList.add('selected');
+            });
+            menuEl.appendChild(opt);
+        });
+
+        if (displaySpan) displaySpan.innerHTML = selectedDisplayHtml;
+
+        if (trigger && !trigger.dataset.bound) {
+            trigger.dataset.bound = 'true';
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = menuEl.classList.contains('show');
+                if (isOpen) {
+                    menuEl.classList.remove('show');
+                    if (wrapper) wrapper.classList.remove('open');
+                } else {
+                    menuEl.classList.add('show');
+                    if (wrapper) wrapper.classList.add('open');
+                }
+            });
+        }
+    }
+
+    function openScheduleModalForEdit(schedule) {
+        modalTitle.textContent = 'Á∑®ËºØ?íÁ?';
+        const timePart = schedule.time ? schedule.time : '00:00';
+        const datePart = normalizeDateStr(schedule.date);
+        const dateTimeValue = `${datePart}T${timePart}`;
+        CustomDatePicker.setValue('schedule-date-trigger', dateTimeValue, true, schedule.endTime || '');
+        
+        safeSetRadioValue('schedule-type', schedule.type);
+        populateLinkedCardSelect(schedule.linkedCardId);
+        document.getElementById('schedule-note').value = schedule.note || '';
+        deleteBtn.style.display = 'block';
+        openModal();
+    }
+
+    function renderCardUsageHistory(cardId) {
+        const historyGroup = document.getElementById('card-usage-history-group');
+        const historyList = document.getElementById('card-usage-history-list');
+        if (!historyGroup || !historyList) return;
+
+        if (!cardId) {
+            historyGroup.style.display = 'none';
+            historyList.innerHTML = '';
+            return;
+        }
+
+        historyGroup.style.display = 'block';
+        historyList.innerHTML = '';
+
+        // Â∞ãÊâæÂºïÁî®Ê≠§Ë™≤?°Á??íÁ?
+        const usedSchedules = schedules.filter(s => !s.isCard && String(s.linkedCardId) === String(cardId));
+
+        if (usedSchedules.length === 0) {
+            historyList.innerHTML = `<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 6px 0;">Â∞öÁÑ°?µÊâ£?íÁ?Á¥Ä??/div>`;
+            return;
+        }
+
+        // ‰æùÊó•?üÁî±?∞Âà∞?äÊ?Â∫?        usedSchedules.sort((a, b) => {
+            const dateA = normalizeDateStr(a.date) + (a.time || '00:00');
+            const dateB = normalizeDateStr(b.date) + (b.time || '00:00');
+            return dateB.localeCompare(dateA);
+        });
+
+        usedSchedules.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'usage-history-item';
+            
+            const dateDisplay = normalizeDateStr(s.date);
+            const timeDisplay = s.time ? ` ${s.time}` : '';
+            const titleDisplay = s.displayTitle || s.type;
+            const colorConfig = typeColors[s.type] || defaultTypeColor;
+
+            if (colorConfig.cardBg) {
+                item.style.backgroundColor = colorConfig.cardBg;
+            } else {
+                item.style.backgroundColor = '#ffffff';
+            }
+
+            item.innerHTML = `
+                <span class="usage-date-info">${dateDisplay}${timeDisplay}</span>
+                <span class="usage-tag" style="background-color: ${colorConfig.bg}; color: ${colorConfig.text};">
+                    ${titleDisplay}
+                </span>
+            `;
+            historyList.appendChild(item);
+        });
+    }
+
+    function openCardModalForEdit(schedule) {
+        cardModalTitle.textContent = 'Á∑®ËºØË™≤Âç°';
+        const startDate = normalizeDateStr(schedule.startDate || schedule.date);
+        const endDate = normalizeDateStr(schedule.date);
+
+        CustomDatePicker.setValue('card-start-date-trigger', startDate, false);
+        CustomDatePicker.setValue('card-end-date-trigger', endDate, false);
+        
+        safeSetRadioValue('card-type', schedule.type);
+        if (schedule.coachLevel) {
+            safeSetRadioValue('coach-level', schedule.coachLevel);
+        }
+        
+        updateCardOptions(schedule.price);
+        
+        cardNote.value = schedule.note || '';
+        renderCardUsageHistory(schedule.id);
+        cardDeleteBtn.style.display = 'block';
+        cardModalOverlay.classList.add('show');
+    }
+
+    function openModal() {
+        modalOverlay.classList.add('show');
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove('show');
+        scheduleForm.reset();
+        editingScheduleId = null;
+    }
+
+    function openAddModal(prefillDateStr) {
+        editingScheduleId = null;
+        modalTitle.textContent = '?∞Â??íÁ?';
+        deleteBtn.style.display = 'none';
+        scheduleForm.reset();
+        
+        const now = new Date();
+        const dateStr = prefillDateStr || formatLocalDate(now);
+        const timeStr = '17:00';
+        const defaultEndTime = '18:30';
+        
+        CustomDatePicker.setValue('schedule-date-trigger', `${dateStr}T${timeStr}`, true, defaultEndTime);
+        populateLinkedCardSelect();
+        openModal();
+    }
+
+    function openCardModal() {
+        editingScheduleId = null;
+        cardModalTitle.textContent = '?∞Â?Ë™≤Âç°';
+        cardDeleteBtn.style.display = 'none';
+        if (cardForm) cardForm.reset();
+        
+        const todayStr = formatLocalDate(new Date());
+
+        CustomDatePicker.setValue('card-start-date-trigger', todayStr, false);
+        CustomDatePicker.setValue('card-end-date-trigger', todayStr, false);
+        
+        safeSetRadioValue('card-type', '?àÂç°');
+        updateCardOptions();
+        renderCardUsageHistory(null);
+        
+        if (cardModalOverlay) {
+            cardModalOverlay.classList.add('show');
+            cardModalOverlay.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; z-index: 1000 !important;';
+        }
+        
+        const modalEl = cardModalOverlay ? cardModalOverlay.querySelector('.modal') : null;
+        if (modalEl) {
+            modalEl.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important;';
+        }
+    }
+
+    function toggleAddMenu(e) {
+        e.stopPropagation();
+        addMenu.classList.toggle('show');
+        if (addMenu.classList.contains('show')) {
+            addMenuOverlay.classList.add('show');
+            const targetBtn = e.target.closest('.icon-btn, .fab');
+            if (targetBtn) {
+                const btnRect = targetBtn.getBoundingClientRect();
+                addMenu.style.bottom = 'auto';
+                addMenu.style.top = (btnRect.bottom + 8) + 'px';
+                addMenu.style.right = '16px';
+            }
+        } else {
+            addMenuOverlay.classList.remove('show');
+        }
+    }
+
+    function closeAddMenu() {
+        addMenu.classList.remove('show');
+        addMenuOverlay.classList.remove('show');
+    }
+
+    if (topAddBtn) topAddBtn.addEventListener('click', toggleAddMenu);
+    if (addMenuOverlay) addMenuOverlay.addEventListener('click', closeAddMenu);
+    
+    if (addCardOpt) {
+        addCardOpt.addEventListener('click', (e) => {
+            if (e) e.stopPropagation();
+            closeAddMenu();
+            openCardModal();
+        });
+    }
+
+    if (addScheduleOpt) {
+        addScheduleOpt.addEventListener('click', (e) => {
+            if (e) e.stopPropagation();
+            closeAddMenu();
+            openAddModal();
+        });
+    }
+
+    function closeShoppingModal() {
+        if (shoppingModalOverlay) shoppingModalOverlay.classList.remove('show');
+        if (shoppingForm) shoppingForm.reset();
+        editingScheduleId = null;
+    }
+
+    function openShoppingModal() {
+        editingScheduleId = null;
+        if (shoppingModalTitle) shoppingModalTitle.textContent = '?∞Â?Ë≥ºÁâ©';
+        if (shoppingDeleteBtn) shoppingDeleteBtn.style.display = 'none';
+        if (shoppingForm) shoppingForm.reset();
+        
+        const todayStr = formatLocalDate(new Date());
+        CustomDatePicker.setValue('shopping-date-trigger', todayStr, false);
+        safeSetRadioValue('shopping-type', '?∞Â???);
+        
+        if (shoppingModalOverlay) shoppingModalOverlay.classList.add('show');
+    }
+
+    function openShoppingModalForEdit(schedule) {
+        editingScheduleId = schedule.id;
+        if (shoppingModalTitle) shoppingModalTitle.textContent = 'Á∑®ËºØË≥ºÁâ©';
+        if (shoppingDeleteBtn) shoppingDeleteBtn.style.display = 'block';
+        
+        const nameInput = document.getElementById('shopping-name');
+        if (nameInput) nameInput.value = schedule.name || schedule.note || '';
+        
+        const dateStr = normalizeDateStr(schedule.date);
+        CustomDatePicker.setValue('shopping-date-trigger', dateStr, false);
+        safeSetRadioValue('shopping-type', schedule.type || '?∞Â???);
+        
+        const priceInput = document.getElementById('shopping-price');
+        if (priceInput) priceInput.value = schedule.price || '';
+        
+        if (shoppingModalOverlay) shoppingModalOverlay.classList.add('show');
+    }
+
+    if (addShoppingOpt) {
+        addShoppingOpt.addEventListener('click', (e) => {
+            if (e) e.stopPropagation();
+            closeAddMenu();
+            openShoppingModal();
+        });
+    }
+    
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+    }
+
+    // ?úÂ??èËºØ
+    function openSearchModal() {
+        if (searchInput) searchInput.value = '';
+        if (searchResults) searchResults.innerHTML = '';
+        if (searchOverlay) searchOverlay.classList.add('show');
+        if (searchInput) searchInput.focus();
+    }
+
+    function closeSearchModal() {
+        if (searchOverlay) searchOverlay.classList.remove('show');
+    }
+
+    if (searchBtn) searchBtn.addEventListener('click', openSearchModal);
+    if (closeSearchBtn) closeSearchBtn.addEventListener('click', closeSearchModal);
+    if (searchOverlay) {
+        searchOverlay.addEventListener('click', (e) => {
+            if (e.target === searchOverlay) closeSearchModal();
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase().trim();
+            searchResults.innerHTML = '';
+            
+            if (!keyword) return;
+
+            const filtered = schedules.filter(s => {
+                const searchTarget = [
+                    s.type,
+                    s.displayTitle,
+                    s.note,
+                    s.date,
+                    s.coachLevel,
+                    s.price
+                ].filter(Boolean).join(' ').toLowerCase();
+                return searchTarget.includes(keyword);
+            });
+
+            if (filtered.length === 0) {
+                searchResults.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 10px;">?æ‰??∞Áõ∏Á¨¶Á??íÁ?</div>';
+                return;
+            }
+
+            filtered.forEach(schedule => {
+                const item = document.createElement('div');
+                item.style.padding = '8px';
+                item.style.borderBottom = '1px solid var(--border-color)';
+                item.style.cursor = 'pointer';
+                
+                const typeSpan = document.createElement('span');
+                typeSpan.textContent = schedule.displayTitle || schedule.type;
+                typeSpan.style.display = 'inline-block';
+                typeSpan.style.padding = '2px 6px';
+                typeSpan.style.borderRadius = '4px';
+                typeSpan.style.fontSize = '12px';
+                typeSpan.style.marginRight = '8px';
+                
+                const colors = typeColors[schedule.type] || defaultTypeColor;
+                typeSpan.style.backgroundColor = colors.bg;
+                typeSpan.style.color = colors.text;
+                
+                const infoSpan = document.createElement('span');
+                infoSpan.style.fontSize = '14px';
+                infoSpan.style.color = 'var(--text-primary)';
+                const timeStr = schedule.time ? ` ${schedule.time}` : '';
+                const displayDate = schedule.date ? normalizeDateStr(schedule.date) : '';
+                let extraInfo = '';
+                
+                if (schedule.isCard && CARD_RULES[schedule.type]) {
+                    const rule = CARD_RULES[schedule.type];
+                    const usage = getCardUsage(schedule.id);
+                    const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+                    if (!isInfinite) {
+                        extraInfo = ` [‰ΩøÁî®: ${usage.classes}/${rule.maxClasses}Ë™? ${usage.practices}/${rule.maxPractices}Á∑¥]`;
+                    } else {
+                        extraInfo = ` [?°È?‰ΩøÁî®]`;
+                    }
+                } else if (!schedule.isCard && schedule.linkedCardId) {
+                    const linkedCard = schedules.find(s => String(s.id) === String(schedule.linkedCardId));
+                    if (linkedCard) {
+                        extraInfo = ` (??äµ: ${linkedCard.displayTitle || linkedCard.type})`;
+                    }
+                }
+                
+                infoSpan.textContent = `${displayDate}${timeStr} - ${schedule.note || '?°Â?Ë®?}${extraInfo}`;
+
+                item.appendChild(typeSpan);
+                item.appendChild(infoSpan);
+                
+                item.addEventListener('click', () => {
+                    closeSearchModal();
+                    editingScheduleId = schedule.id;
+                    if (schedule.isCard) {
+                        openCardModalForEdit(schedule);
+                    } else if (schedule.isShopping) {
+                        openShoppingModalForEdit(schedule);
+                    } else {
+                        openScheduleModalForEdit(schedule);
+                    }
+                });
+                
+                searchResults.appendChild(item);
+            });
+        });
+    }
+
+    // AI ?äÂ§©
+    const aiChatWindow = document.getElementById('ai-chat-window');
+    const closeAiChatBtn = document.getElementById('close-ai-chat');
+    const aiChatMessages = document.getElementById('ai-chat-messages');
+    const aiChatInput = document.getElementById('ai-chat-input');
+    const aiSendBtn = document.getElementById('ai-send-btn');
+
+    function toggleAiChat() {
+        aiChatWindow.classList.toggle('show');
+        if (aiChatWindow.classList.contains('show')) {
+            aiChatInput.focus();
+        }
+    }
+
+    if (aiBtn) aiBtn.addEventListener('click', toggleAiChat);
+    if (closeAiChatBtn) closeAiChatBtn.addEventListener('click', toggleAiChat);
+
+    function getAiResponse(userText) {
+        const text = userText.toLowerCase();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+        
+        const thisMonthSchedules = schedules.filter(s => {
+            if (!s.date) return false;
+            const normDate = normalizeDateStr(s.date);
+            const parts = normDate.split('/');
+            return parseInt(parts[0], 10) === currentYear && parseInt(parts[1], 10) === currentMonth;
+        });
+
+        const activeCards = schedules.filter(s => s.isCard);
+
+        if (text.includes('Áµ±Ë?') || text.includes('ÂπæÂ?') || text.includes('?ãÂ???) || text.includes('Á¥Ä??)) {
+            const normalCount = thisMonthSchedules.filter(s => !s.isCard).length;
+            return `?¨Ê? (${currentYear}Âπ?{currentMonth}?? ?®ÂÖ±??${normalCount} ?ÇÈ??ïË™≤Á®ãË? ${thisMonthSchedules.length - normalCount} ÂºµË™≤?°Âà∞?üÊ??í„ÄÇÁπºÁ∫åÂ?Ê≤πÔ?`;
+        } else if (text.includes('Ë™≤Âç°') || text.includes('?∞Ê?') || text.includes('?°Á?')) {
+            if (activeCards.length === 0) {
+                return '?ÆÂ?Ê≤íÊ??ªË?‰ªª‰?Ë™≤Âç°?∞Ê?Ë≥áË??ÇÊÇ®?Ø‰ª•ÈªûÈÅ∏?≥‰?Ëßí„Ä??çÊñ∞Â¢ûË™≤?°Â?Ôº?;
+            }
+            const cardDetails = activeCards.map(c => `??${c.displayTitle || c.type}: ${normalizeDateStr(c.date)} ?∞Ê?`).join('\n');
+            return `?ÆÂ?Ë®òÈ?‰∏≠Á?Ë™≤Âç°?∞Ê??•Ô?\n${cardDetails}`;
+        } else if (text.includes('Âª∫Ë≠∞') || text.includes('Ë®ìÁ∑¥') || text.includes('?±Ë∫´')) {
+            return '?ãÂ??çÂª∫Ë≠∞ÈÄ≤Ë? 10 ?ÜÈ??ïÊ??±Ë∫´ÔºåË?Á∑¥Â?Ë®òÂ??†Âº∑Â§ßËÖø?áÂ??å‰º∏Â±ï‰ª•‰øÉÈÄ≤ÊÅ¢Âæ©Â?Ôº?;
+        } else if (text.includes('‰Ω†Â•Ω') || text.includes('?àÂ?') || text.includes('hi') || text.includes('hello')) {
+            return '?®Â•ΩÔºÅÊ???Gemini AI ?ãÂ??©Á??ÇÊÇ®?Ø‰ª•?ëÊ?Ë©¢Â??åÊú¨?àÈ??ïÁµ±Ë®à„Äç„ÄÅ„ÄåË™≤?°Âà∞?üÊó•?çÊ??åË?Á∑¥Âª∫Ë≠∞„ÄçÔ?';
+        } else {
+            return `?∂Âà∞?®Á?Ë©¢Â?Ôºö„Ä?{userText}?ç„ÄÇÊÇ®?ÆÂ??±Â???${schedules.length} Á≠ÜË??ô„ÄÇËã•?ÄË¶ÅÊü•Ë©¢Ë™≤?°Ê?Áµ±Ë??∏Ê?ÔºåÈö®?ÇÂ?Ë®¥Ê?ÔºÅ`;
+        }
+    }
+
+    function sendAiMessage() {
+        const text = aiChatInput.value.trim();
+        if (!text) return;
+
+        const userMsg = document.createElement('div');
+        userMsg.className = 'chat-bubble user';
+        userMsg.textContent = text;
+        aiChatMessages.appendChild(userMsg);
+        
+        aiChatInput.value = '';
+        aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+
+        setTimeout(() => {
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'chat-bubble ai';
+            aiMsg.style.whiteSpace = 'pre-line';
+            aiMsg.textContent = getAiResponse(text);
+            aiChatMessages.appendChild(aiMsg);
+            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+        }, 400);
+    }
+
+    if (aiSendBtn) aiSendBtn.addEventListener('click', sendAiMessage);
+    if (aiChatInput) {
+        aiChatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendAiMessage();
+        });
+    }
+
+    function initCustomSelect(triggerId, menuId, wrapperId, hiddenInputId, displaySpanId, onChangeCallback) {
+        const trigger = document.getElementById(triggerId);
+        const menuEl = document.getElementById(menuId);
+        const wrapper = document.getElementById(wrapperId);
+        const hiddenInput = document.getElementById(hiddenInputId);
+        const displaySpan = document.getElementById(displaySpanId);
+
+        if (!trigger || !menuEl) return;
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.custom-select-menu.show').forEach(m => {
+                if (m !== menuEl) m.classList.remove('show');
+            });
+            document.querySelectorAll('.custom-select-wrapper.open').forEach(w => {
+                if (w !== wrapper) w.classList.remove('open');
+            });
+
+            const isOpen = menuEl.classList.contains('show');
+            if (isOpen) {
+                menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+            } else {
+                menuEl.classList.add('show');
+                if (wrapper) wrapper.classList.add('open');
+            }
+        });
+
+        const options = menuEl.querySelectorAll('.custom-select-option');
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = opt.dataset.value;
+                if (hiddenInput) hiddenInput.value = val;
+                if (displaySpan) displaySpan.textContent = val;
+                
+                options.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+
+                if (menuEl) menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+
+                if (typeof onChangeCallback === 'function') {
+                    onChangeCallback(val);
+                }
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (wrapper && !e.target.closest(`#${wrapperId}`)) {
+                if (menuEl) menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+            }
+        });
+    }
+
+    initCustomSelect('card-type-trigger', 'card-type-menu', 'card-type-wrapper', 'card-type-select', 'card-type-display', () => {
+        updateCardOptions();
+    });
+
+    initCustomSelect('coach-level-trigger', 'coach-level-menu', 'coach-level-wrapper', 'coach-level-select', 'coach-level-display', () => {
+        updateCardOptions();
+    });
+
+    const cardPriceTrigger = document.getElementById('card-price-trigger');
+    const cardPriceMenu = document.getElementById('card-price-menu');
+    const cardPriceWrapper = document.getElementById('card-price-wrapper');
+
+    if (cardPriceTrigger && cardPriceMenu) {
+        cardPriceTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = cardPriceMenu.classList.contains('show');
+            if (isOpen) {
+                cardPriceMenu.classList.remove('show');
+                if (cardPriceWrapper) cardPriceWrapper.classList.remove('open');
+            } else {
+                cardPriceMenu.classList.add('show');
+                if (cardPriceWrapper) cardPriceWrapper.classList.add('open');
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#card-price-wrapper')) {
+                if (cardPriceMenu) cardPriceMenu.classList.remove('show');
+                if (cardPriceWrapper) cardPriceWrapper.classList.remove('open');
+            }
+        });
+    }
+
+    function addDaysSafely(startDateStr, daysToAdd) {
+        const d = parseLocalDate(startDateStr);
+        d.setDate(d.getDate() + daysToAdd);
+        return formatLocalDate(d);
+    }
+
+    function updateCardOptions(preferredPrice = null) {
+        const type = safeGetRadioValue('card-type');
+        if (!type) return;
+
+        let prices = [];
+        if (type.startsWith('ÁßÅ‰∫∫Ë™≤Âç°')) {
+            if (coachLevelGroup) coachLevelGroup.style.display = 'block';
+            let coach = safeGetRadioValue('coach-level');
+            if (!coach) {
+                safeSetRadioValue('coach-level', '‰∏Ä??);
+                coach = safeGetRadioValue('coach-level');
+            }
+            prices = (cardPrices[type] && cardPrices[type][coach]) ? cardPrices[type][coach] : [];
+        } else {
+            if (coachLevelGroup) coachLevelGroup.style.display = 'none';
+            prices = cardPrices[type] || [];
+        }
+
+        const startDateVal = document.getElementById('card-start-date')?.value || '';
+        
+        if (type === '?ÆÊ¨°?•Â†¥') {
+            const isHoliday = isHolidayDate(startDateVal);
+            const defaultPrice = isHoliday ? '220(?áÊó•)' : '200(Âπ≥Êó•)';
+            if (!preferredPrice) {
+                preferredPrice = defaultPrice;
+            }
+            const endDateInput = document.getElementById('card-end-date');
+            if (startDateVal && endDateInput && (!endDateInput.value || endDateInput.value !== startDateVal)) {
+                CustomDatePicker.setValue('card-end-date-trigger', startDateVal, false);
+            }
+        } else if (startDateVal && CARD_RULES[type]) {
+            const rule = CARD_RULES[type];
+            const endStr = rule.durationMonths 
+                ? addMonthsSafely(startDateVal, rule.durationMonths)
+                : addDaysSafely(startDateVal, rule.durationDays);
+            
+            const currentEnd = document.getElementById('card-end-date')?.value || '';
+            if (currentEnd !== endStr) {
+                CustomDatePicker.setValue('card-end-date-trigger', endStr, false);
+            }
+        }
+
+        const priceMenu = document.getElementById('card-price-menu');
+        const priceInput = document.getElementById('card-price-select');
+        const priceDisplay = document.getElementById('card-price-display');
+
+        if (priceMenu) {
+            priceMenu.innerHTML = '';
+            let selectedPrice = '';
+
+            prices.forEach((p, index) => {
+                const opt = document.createElement('div');
+                opt.className = 'custom-select-option';
+                opt.dataset.value = p;
+                opt.textContent = p;
+
+                const isSelected = preferredPrice 
+                    ? (p === preferredPrice || parseCleanPrice(p) === parseCleanPrice(preferredPrice)) 
+                    : (index === 0);
+
+                if (isSelected) {
+                    opt.classList.add('selected');
+                    selectedPrice = p;
+                }
+
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (priceInput) priceInput.value = p;
+                    if (priceDisplay) priceDisplay.textContent = p;
+                    
+                    priceMenu.querySelectorAll('.custom-select-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+
+                    if (priceMenu) priceMenu.classList.remove('show');
+                    if (cardPriceWrapper) cardPriceWrapper.classList.remove('open');
+                });
+
+                priceMenu.appendChild(opt);
+            });
+
+            if (selectedPrice) {
+                if (priceInput) priceInput.value = selectedPrice;
+                if (priceDisplay) priceDisplay.textContent = selectedPrice;
+            } else if (prices.length > 0) {
+                if (priceInput) priceInput.value = prices[0];
+                if (priceDisplay) priceDisplay.textContent = prices[0];
+            } else {
+                if (priceInput) priceInput.value = '';
+                if (priceDisplay) priceDisplay.textContent = 'Ë´ãÈÅ∏?áÂÉπ??;
+            }
+        }
+    }
+
+    function closeCardModal() {
+        if (cardModalOverlay) {
+            cardModalOverlay.classList.remove('show');
+            cardModalOverlay.style.cssText = '';
+        }
+        const modalEl = cardModalOverlay ? cardModalOverlay.querySelector('.modal') : null;
+        if (modalEl) {
+            modalEl.style.cssText = '';
+        }
+        if (cardForm) cardForm.reset();
+        updateCardOptions();
+        editingScheduleId = null;
+    }
+
+    if (cardCancelBtn) cardCancelBtn.addEventListener('click', closeCardModal);
+    if (cardModalOverlay) {
+        cardModalOverlay.addEventListener('click', (e) => {
+            if (e.target === cardModalOverlay) closeCardModal();
+        });
+    }
+
+    if (cardForm) {
+        cardForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cardType = safeGetRadioValue('card-type');
+            const startDate = document.getElementById('card-start-date').value;
+            const endDate = document.getElementById('card-end-date').value;
+            const note = cardNote.value;
+
+            const normalizedStartDate = normalizeDateStr(startDate);
+            const normalizedEndDate = normalizeDateStr(endDate);
+            
+            let coachLevel = '';
+            if (cardType.startsWith('ÁßÅ‰∫∫Ë™≤Âç°')) {
+                coachLevel = safeGetRadioValue('coach-level');
+            }
+            const price = safeGetRadioValue('card-price');
+
+            let displayTitle = cardType;
+            if (cardType === '?àÂç°' && price) {
+                displayTitle = `?àÂç° ${price}`;
+            }
+
+            if (editingScheduleId) {
+                const scheduleIndex = schedules.findIndex(s => String(s.id) === String(editingScheduleId));
+                if (scheduleIndex > -1) {
+                    schedules[scheduleIndex].date = normalizedEndDate;
+                    schedules[scheduleIndex].startDate = normalizedStartDate;
+                    schedules[scheduleIndex].type = cardType;
+                    schedules[scheduleIndex].displayTitle = displayTitle;
+                    schedules[scheduleIndex].coachLevel = coachLevel;
+                    schedules[scheduleIndex].price = price;
+                    schedules[scheduleIndex].note = note;
+                    schedules[scheduleIndex].isCard = true;
+                    schedules[scheduleIndex].time = '';
+                } else {
+                    schedules.push({
+                        id: generateUniqueId(),
+                        date: normalizedEndDate,
+                        startDate: normalizedStartDate,
+                        type: cardType,
+                        displayTitle: displayTitle,
+                        coachLevel: coachLevel,
+                        price: price,
+                        note: note,
+                        isCard: true,
+                        time: ''
+                    });
+                }
+            } else {
+                const newCard = {
+                    id: generateUniqueId(),
+                    date: normalizedEndDate,
+                    startDate: normalizedStartDate,
+                    type: cardType,
+                    displayTitle: displayTitle,
+                    coachLevel: coachLevel,
+                    price: price,
+                    note: note,
+                    isCard: true,
+                    time: ''
+                };
+                schedules.push(newCard);
+            }
+
+            saveSchedules(schedules);
+            if (normalizedEndDate) {
+                currentDate = parseLocalDate(normalizedEndDate);
+            }
+            renderView();
+            closeCardModal();
+        });
+    }
+
+    if (cardDeleteBtn) {
+        cardDeleteBtn.addEventListener('click', () => {
+            if (editingScheduleId) {
+                schedules = schedules.filter(s => String(s.id) !== String(editingScheduleId));
+                saveSchedules(schedules);
+                renderView();
+                closeCardModal();
+            }
+        });
+    }
+
+    if (shoppingForm) {
+        shoppingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('shopping-name').value;
+            const dateVal = document.getElementById('shopping-date').value;
+            const type = safeGetRadioValue('shopping-type');
+            const price = document.getElementById('shopping-price').value;
+            const normalizedDate = normalizeDateStr(dateVal);
+
+            if (editingScheduleId) {
+                const index = schedules.findIndex(s => String(s.id) === String(editingScheduleId));
+                if (index > -1) {
+                    schedules[index].date = normalizedDate;
+                    schedules[index].name = name;
+                    schedules[index].type = type;
+                    schedules[index].price = price;
+                    schedules[index].note = name;
+                    schedules[index].isShopping = true;
+                    schedules[index].displayTitle = `Ë≥ºÁâ© ¬∑ ${name}`;
+                }
+            } else {
+                const newShopping = {
+                    id: generateUniqueId(),
+                    date: normalizedDate,
+                    name: name,
+                    type: type,
+                    price: price,
+                    note: name,
+                    isShopping: true,
+                    displayTitle: `Ë≥ºÁâ© ¬∑ ${name}`
+                };
+                schedules.push(newShopping);
+            }
+
+            saveSchedules(schedules);
+            if (normalizedDate) currentDate = parseLocalDate(normalizedDate);
+            renderView();
+            closeShoppingModal();
+        });
+    }
+
+    if (shoppingCancelBtn) shoppingCancelBtn.addEventListener('click', closeShoppingModal);
+    if (shoppingDeleteBtn) {
+        shoppingDeleteBtn.addEventListener('click', () => {
+            if (editingScheduleId) {
+                schedules = schedules.filter(s => String(s.id) !== String(editingScheduleId));
+                saveSchedules(schedules);
+                renderView();
+                closeShoppingModal();
+            }
+        });
+    }
+    if (shoppingModalOverlay) {
+        shoppingModalOverlay.addEventListener('click', (e) => {
+            if (e.target === shoppingModalOverlay) closeShoppingModal();
+        });
+    }
+
+    if (scheduleForm) {
+        scheduleForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const hiddenInput = document.getElementById('schedule-date');
+            const datetimeVal = hiddenInput ? hiddenInput.value : '';
+            const endTimeVal = hiddenInput ? hiddenInput.dataset.endtime || '' : '';
+            const [datePart, timePart] = datetimeVal.split('T');
+            const scheduleType = safeGetRadioValue('schedule-type');
+            const noteVal = document.getElementById('schedule-note').value;
+            const linkedCardId = document.getElementById('linked-card-select').value;
+            const normalizedDate = normalizeDateStr(datePart);
+            
+            if (editingScheduleId) {
+                const scheduleIndex = schedules.findIndex(s => String(s.id) === String(editingScheduleId));
+                if (scheduleIndex > -1) {
+                    schedules[scheduleIndex].date = normalizedDate;
+                    schedules[scheduleIndex].time = timePart || '';
+                    schedules[scheduleIndex].endTime = endTimeVal;
+                    schedules[scheduleIndex].type = scheduleType;
+                    schedules[scheduleIndex].note = noteVal;
+                    schedules[scheduleIndex].linkedCardId = linkedCardId;
+                } else {
+                    schedules.push({
+                        id: generateUniqueId(),
+                        date: normalizedDate,
+                        time: timePart || '',
+                        endTime: endTimeVal,
+                        type: scheduleType,
+                        note: noteVal,
+                        linkedCardId: linkedCardId,
+                        isCard: false
+                    });
+                }
+            } else {
+                const newSchedule = {
+                    id: generateUniqueId(),
+                    date: normalizedDate,
+                    time: timePart || '',
+                    endTime: endTimeVal,
+                    type: scheduleType,
+                    note: noteVal,
+                    linkedCardId: linkedCardId,
+                    isCard: false
+                };
+                schedules.push(newSchedule);
+            }
+
+            saveSchedules(schedules);
+            if (normalizedDate) {
+                currentDate = parseLocalDate(normalizedDate);
+            }
+            renderView();
+            closeModal();
+        });
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            if (editingScheduleId) {
+                schedules = schedules.filter(s => String(s.id) !== String(editingScheduleId));
+                saveSchedules(schedules);
+                renderView();
+                closeModal();
+            }
+        });
+    }
+    // ?´Èù¢‰∏ãÊñπ?∏ÊµÆÊ©¢Â??∏ÂñÆ (Bottom Nav Dock - ?ÖÂ?Á§? ‰∫íÂ??áÈ??¢Â??õÈ?Ëº?    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    bottomNavItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const tab = item.dataset.tab;
+            currentTab = tab;
+            bottomNavItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            if (tab === 'calendar') {
+                if (calendarViewContainer) calendarViewContainer.style.display = 'block';
+                if (databaseView) databaseView.style.display = 'none';
+                if (statsView) statsView.style.display = 'none';
+                if (settingsView) settingsView.style.display = 'none';
+                if (prevMonthBtn) prevMonthBtn.style.display = 'flex';
+                if (nextMonthBtn) nextMonthBtn.style.display = 'flex';
+                renderView();
+            } else {
+                if (calendarViewContainer) calendarViewContainer.style.display = 'none';
+                if (prevMonthBtn) prevMonthBtn.style.display = 'none';
+                if (nextMonthBtn) nextMonthBtn.style.display = 'none';
+
+                if (databaseView) databaseView.style.display = 'none';
+                if (statsView) statsView.style.display = 'none';
+                if (settingsView) settingsView.style.display = 'none';
+
+                if (tab === 'database') {
+                    if (databaseView) databaseView.style.display = 'block';
+                    if (monthTitle) monthTitle.textContent = 'Database';
+                } else if (tab === 'stats') {
+                    if (statsView) statsView.style.display = 'flex';
+                    if (monthTitle) monthTitle.textContent = 'Statistics';
+                    const modeSelect = document.getElementById('stats-mode-select');
+                    const currentMode = modeSelect ? modeSelect.value : 'ÊØèÊ?Á∏ΩË¶Ω';
+                    if (currentMode === '?ãÈä∑Á∏ΩË¶Ω') {
+                        renderExpenseDashboard();
+                    } else if (currentMode === 'ÊØèÊ?Á∏ΩË¶Ω') {
+                        renderStatsDashboard();
+                    }
+                } else if (tab === 'settings') {
+                    if (settingsView) settingsView.style.display = 'block';
+                    if (monthTitle) monthTitle.textContent = 'Settings';
+                }
+            }
+        });
+    });
+
+    // ---- Áµ±Ë??ÄË°®Êùø Dashboard Ë®àÁ??áÂ??ãÂ?Ë°®Ê∏≤?ìÈ?Ëº?----
+    let statsCurrentMonthDate = new Date(currentDate);
+
+    function calculateScheduleHours(schedule) {
+        if (!schedule.time) return 1.5;
+        const [sh, sm] = schedule.time.split(':').map(Number);
+        const startMin = sh * 60 + sm;
+
+        if (schedule.endTime) {
+            const [eh, em] = schedule.endTime.split(':').map(Number);
+            const endMin = eh * 60 + em;
+            if (endMin > startMin) {
+                return parseFloat(((endMin - startMin) / 60).toFixed(1));
+            }
+        }
+        return 1.5;
+    }
+
+    function parseCleanPrice(val) {
+        if (typeof val === 'number') return val;
+        if (!val || typeof val !== 'string') return 0;
+        const pricePart = val.split('(')[0];
+        const clean = pricePart.replace(/,/g, '').replace(/[^0-9.]/g, '');
+        return parseFloat(clean) || 0;
+    }
+
+    function getDefaultCost(schedule) {
+        return 0;
+    }
+
+    function getPassCoveredMonths(pass) {
+        const startStr = normalizeDateStr(pass.startDate || pass.date);
+        const endStr = normalizeDateStr(pass.date);
+        if (!startStr) return [];
+        
+        const startD = parseLocalDate(startStr);
+        const endD = endStr ? parseLocalDate(endStr) : parseLocalDate(startStr);
+        
+        const startY = startD.getFullYear();
+        const startM = startD.getMonth();
+        
+        const endY = endD.getFullYear();
+        const endM = endD.getMonth();
+        
+        const totalMonths = (endY - startY) * 12 + (endM - startM);
+        const count = totalMonths > 0 ? totalMonths : 1;
+        
+        const months = [];
+        for (let i = 0; i < count; i++) {
+            const d = new Date(startY, startM + i, 1);
+            months.push(`${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}`);
+        }
+        return months;
+    }
+
+
+
+    function renderStatsDashboard() {
+        const statsMonthLabel = document.getElementById('stats-month-label');
+        const metricSessions = document.getElementById('metric-sessions');
+        const metricSessionsSub = document.getElementById('metric-sessions-sub');
+        const metricHours = document.getElementById('metric-hours');
+        const metricHoursSub = document.getElementById('metric-hours-sub');
+        const metricCost = document.getElementById('metric-cost');
+        const metricCostSub = document.getElementById('metric-cost-sub');
+        const monthlyBarChart = document.getElementById('monthly-bar-chart');
+        const typeDonutChart = document.getElementById('type-donut-chart');
+        const statsLogList = document.getElementById('stats-log-list');
+
+        const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const year = statsCurrentMonthDate.getFullYear();
+        const month = statsCurrentMonthDate.getMonth();
+        const currentMonthStr = `${year}/${String(month + 1).padStart(2, '0')}`;
+
+        if (statsMonthLabel) {
+            statsMonthLabel.textContent = `${monthNamesFull[month]} ${year}`;
+        }
+
+        const monthSchedules = schedules.filter(s => {
+            if (s.isCard) return false;
+            const normDate = normalizeDateStr(s.date);
+            return normDate && normDate.startsWith(currentMonthStr);
+        });
+
+        const groupClass = monthSchedules.filter(s => s.type === '?±Ê??òË™≤').length;
+        const privateClass = monthSchedules.filter(s => s.type === '?±Ê?ÁßÅË™≤').length;
+        const practice = monthSchedules.filter(s => s.type === '?±Ê?Á∑¥Á?').length;
+        const ballet = monthSchedules.filter(s => s.type === '?≠Ëïæ').length;
+        const totalSessions = monthSchedules.length;
+
+        if (metricSessions) metricSessions.textContent = `${totalSessions} ?Ç`;
+        if (metricSessionsSub) metricSessionsSub.textContent = `?òË™≤ ${groupClass} | ÁßÅË™≤ ${privateClass} | Á∑¥Á? ${practice} | ?≠Ëïæ ${ballet}`;
+
+        let totalHours = 0;
+        monthSchedules.forEach(s => {
+            totalHours += calculateScheduleHours(s);
+        });
+        const avgHours = totalSessions > 0 ? (totalHours / totalSessions).toFixed(1) : '0';
+
+        if (metricHours) metricHours.textContent = `${totalHours.toFixed(1)} Â∞èÊ?`;
+        if (metricHoursSub) metricHoursSub.textContent = `Âπ≥Â?ÊØèÂ? ${avgHours} Â∞èÊ?`;
+
+        // Ë®àÁ??∂Ê??±Ë≤ª (?ïÊ??êÊú¨Ë®àÁ?)
+        let totalCost = 0;
+        let monthCardDetailsCount = 0;
+
+        const allCards = schedules.filter(s => s.isCard);
+        
+        allCards.forEach(card => {
+            const price = parseCleanPrice(card.price);
+            if (price === 0) return;
+            
+            const startDate = normalizeDateStr(card.startDate || card.date);
+            const endDate = normalizeDateStr(card.date);
+            const coveredMonths = getPassCoveredMonths(card);
+            
+            const rule = getCardRule(card);
+            if (!rule) {
+                // Ê≤íÊ?ÂÆöÁæ©Ë¶èÂ??ÑË™≤??(‰æãÂ?ÔºöÂñÆÊ¨°ÂÖ•??ÔºåÁõ¥?•Á??®Ë≥ºË≤∑Ê?‰ª?                if (startDate && startDate.startsWith(currentMonthStr)) {
+                    totalCost += price;
+                    monthCardDetailsCount++;
+                }
+                return;
+            }
+
+            const usage = getCardUsage(card.id);
+            const totalUsed = usage.classes + usage.practices;
+            const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+            
+            if (isInfinite || totalUsed === 0) {
+                // ?•ÁÑ°?êÊ¨°?∏Ê?ÂÆåÂÖ®?™‰Ωø?®Ô?Âπ≥Â??ÜÊî§?≥Ê∂µ?ãÊ?‰ª?                if (coveredMonths.includes(currentMonthStr)) {
+                    totalCost += price / (coveredMonths.length || 1);
+                    monthCardDetailsCount++;
+                }
+            } else {
+                // ?â‰Ωø?®Ê¨°?∏Ô?‰æùÊ?‰ΩøÁî®ÊØî‰??ÜÊî§
+                const todayStr = formatLocalDate(new Date());
+                const isExpired = endDate < todayStr;
+                
+                let singleCost = 0;
+                if (isExpired) {
+                    singleCost = price / totalUsed;
+                } else {
+                    const maxQuota = rule.maxClasses + rule.maxPractices;
+                    singleCost = price / maxQuota;
+                }
+                
+                // Ë®àÁ??¨Ê??®‰?Â§öÂ?Ê¨?                let usedInThisMonth = 0;
+                schedules.forEach(s => {
+                    if (!s.isCard && String(s.linkedCardId) === String(card.id)) {
+                        if (normalizeDateStr(s.date).startsWith(currentMonthStr)) {
+                            usedInThisMonth++;
+                        }
+                    }
+                });
+                
+                if (usedInThisMonth > 0) {
+                    totalCost += usedInThisMonth * singleCost;
+                    if (!coveredMonths.includes(currentMonthStr)) {
+                        monthCardDetailsCount++; 
+                    }
+                }
+                
+                if (coveredMonths.includes(currentMonthStr)) {
+                     monthCardDetailsCount++;
+                }
+            }
+        });
+
+        totalCost = Math.round(totalCost);
+
+        if (metricCost) metricCost.textContent = `NT$ ${totalCost.toLocaleString()}`;
+        if (metricCostSub) metricCostSub.textContent = `?ÖÂê´ ${monthSchedules.length} ?ÇË™≤Á®ãË? ${monthCardDetailsCount} ÂºµÁï∂?àÊ???Ë≥ºË≤∑Ë™≤Âç°`;
+
+        if (monthlyBarChart) {
+            monthlyBarChart.innerHTML = '';
+            const monthsList = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(year, month - i, 1);
+                const mStr = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const mName = `${d.getMonth() + 1}?à`;
+                const count = schedules.filter(s => !s.isCard && s.date && normalizeDateStr(s.date).startsWith(mStr)).length;
+                monthsList.push({ name: mName, count, isCurrent: i === 0 });
+            }
+
+            const maxCount = Math.max(...monthsList.map(m => m.count), 1);
+            monthsList.forEach(m => {
+                const group = document.createElement('div');
+                group.className = `bar-group ${m.isCurrent ? 'active' : ''}`;
+
+                const heightPct = Math.round((m.count / maxCount) * 100);
+
+                group.innerHTML = `
+                    <div class="bar-wrapper">
+                        <span class="bar-val-tooltip">${m.count}</span>
+                        <div class="bar-fill" style="height: ${heightPct}%;"></div>
+                    </div>
+                    <span class="bar-label">${m.name}</span>
+                `;
+                monthlyBarChart.appendChild(group);
+            });
+        }
+
+        if (typeDonutChart) {
+            typeDonutChart.innerHTML = '';
+            const typeCounts = [
+                { type: '?±Ê??òË™≤', count: groupClass },
+                { type: '?±Ê?ÁßÅË™≤', count: privateClass },
+                { type: '?±Ê?Á∑¥Á?', count: practice },
+                { type: '?≠Ëïæ', count: ballet }
+            ];
+
+            const legend = document.createElement('div');
+            legend.className = 'donut-legend';
+            legend.style.width = '100%';
+
+            typeCounts.forEach(tc => {
+                const pct = totalSessions > 0 ? Math.round((tc.count / totalSessions) * 100) : 0;
+                const colors = typeColors[tc.type] || defaultTypeColor;
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.style.justifyContent = 'space-between';
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 4px 14px; border-radius: 9999px; font-size: 13px; font-weight: 500; display: inline-block;">${tc.type}</span>
+                        <span style="font-size: 13px; color: #9c9c9c; font-weight: 500;">${pct}%</span>
+                    </div>
+                    <span style="font-weight: 600; color: var(--text-primary);">${tc.count} ??/span>
+                `;
+                legend.appendChild(item);
+            });
+            typeDonutChart.appendChild(legend);
+        }
+
+        if (statsLogList) {
+            statsLogList.innerHTML = '';
+            if (monthSchedules.length === 0) {
+                statsLogList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px; font-size: 13px;">?¨Ê?Â∞öÁÑ°Ë™≤Á??ñÁ∑¥ÁøíÁ???/div>';
+            } else {
+                monthSchedules.sort((a, b) => b.date.localeCompare(a.date)).forEach(s => {
+                    const hrs = calculateScheduleHours(s);
+                    const cost = getDefaultCost(s);
+                    const timeRange = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '?®Â§©';
+                    const colors = typeColors[s.type] || defaultTypeColor;
+
+                    const row = document.createElement('div');
+                    row.className = 'stats-log-item';
+                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
+                    row.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;">${s.type}</span>
+                            <div>
+                                <div style="font-weight: 600; font-size: 13px;">${normalizeDateStr(s.date)} ${timeRange}</div>
+                                <div style="font-size: 11px; color: var(--text-secondary);">${s.note || '?°Â?Ë®?} (${hrs.toFixed(1)}h)</div>
+                            </div>
+                        </div>
+                        <div style="font-weight: 600; font-size: 13px; color: #715a57;">NT$ ${cost.toLocaleString()}</div>
+                    `;
+                    statsLogList.appendChild(row);
+                });
+            }
+        }
+    }
+
+    const statsPrevBtn = document.getElementById('stats-prev-month');
+    const statsNextBtn = document.getElementById('stats-next-month');
+    const statsAllTimeBtn = document.getElementById('stats-all-time-btn');
+
+    if (statsPrevBtn) {
+        statsPrevBtn.addEventListener('click', () => {
+            statsCurrentMonthDate.setDate(1);
+            statsCurrentMonthDate.setMonth(statsCurrentMonthDate.getMonth() - 1);
+            renderStatsDashboard();
+        });
+    }
+
+    if (statsNextBtn) {
+        statsNextBtn.addEventListener('click', () => {
+            statsCurrentMonthDate.setDate(1);
+            statsCurrentMonthDate.setMonth(statsCurrentMonthDate.getMonth() + 1);
+            renderStatsDashboard();
+        });
+    }
+
+    function renderExpenseDashboard() {
+        const expenseTotalCost = document.getElementById('expense-total-cost');
+        const expenseTotalCostSub = document.getElementById('expense-total-cost-sub');
+        const expenseTotalCount = document.getElementById('expense-total-count');
+        const expenseTotalCountSub = document.getElementById('expense-total-count-sub');
+        const expenseActiveCards = document.getElementById('expense-active-cards');
+        const expenseActiveCardsSub = document.getElementById('expense-active-cards-sub');
+        const expenseShoppingTotalCost = document.getElementById('expense-shopping-total-cost');
+        const expenseShoppingTotalSub = document.getElementById('expense-shopping-total-sub');
+        const expensePurchaseList = document.getElementById('expense-purchase-list');
+        const expenseShoppingList = document.getElementById('expense-shopping-list');
+
+        if (!expensePurchaseList || !expenseShoppingList) return;
+
+        const cardRecords = schedules.filter(s => s.isCard);
+        const shoppingRecords = schedules.filter(s => s.isShopping);
+
+        cardRecords.sort((a, b) => {
+            const dateA = a.startDate || a.date || '';
+            const dateB = b.startDate || b.date || '';
+            return dateB.localeCompare(dateA);
+        });
+
+        shoppingRecords.sort((a, b) => {
+            const dateA = a.date || '';
+            const dateB = b.date || '';
+            return dateB.localeCompare(dateA);
+        });
+
+        const todayStr = formatLocalDate(new Date());
+        let totalCourseCost = 0;
+        let activeCount = 0;
+
+        cardRecords.forEach(item => {
+            const price = parseCleanPrice(item.price);
+            totalCourseCost += price;
+
+            const endDateStr = normalizeDateStr(item.date);
+            const isExpired = endDateStr ? (endDateStr < todayStr) : false;
+            
+            const rule = getCardRule(item);
+            if (item.type === '?ÆÊ¨°?•Â†¥') {
+                const isUsed = schedules.some(s => !s.isCard && String(s.linkedCardId) === String(item.id));
+                if (!isUsed && !isExpired) {
+                    activeCount++;
+                }
+            } else if (rule) {
+                const usage = getCardUsage(item.id);
+                const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+                if (isInfinite) {
+                    if (!isExpired) activeCount++;
+                } else {
+                    const totalQuota = rule.maxClasses + rule.maxPractices;
+                    const usedTotal = usage.classes + usage.practices;
+                    if (!isExpired && usedTotal < totalQuota) {
+                        activeCount++;
+                    }
+                }
+            } else {
+                if (!isExpired) activeCount++;
+            }
+        });
+
+        let totalShoppingCost = 0;
+        shoppingRecords.forEach(item => {
+            totalShoppingCost += parseCleanPrice(item.price);
+        });
+
+        if (expenseTotalCost) expenseTotalCost.textContent = `NT$ ${totalCourseCost.toLocaleString()}`;
+        if (expenseTotalCostSub) expenseTotalCostSub.textContent = `?Ä?âË™≤?°Ë??ÆÊ¨°?•Â†¥Ë≤ªÁî®`;
+
+        if (expenseTotalCount) expenseTotalCount.textContent = `${cardRecords.length} Á≠Ü`;
+        if (expenseTotalCountSub) expenseTotalCountSub.textContent = `?ÖÂê´?àÂç°?ÅÂ??°Ë??ÆÊ¨°?∏`;
+
+        if (expenseActiveCards) expenseActiveCards.textContent = `${activeCount} Âºµ`;
+        if (expenseActiveCardsSub) expenseActiveCardsSub.textContent = `Â∞öÊú™?∞Ê?‰∏îÂ??âÈ?Â∫¶`;
+
+        if (expenseShoppingTotalCost) expenseShoppingTotalCost.textContent = `NT$ ${totalShoppingCost.toLocaleString()}`;
+        if (expenseShoppingTotalSub) expenseShoppingTotalSub.textContent = `Á¥ØÁ? ${shoppingRecords.length} Á≠ÜË??ôË??®Â??±Ë≤ª`;
+
+        // Ê∏≤Ê?Ë≥ºË™≤Á¥Ä?ÑÂ?Ë°?        expensePurchaseList.innerHTML = '';
+        if (cardRecords.length === 0) {
+            expensePurchaseList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 13px;">?ÆÂ?Â∞öÁÑ°Ë≥ºË™≤Á¥Ä??/div>';
+        } else {
+            cardRecords.forEach(item => {
+                const price = parseCleanPrice(item.price);
+                const colors = typeColors[item.type] || defaultTypeColor;
+                
+                let usageText = '';
+                let statusBadgeHtml = '';
+
+                const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
+                const endDate = item.date ? normalizeDateStr(item.date) : '';
+                const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '?°Êó•??);
+                const endDateStr = normalizeDateStr(item.date);
+                const isExpired = endDateStr ? (endDateStr < todayStr) : false;
+
+                const rule = getCardRule(item);
+                if (item.type === '?ÆÊ¨°?•Â†¥') {
+                    const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
+                    if (usedSchedule) {
+                        usageText = `Â∑≤Êñº ${normalizeDateStr(usedSchedule.date)} ?µÊâ£`;
+                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: rgba(113, 90, 87, 0.1); color: var(--text-secondary);">Â∑≤‰Ωø??/span>`;
+                    } else if (isExpired) {
+                        usageText = `?™‰Ωø?®`;
+                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #fde8e8; color: #e53e3e;">Â∑≤È???/span>`;
+                    } else {
+                        usageText = `?ØÊäµ??Ö•??1 Ê¨°`;
+                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e6f4ea; color: #137333; font-weight: 500;">?âÊ?‰ΩøÁî®‰∏?/span>`;
+                    }
+                } else if (rule) {
+                    const usage = getCardUsage(item.id);
+                    const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+                    if (isInfinite) {
+                        usageText = `?üÈ??ß‰??êÊ¨°?∏`;
+                        if (isExpired) {
+                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #fde8e8; color: #e53e3e;">Â∑≤È???/span>`;
+                        } else {
+                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e6f4ea; color: #137333; font-weight: 500;">?âÊ?‰ΩøÁî®‰∏?/span>`;
+                        }
+                    } else {
+                        const totalQuota = rule.maxClasses + rule.maxPractices;
+                        const usedTotal = usage.classes + usage.practices;
+                        
+                        let parts = [];
+                        if (rule.maxClasses > 0) parts.push(`Ë™≤Â? ${usage.classes}/${rule.maxClasses}`);
+                        if (rule.maxPractices > 0) parts.push(`Á∑¥Á? ${usage.practices}/${rule.maxPractices}`);
+                        usageText = parts.join(' | ');
+
+                        if (usedTotal >= totalQuota) {
+                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: rgba(113, 90, 87, 0.1); color: var(--text-secondary);">Â∑≤Áî®ÂÆ?/span>`;
+                        } else if (isExpired) {
+                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #fde8e8; color: #e53e3e;">Â∑≤È???/span>`;
+                        } else {
+                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e6f4ea; color: #137333; font-weight: 500;">?âÊ?‰ΩøÁî®‰∏?/span>`;
+                        }
+                    }
+                } else {
+                    usageText = item.note || 'Ë≥ºË™≤Á¥Ä??;
+                    statusBadgeHtml = isExpired 
+                        ? `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #fde8e8; color: #e53e3e;">Â∑≤È???/span>`
+                        : `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e6f4ea; color: #137333; font-weight: 500;">?âÊ?‰ΩøÁî®‰∏?/span>`;
+                }
+
+                const row = document.createElement('div');
+                row.className = 'stats-log-item';
+                row.style.cursor = 'pointer';
+                if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
+                
+                row.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; shrink: 0;">${item.displayTitle || item.type}</span>
+                        <div>
+                            <div style="font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                                <span>${dateStr}</span>
+                                ${statusBadgeHtml}
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                ${usageText}${item.note ? ' ¬∑ ' + item.note : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 600; font-size: 14px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>
+                `;
+
+                row.addEventListener('click', () => {
+                    editingScheduleId = item.id;
+                    openCardModalForEdit(item);
+                });
+
+                expensePurchaseList.appendChild(row);
+            });
+        }
+
+        // Ê∏≤Ê?Ë≥ºÁâ©Á¥Ä?ÑÂ?Ë°?        expenseShoppingList.innerHTML = '';
+        if (shoppingRecords.length === 0) {
+            expenseShoppingList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 24px; font-size: 13px;">?ÆÂ?Â∞öÁÑ°Ë≥ºÁâ©Á¥Ä??/div>';
+        } else {
+            shoppingRecords.forEach(item => {
+                const price = parseCleanPrice(item.price);
+                const colors = typeColors[item.type] || { bg: '#e0ecf8', text: '#39587c', cardBg: '#f2f7fc' };
+                const dateStr = item.date ? normalizeDateStr(item.date) : '?°Êó•??;
+                
+                const row = document.createElement('div');
+                row.className = 'stats-log-item';
+                row.style.cursor = 'pointer';
+                if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
+
+                row.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; shrink: 0;">${item.type || 'Ë≥ºÁâ©'}</span>
+                        <div>
+                            <div style="font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+                                <span>${dateStr}</span>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: rgba(224, 236, 248, 0.7); color: #39587c; font-weight: 500;">Ë≥ºÁâ©</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                                ${item.name || item.note || 'Ë≥ºÁâ©Á¥Ä??}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-weight: 600; font-size: 14px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>
+                `;
+
+                row.addEventListener('click', () => {
+                    editingScheduleId = item.id;
+                    openShoppingModalForEdit(item);
+                });
+
+                expenseShoppingList.appendChild(row);
+            });
+        }
+    }
+
+    function initStatsModeSelector() {
+        const wrapper = document.getElementById('stats-mode-wrapper');
+        const trigger = document.getElementById('stats-mode-trigger');
+        const menuEl = document.getElementById('stats-mode-menu');
+        const displaySpan = document.getElementById('stats-mode-display');
+        const hiddenInput = document.getElementById('stats-mode-select');
+        const monthlyContent = document.getElementById('stats-monthly-content');
+        const placeholderContent = document.getElementById('stats-placeholder-content');
+        const expenseContent = document.getElementById('stats-expense-content');
+        const monthSelectorGroup = document.querySelector('.dashboard-month-selector');
+
+        if (!trigger || !menuEl) return;
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = menuEl.classList.contains('show');
+            if (isOpen) {
+                menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+            } else {
+                menuEl.classList.add('show');
+                if (wrapper) wrapper.classList.add('open');
+            }
+        });
+
+        const options = menuEl.querySelectorAll('.custom-select-option');
+        options.forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const mode = opt.dataset.value;
+                if (hiddenInput) hiddenInput.value = mode;
+                if (displaySpan) displaySpan.textContent = mode;
+                
+                options.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+
+                if (menuEl) menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+
+                if (mode === 'ÊØèÊ?Á∏ΩË¶Ω') {
+                    if (monthlyContent) monthlyContent.style.display = 'block';
+                    if (placeholderContent) placeholderContent.style.display = 'none';
+                    if (expenseContent) expenseContent.style.display = 'none';
+                    if (monthSelectorGroup) monthSelectorGroup.style.display = 'flex';
+                    renderStatsDashboard();
+                } else if (mode === '?ãÈä∑Á∏ΩË¶Ω') {
+                    if (monthlyContent) monthlyContent.style.display = 'none';
+                    if (placeholderContent) placeholderContent.style.display = 'none';
+                    if (expenseContent) expenseContent.style.display = 'flex';
+                    if (monthSelectorGroup) monthSelectorGroup.style.display = 'none';
+                    renderExpenseDashboard();
+                } else {
+                    if (monthlyContent) monthlyContent.style.display = 'none';
+                    if (expenseContent) expenseContent.style.display = 'none';
+                    if (placeholderContent) {
+                        placeholderContent.style.display = 'flex';
+                        placeholderContent.textContent = '';
+                    }
+                    if (monthSelectorGroup) monthSelectorGroup.style.display = 'none';
+                }
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#stats-mode-wrapper')) {
+                if (menuEl) menuEl.classList.remove('show');
+                if (wrapper) wrapper.classList.remove('open');
+            }
+        });
+    }
+
+    initStatsModeSelector();
+
+    let scrollTimeout = null;
+    let touchStartY = 0;
+    
+    function changeMonthByScroll(delta) {
+        if (scrollTimeout) return;
+        if (currentViewMode === 'month') {
+            currentDate.setDate(1);
+            currentDate.setMonth(currentDate.getMonth() + delta);
+        } else {
+            currentDate.setFullYear(currentDate.getFullYear() + delta);
+        }
+        renderView();
+        scrollTimeout = setTimeout(() => {
+            scrollTimeout = null;
+        }, 400);
+    }
+
+    const scrollTarget = calendarGrid || yearCalendarView;
+    if (scrollTarget) {
+        document.body.addEventListener('wheel', (e) => {
+            if (e.target.closest('#calendar-grid, #year-calendar-view')) {
+                if (Math.abs(e.deltaY) > 20) {
+                    if (e.deltaY > 0) {
+                        changeMonthByScroll(1);
+                    } else {
+                        changeMonthByScroll(-1);
+                    }
+                }
+            }
+        }, { passive: true });
+    }
+
+    // ---- ?ï‰?Á∑¥Á?ÂΩ±Á?Ë≥áÊ?Â∫´È?Ëº?(Video Database Logic) ----
+    let videos = loadVideos();
+    let currentSelectedCategory = 'ALL';
+    let videoSearchKeyword = '';
+    let editingVideoId = null;
+
+    function loadVideos() {
+        try {
+            const raw = localStorage.getItem('skating_videos_db');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch (e) {
+            console.error('Failed to load videos:', e);
+        }
+        return [
+            {
+                id: 'v1',
+                title: 'Axel (1A) ‰∏Ä?àÂ?Ë∑≥Ë?Ëµ∑Ë∑≥?áÁ©∫‰∏≠Ëª∏ÂøÉÊ?Ë°ìÁ§∫ÁØ?,
+                url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                category: 'Ë∑≥Ë?',
+                cover: '',
+                note: 'Ê≥®Ê??çÂ??ÉÈÄ≤ÂÖ•ÂºßÁ??áÂ∑¶?øÊì∫?ïÂ∏∂?ïËµ∑Ë∑≥È?Â∫¶„Ä?
+            },
+            {
+                id: 'v2',
+                title: 'Camel Spin ?ïÂ??ãË?‰º∏Â??áÊ??≥ÈÄ≤È?Ë®ìÁ∑¥',
+                url: 'https://youtube.com/shorts/3JX25bV4Nkc',
+                category: '?ãË?',
+                cover: '',
+                note: 'Ê∞¥Âπ≥?ØÊ?Ëª∏Â?Á∂≠Ê?ÔºåÊ†∏ÂøÉÊî∂Á∑äÈÅø?çÊ?ËΩâ„Ä?
+            },
+            {
+                id: 'v3',
+                title: 'Twizzle ?ôÂ??ãË?Ê≠•Ê?Á∑¥Á??áÂπ≥Ë°°Êéß??,
+                url: 'https://www.instagram.com/reels/C1234567890/',
+                category: 'Ê≠•Ê?',
+                cover: '',
+                note: 'ËΩâÈ??ÇË??ã‰??ÅÂæÆÂΩàÊÄßÔ??©Ê¨°ËΩâÈ??ì‰??õÂ???
+            }
+        ];
+    }
+
+    function saveVideos(data) {
+        try {
+            localStorage.setItem('skating_videos_db', JSON.stringify(data));
+        } catch (e) {
+            console.error('Failed to save videos:', e);
+        }
+    }
+
+    function detectVideoPlatform(url) {
+        if (!url || typeof url !== 'string') return { platform: 'other', label: 'Video', videoId: '' };
+        const cleanUrl = url.trim();
+
+        if (cleanUrl.includes('youtube.com/shorts/') || cleanUrl.includes('youtu.be/shorts/')) {
+            const parts = cleanUrl.split('/shorts/');
+            const videoId = parts[1] ? parts[1].split('?')[0].split('/')[0] : '';
+            return { platform: 'shorts', label: 'Shorts', videoId };
+        }
+
+        if (cleanUrl.includes('youtube.com') || cleanUrl.includes('youtu.be')) {
+            let videoId = '';
+            if (cleanUrl.includes('youtu.be/')) {
+                videoId = cleanUrl.split('youtu.be/')[1].split('?')[0];
+            } else if (cleanUrl.includes('v=')) {
+                videoId = cleanUrl.split('v=')[1].split('&')[0];
+            }
+            return { platform: 'youtube', label: 'YouTube', videoId };
+        }
+
+        if (cleanUrl.includes('instagram.com/reels/') || cleanUrl.includes('instagram.com/reel/')) {
+            return { platform: 'reels', label: 'Reels', videoId: '' };
+        }
+
+        if (cleanUrl.includes('xiaohongshu.com') || cleanUrl.includes('xhslink.com') || cleanUrl.includes('rednote')) {
+            return { platform: 'rednote', label: 'Â∞èÁ???, videoId: '' };
+        }
+
+        return { platform: 'other', label: 'ÂΩ±Á?', videoId: '' };
+    }
+
+    function getVideoThumbnailUrl(video) {
+        if (video.cover && video.cover.trim() !== '') {
+            return video.cover.trim();
+        }
+        const info = detectVideoPlatform(video.url);
+        if ((info.platform === 'youtube' || info.platform === 'shorts') && info.videoId) {
+            return `https://img.youtube.com/vi/${info.videoId}/hqdefault.jpg`;
+        }
+        return '';
+    }
+
+    function renderDatabaseView() {
+        const grid = document.getElementById('video-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+
+        let filtered = videos.filter(v => {
+            if (currentSelectedCategory !== 'ALL' && v.category !== currentSelectedCategory) {
+                return false;
+            }
+            if (videoSearchKeyword) {
+                const target = `${v.title || ''} ${v.note || ''} ${v.category || ''}`.toLowerCase();
+                if (!target.includes(videoSearchKeyword.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 40px 20px; font-size: 14px;">
+                    Â∞öÁÑ°Á¨¶Â?Ê¢ù‰ª∂?ÑÂ?‰ΩúÁ∑¥ÁøíÂΩ±?áÔ?ÈªûÈÅ∏?≥‰?Ëßí„ÄåÊñ∞Â¢ûÂΩ±?á„ÄçÈ?ÂßãÊî∂?èÔ?
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach(video => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+
+            const thumbUrl = getVideoThumbnailUrl(video);
+            const platformInfo = detectVideoPlatform(video.url);
+            const catColors = typeColors[video.category] || defaultTypeColor;
+
+            let thumbHtml = '';
+            if (thumbUrl) {
+                thumbHtml = `<img src="${thumbUrl}" class="video-thumb-img" alt="${video.title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="video-thumb-generated" style="display: none;">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <div class="gen-title">${video.title}</div>
+                </div>`;
+            } else {
+                thumbHtml = `
+                <div class="video-thumb-generated">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <div class="gen-title">${video.title}</div>
+                </div>`;
+            }
+
+            card.innerHTML = `
+                <div class="video-thumb-wrapper">
+                    <span class="video-platform-badge ${platformInfo.platform}">${platformInfo.label}</span>
+                    ${thumbHtml}
+                    <div class="video-play-btn">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </div>
+                </div>
+                <div class="video-card-body">
+                    <div class="video-card-header-row">
+                        <h3 class="video-card-title">${video.title}</h3>
+                        <span class="video-card-category" style="background-color: ${catColors.bg}; color: ${catColors.text};">${video.category || '?™Â?È°?}</span>
+                    </div>
+                    <div class="video-card-note">${video.note || '?°Á∑¥ÁøíÂ?Ë®?}</div>
+                    <div class="video-card-footer">
+                        <a href="${video.url}" target="_blank" rel="noopener noreferrer" class="video-open-link-btn">
+                            ??${platformInfo.label} ËßÄ??                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <div class="video-actions-btns">
+                            <button class="video-action-icon edit-video-btn" title="Á∑®ËºØÂΩ±Á?">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // ÈªûÊ??êË¶Ω?ñÊ??≠Êîæ?âÈ??®Êñ∞?ÜÈ??ìÈ??üÂ?ÂΩ±Á?
+            const thumbWrapper = card.querySelector('.video-thumb-wrapper');
+            if (thumbWrapper) {
+                thumbWrapper.addEventListener('click', () => {
+                    window.open(video.url, '_blank');
+                });
+            }
+
+            // ÈªûÊ?Á∑®ËºØ?âÈ?
+            const editBtn = card.querySelector('.edit-video-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openVideoModalForEdit(video);
+                });
+            }
+
+            grid.appendChild(card);
+        });
+    }
+
+    // ?ÜÈ? Pills ?áÊ?Â∞ã‰?‰ª∂Á?ÂÆ?    const videoCategoryPills = document.getElementById('video-category-pills');
+    if (videoCategoryPills) {
+        const pills = videoCategoryPills.querySelectorAll('.video-cat-pill');
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                pills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentSelectedCategory = pill.dataset.category || 'ALL';
+                renderDatabaseView();
+            });
+        });
+    }
+
+    const videoSearchInput = document.getElementById('video-search-input');
+    if (videoSearchInput) {
+        videoSearchInput.addEventListener('input', (e) => {
+            videoSearchKeyword = e.target.value.trim();
+            renderDatabaseView();
+        });
+    }
+
+    // ÂΩ±Á? Modal ?ßÂà∂ logic
+    const videoModalOverlay = document.getElementById('video-modal-overlay');
+    const videoForm = document.getElementById('video-form');
+    const videoModalTitle = document.getElementById('video-modal-title');
+    const videoDeleteBtn = document.getElementById('video-delete-btn');
+    const videoCancelBtn = document.getElementById('video-cancel-btn');
+    const addVideoBtn = document.getElementById('add-video-btn');
+
+    initCustomSelect('video-category-trigger', 'video-category-menu', 'video-category-wrapper', 'video-category-select', 'video-category-display');
+
+    function closeVideoModal() {
+        if (videoModalOverlay) videoModalOverlay.classList.remove('show');
+        if (videoForm) videoForm.reset();
+        editingVideoId = null;
+    }
+
+    function openVideoModal() {
+        editingVideoId = null;
+        if (videoModalTitle) videoModalTitle.textContent = '?∞Â?ÂΩ±Á?';
+        if (videoDeleteBtn) videoDeleteBtn.style.display = 'none';
+        if (videoForm) videoForm.reset();
+        safeSetRadioValue('video-category', 'Ë∑≥Ë?');
+        if (videoModalOverlay) videoModalOverlay.classList.add('show');
+    }
+
+    function openVideoModalForEdit(video) {
+        editingVideoId = video.id;
+        if (videoModalTitle) videoModalTitle.textContent = 'Á∑®ËºØÂΩ±Á?';
+        if (videoDeleteBtn) videoDeleteBtn.style.display = 'block';
+
+        const titleInput = document.getElementById('video-title');
+        const urlInput = document.getElementById('video-url');
+        const coverInput = document.getElementById('video-cover');
+        const noteInput = document.getElementById('video-note');
+
+        if (titleInput) titleInput.value = video.title || '';
+        if (urlInput) urlInput.value = video.url || '';
+        if (coverInput) coverInput.value = video.cover || '';
+        if (noteInput) noteInput.value = video.note || '';
+
+        safeSetRadioValue('video-category', video.category || 'Ë∑≥Ë?');
+        if (videoModalOverlay) videoModalOverlay.classList.add('show');
+    }
+
+    if (addVideoBtn) addVideoBtn.addEventListener('click', openVideoModal);
+    if (videoCancelBtn) videoCancelBtn.addEventListener('click', closeVideoModal);
+    if (videoModalOverlay) {
+        videoModalOverlay.addEventListener('click', (e) => {
+            if (e.target === videoModalOverlay) closeVideoModal();
+        });
+    }
+
+    if (videoForm) {
+        videoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('video-title').value;
+            const url = document.getElementById('video-url').value;
+            const category = safeGetRadioValue('video-category');
+            const cover = document.getElementById('video-cover').value;
+            const note = document.getElementById('video-note').value;
+
+            if (editingVideoId) {
+                const idx = videos.findIndex(v => String(v.id) === String(editingVideoId));
+                if (idx > -1) {
+                    videos[idx].title = title;
+                    videos[idx].url = url;
+                    videos[idx].category = category;
+                    videos[idx].cover = cover;
+                    videos[idx].note = note;
+                }
+            } else {
+                videos.unshift({
+                    id: 'v-' + Date.now(),
+                    title: title,
+                    url: url,
+                    category: category,
+                    cover: cover,
+                    note: note
+                });
+            }
+
+            saveVideos(videos);
+            renderDatabaseView();
+            closeVideoModal();
+        });
+    }
+
+    if (videoDeleteBtn) {
+        videoDeleteBtn.addEventListener('click', () => {
+            if (editingVideoId) {
+                videos = videos.filter(v => String(v.id) !== String(editingVideoId));
+                saveVideos(videos);
+                renderDatabaseView();
+                closeVideoModal();
+            }
+        });
+    }
+
+    // Á∂ÅÂ??®Â?Â∫ïÈÉ®?∏ÂñÆ?ÜÈ??áÊ? (Calendar, Database, Stats, Settings)
+    const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+    bottomNavItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const tab = item.dataset.tab;
+            if (!tab) return;
+            currentTab = tab;
+            bottomNavItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            renderView();
+        });
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startApp);
+} else {
+    startApp();
+}
+
+</script>
+</body>
+</html>
+

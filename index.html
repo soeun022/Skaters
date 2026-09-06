@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skaters</title>
+    <!-- iOS / Android Web App Standalone Mode & PWA Manifest -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Skaters">
+    <meta name="theme-color" content="#f7edeb">
+    <link rel="manifest" href="manifest.json">
+    <!-- App Icons (iOS Squircle & Base64 Favicon) -->
+    <link rel="icon" type="image/svg+xml" href="favicon-rounded.svg?v=4">
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,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">
+    <link rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,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">
+    <link rel="shortcut icon" type="image/png" href="data:image/png;base64,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">
+    <link rel="apple-touch-icon" sizes="128x128" href="data:image/png;base64,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">
+    <link rel="icon" type="image/png" href="favicon-32.png?v=4">
+    <link rel="icon" type="image/png" href="favicon-64.png?v=4">
+    <link rel="apple-touch-icon" href="favicon-128.png?v=4">
+<!-- 使用 Google Fonts: Noto Serif TC (對應 Hoefler Text 古典襯線明體風格) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 頂部導覽列 -->
+    <header class="navbar">
+        <!-- 中間月份/年份懸浮橢圓毛玻璃選單 -->
+        <div id="top-month-dock" class="top-month-dock">
+            <button id="prev-month-btn" class="icon-btn" title="上一個">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div id="month-title-wrapper" class="month-title-wrapper" title="點擊切換年曆/月曆">
+                <h1 id="month-title">September 2026</h1>
+            </div>
+            <button id="next-month-btn" class="icon-btn" title="下一個">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+        </div>
+
+        <!-- 右側搜尋與新增獨立懸浮橢圓毛玻璃選單 -->
+        <div id="top-action-dock" class="top-action-dock">
+            <button id="search-btn" class="icon-btn" title="搜尋">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+            <button id="top-add-btn" class="icon-btn" title="新增">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- 月曆視圖主容器 -->
+    <div id="calendar-view-container" class="page-view-container">
+        <!-- 系統提醒 -->
+        <div id="system-alert-container" style="padding: 12px 16px; margin: 10px 16px; background-color: #fcebd2; color: #826233; border-radius: 8px; font-size: 13px; font-weight: 500; display: none;">
+        </div>
+        <!-- 星期列 -->
+        <div id="weekdays-bar" class="weekdays">
+            <div>Mon.</div>
+            <div>Tue.</div>
+            <div>Wed.</div>
+            <div>Thu.</div>
+            <div>Fri.</div>
+            <div>Sat.</div>
+            <div>Sun.</div>
+        </div>
+
+        <!-- 月曆網格 -->
+        <main id="calendar-grid" class="calendar-grid">
+            <!-- JS 會在這裡動態產生日期 -->
+        </main>
+
+        <!-- 年曆視圖網格 (預設隱鎖) -->
+        <div id="year-calendar-view" class="year-calendar-view" style="display: none;">
+            <!-- JS 會在這裡動態產生 12 個月份迷你月曆 -->
+        </div>
+    </div>
+
+    <!-- 單日視圖主容器 -->
+    <div id="day-view-container" class="page-view-container stats-dashboard" style="display: none;">
+        <div class="recent-list-card">
+            <h3 class="chart-title">當日排程與活動</h3>
+            <div id="day-view-list" class="stats-log-list"></div>
+        </div>
+    </div>
+
+    <!-- 動作練習影片資料庫 View -->
+    <div id="database-view" class="page-view-container video-db-container" style="display: none;">
+        <div class="video-db-header">
+            <div class="video-db-title-area">
+                <h2 class="video-db-title">動作練習影片庫</h2>
+                <span class="video-db-subtitle">動作技術拆解與練習影片收藏</span>
+            </div>
+            <button id="add-video-btn" class="video-add-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                新增影片
+            </button>
+        </div>
+
+        <!-- 搜尋與分類滑動列 -->
+        <div class="video-filter-bar">
+            <div class="video-search-box">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#715a57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="video-search-input" placeholder="搜尋影片名稱或關鍵字...">
+            </div>
+            
+            <div class="video-category-pills" id="video-category-pills">
+                <button class="video-cat-pill active" data-category="ALL">全部</button>
+                <button class="video-cat-pill" data-category="跳躍">跳躍</button>
+                <button class="video-cat-pill" data-category="旋轉">旋轉</button>
+                <button class="video-cat-pill" data-category="步法">步法</button>
+                <button class="video-cat-pill" data-category="滑行基礎">滑行基礎</button>
+                <button class="video-cat-pill" data-category="陸上訓練">陸上訓練</button>
+                <button class="video-cat-pill" data-category="其他">其他</button>
+            </div>
+        </div>
+
+        <!-- 影片網格 Cards Grid -->
+        <div id="video-grid" class="video-grid"></div>
+    </div>
+
+    <!-- 統計視圖 (Stats Dashboard View) -->
+    <div id="stats-view" class="page-view-container stats-dashboard" style="display: none;">
+        <div class="dashboard-header">
+            <div class="dashboard-month-selector">
+                <button id="stats-prev-month" class="icon-btn" title="上個月">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <span id="stats-month-label" class="stats-month-label">September 2026</span>
+                <button id="stats-next-month" class="icon-btn" title="下個月">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+
+            <div class="custom-select-wrapper" id="stats-mode-wrapper" style="width: auto;">
+                <input type="hidden" id="stats-mode-select" value="每月總覽">
+                <div class="stats-mode-trigger" id="stats-mode-trigger" tabindex="0">
+                    <span id="stats-mode-display">每月總覽</span>
+                    <svg class="custom-select-arrow" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="custom-select-menu stats-mode-menu" id="stats-mode-menu">
+                    <div class="custom-select-option selected" data-value="每月總覽">每月總覽</div>
+                    <div class="custom-select-option" data-value="年度總覽">年度總覽</div>
+                    <div class="custom-select-option" data-value="全期間總覽">全期間總覽</div>
+                    <div class="custom-select-option" data-value="開銷總覽">開銷總覽</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 每月總覽內容 (Monthly Overview Content) -->
+        <div id="stats-monthly-content" style="display: block;">
+            <!-- 3大核心指標卡片 (Metric Cards) -->
+            <div class="metric-cards-grid">
+                <div id="sessions-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">當月堂數 / 練習</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="metric-sessions" class="metric-value">0 堂</div>
+                    <div id="metric-sessions-sub" class="metric-subtext">團課 0 | 私課 0 | 練習 0</div>
+                </div>
+
+                <div id="hours-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總運動時數</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="metric-hours" class="metric-value">0 小時</div>
+                    <div id="metric-hours-sub" class="metric-subtext">平均每堂 0 小時</div>
+                </div>
+
+                <div id="cost-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總運動花費</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="metric-cost" class="metric-value">NT$ 0</div>
+                    <div id="metric-cost-sub" class="metric-subtext">包含課程與課卡費用</div>
+                </div>
+
+                <div id="shopping-cost-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總購物花費</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="metric-shopping-cost" class="metric-value">NT$ 0</div>
+                    <div id="metric-shopping-cost-sub" class="metric-subtext">共 0 筆購物紀錄</div>
+                </div>
+            </div>
+
+            <!-- 數據圖表區域 (Charts Container) -->
+            <div class="charts-grid" style="margin-top: 18px;">
+                <!-- 月度趨勢圖表卡片 -->
+                <div class="chart-card">
+                    <h3 class="chart-title">近 6 個月運動堂數與時數趨勢</h3>
+                    <div id="monthly-bar-chart" class="bar-chart-container"></div>
+                </div>
+
+                <!-- 運動類型佔比圓環圖卡片 -->
+                <div class="chart-card">
+                    <h3 class="chart-title">運動類型分布佔比</h3>
+                    <div id="type-donut-chart" class="donut-chart-container"></div>
+                </div>
+            </div>
+
+            <!-- 本月詳細列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">本月課程與練習紀錄</h3>
+                <div id="stats-log-list" class="stats-log-list"></div>
+            </div>
+
+            <!-- 本月購課列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">本月購課紀錄</h3>
+                <div id="stats-card-list" class="stats-log-list"></div>
+            </div>
+
+            <!-- 本月購物列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">本月購物紀錄</h3>
+                <div id="stats-shopping-list" class="stats-log-list"></div>
+            </div>
+        </div>
+
+        <!-- 年度總覽內容 (Yearly Overview Content) -->
+        <div id="stats-yearly-content" style="display: none;">
+            <!-- 4大核心指標卡片 (Metric Cards) -->
+            <div class="metric-cards-grid">
+                <div id="yearly-sessions-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">當年度堂數 / 練習</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="yearly-metric-sessions" class="metric-value">0 堂</div>
+                    <div id="yearly-metric-sessions-sub" class="metric-subtext">團課 0 | 私課 0 | 練習 0</div>
+                </div>
+
+                <div id="yearly-hours-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總運動時數</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="yearly-metric-hours" class="metric-value">0 小時</div>
+                    <div id="yearly-metric-hours-sub" class="metric-subtext">平均每月 0 小時</div>
+                </div>
+
+                <div id="yearly-cost-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總運動花費</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="yearly-metric-cost" class="metric-value">NT$ 0</div>
+                    <div id="yearly-metric-cost-sub" class="metric-subtext">包含年度課程與課卡費用</div>
+                </div>
+
+                <div id="yearly-shopping-cost-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總購物花費</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="yearly-metric-shopping-cost" class="metric-value">NT$ 0</div>
+                    <div id="yearly-metric-shopping-cost-sub" class="metric-subtext">共 0 筆購物紀錄</div>
+                </div>
+            </div>
+
+            <!-- 數據圖表區域 (Charts Container) -->
+            <div class="charts-grid" style="margin-top: 18px;">
+                <!-- 12 個月趨勢圖表卡片 -->
+                <div class="chart-card">
+                    <h3 class="chart-title">全年度 12 個月運動堂數與時數趨勢</h3>
+                    <div id="yearly-bar-chart" class="bar-chart-container"></div>
+                </div>
+
+                <!-- 運動類型佔比圓環圖卡片 -->
+                <div class="chart-card">
+                    <h3 class="chart-title">運動類型分布佔比</h3>
+                    <div id="yearly-type-donut-chart" class="donut-chart-container"></div>
+                </div>
+            </div>
+
+            <!-- 年度詳細列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">年度課程與練習紀錄</h3>
+                <div id="yearly-stats-log-list" class="stats-log-list"></div>
+            </div>
+
+            <!-- 年度購課列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">年度購課紀錄</h3>
+                <div id="yearly-stats-card-list" class="stats-log-list"></div>
+            </div>
+
+            <!-- 年度購物列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">年度購物紀錄</h3>
+                <div id="yearly-stats-shopping-list" class="stats-log-list"></div>
+            </div>
+        </div>
+
+        <!-- 全期間總覽內容 (All-Time Overview Content) -->
+        <div id="stats-alltime-content" style="display: none;">
+            <!-- 4大核心指標卡片 (Metric Cards) -->
+            <div class="metric-cards-grid">
+                <div id="alltime-sessions-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">全期間堂數 / 練習</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="alltime-metric-sessions" class="metric-value">0 堂</div>
+                    <div id="alltime-metric-sessions-sub" class="metric-subtext">團課 0 | 私課 0 | 練習 0</div>
+                </div>
+
+                <div id="alltime-hours-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總運動時數</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="alltime-metric-hours" class="metric-value">0 小時</div>
+                    <div id="alltime-metric-hours-sub" class="metric-subtext">平均每月 0 小時</div>
+                </div>
+
+                <div id="alltime-cost-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總運動花費</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="alltime-metric-cost" class="metric-value">NT$ 0</div>
+                    <div id="alltime-metric-cost-sub" class="metric-subtext">包含全期間課程與課卡費用</div>
+                </div>
+
+                <div id="alltime-shopping-cost-metric-card" class="metric-card" style="cursor: pointer; position: relative;">
+                    <div class="metric-header">
+                        <span class="metric-title">總購物花費</span>
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-secondary); opacity: 0.7;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    </div>
+                    <div id="alltime-metric-shopping-cost" class="metric-value">NT$ 0</div>
+                    <div id="alltime-metric-shopping-cost-sub" class="metric-subtext">共 0 筆購物紀錄</div>
+                </div>
+            </div>
+
+            <!-- 數據圖表區域 (Charts Container) -->
+            <div class="charts-grid" style="margin-top: 18px;">
+                <!-- 全期間趨勢圖表卡片 -->
+                <div class="chart-card">
+                    <h3 class="chart-title">全期間 12 個月運動堂數與時數趨勢</h3>
+                    <div id="alltime-bar-chart" class="bar-chart-container"></div>
+                </div>
+
+                <!-- 運動類型佔比圓環圖卡片 -->
+                <div class="chart-card">
+                    <h3 class="chart-title">運動類型分布佔比</h3>
+                    <div id="alltime-type-donut-chart" class="donut-chart-container"></div>
+                </div>
+            </div>
+
+            <!-- 全期間詳細列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">全期間課程與練習紀錄</h3>
+                <div id="alltime-stats-log-list" class="stats-log-list"></div>
+            </div>
+
+            <!-- 全期間購課列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">全期間購課紀錄</h3>
+                <div id="alltime-stats-card-list" class="stats-log-list"></div>
+            </div>
+
+            <!-- 全期間購物列表卡片 -->
+            <div class="recent-list-card" style="margin-top: 18px;">
+                <h3 class="chart-title">全期間購物紀錄</h3>
+                <div id="alltime-stats-shopping-list" class="stats-log-list"></div>
+            </div>
+        </div>
+
+        <!-- 模式切換留白預留區 (Other Overview Modes Blank Content) -->
+        <div id="stats-placeholder-content" style="display: none; min-height: 250px; border-radius: 16px; background-color: var(--bg-white); border: 1px dashed rgba(113, 90, 87, 0.2); align-items: center; justify-content: center; color: var(--text-secondary); font-size: 14px; margin-top: 12px; padding: 40px 20px; text-align: center;">
+        </div>
+
+        <!-- 開銷總覽內容 (Expense Overview Content) -->
+        <div id="stats-expense-content" style="display: none; flex-direction: column; gap: 18px; width: 100%;">
+            <!-- 開銷核心指標卡片 -->
+            <div class="metric-cards-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">累積購課總花費</span>
+                    </div>
+                    <div id="expense-total-cost" class="metric-value">NT$ 0</div>
+                    <div id="expense-total-cost-sub" class="metric-subtext">所有課卡與單次入場費用</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">購課總筆數</span>
+                    </div>
+                    <div id="expense-total-count" class="metric-value">0 筆</div>
+                    <div id="expense-total-count-sub" class="metric-subtext">包含月卡、包卡與單次券</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">使用中 / 有效課卡</span>
+                    </div>
+                    <div id="expense-active-cards" class="metric-value">0 張</div>
+                    <div id="expense-active-cards-sub" class="metric-subtext">尚未到期且尚有額度</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">累積購物總花費</span>
+                    </div>
+                    <div id="expense-shopping-total-cost" class="metric-value">NT$ 0</div>
+                    <div id="expense-shopping-total-sub" class="metric-subtext">包含冰刀鞋、護具、配件與訓練用具</div>
+                </div>
+            </div>
+
+            <!-- 購課紀錄列表卡片 -->
+            <div class="recent-list-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <h3 class="chart-title">購課與單次入場紀錄</h3>
+                    <span style="font-size: 12px; color: var(--text-secondary);">點擊項目可編輯課卡</span>
+                </div>
+                <div id="expense-purchase-list" class="stats-log-list" style="max-height: 360px;"></div>
+            </div>
+
+            <!-- 購物紀錄列表卡片 -->
+            <div class="recent-list-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <h3 class="chart-title">購物紀錄</h3>
+                    <span style="font-size: 12px; color: var(--text-secondary);">點擊項目可編輯購物</span>
+                </div>
+                <div id="expense-shopping-list" class="stats-log-list" style="max-height: 360px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定空白頁面 View -->
+    <div id="settings-view" class="page-view-container" style="display: none;">
+        <div class="settings-section">
+            <h3 class="settings-section-title">資料備份與還原</h3>
+            <p class="settings-section-desc">將您的所有排程與影片紀錄匯出為 JSON 檔案，或從其他裝置匯入以還原資料。請注意，匯入會覆蓋現有資料。</p>
+            <div class="settings-actions">
+                <button id="export-btn" class="btn btn-secondary">匯出資料</button>
+                <button id="import-btn" class="btn btn-primary">匯入資料</button>
+            </div>
+            <input type="file" id="import-file-input" accept=".json" style="display: none;">
+        </div>
+
+        <!-- 頁尾品牌與版權宣告 -->
+        <div class="settings-footer-branding">
+            <div class="settings-app-icon-wrapper">
+                <img src="Skater icon.png" alt="Skaters" class="settings-app-icon">
+            </div>
+            <h4 class="settings-app-name">Skaters</h4>
+            <p class="settings-app-version">Version 1.0.0</p>
+            <p class="settings-copyright">© 2026 Skaters All Rights Reserved.</p>
+        </div>
+    </div>
+
+    <!-- 右下角 AI 助理按鈕 -->
+    <button id="ai-btn" class="fab">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#9c9c9c">
+            <!-- 大星芒 -->
+            <path d="M10 4 L12 10 L18 12 L12 14 L10 20 L8 14 L2 12 L8 10 Z"></path>
+            <!-- 中星芒 -->
+            <path d="M19 1 L20 4 L23 5 L20 6 L19 9 L18 6 L15 5 L18 4 Z"></path>
+            <!-- 小星芒 -->
+            <path d="M18 16 L18.5 17.5 L20 18 L18.5 18.5 L18 20 L17.5 18.5 L16 18 L17.5 17.5 Z"></path>
+        </svg>
+    </button>
+
+    <!-- 畫面下方懸浮橢圓選單 (Floating Oval Bottom Dock - 僅圖示) -->
+    <nav id="bottom-nav-dock" class="bottom-nav-dock">
+        <button class="bottom-nav-item active" data-tab="calendar" title="月曆">
+            <svg viewBox="0 0 24 24" width="25" height="25" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+        </button>
+        <button class="bottom-nav-item" data-tab="database" title="資料庫">
+            <svg viewBox="0 0 24 24" width="25" height="25" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="6 3 20 12 6 21 6 3"></polygon>
+            </svg>
+        </button>
+        <button class="bottom-nav-item" data-tab="stats" title="統計">
+            <svg viewBox="0 0 24 24" width="25" height="25" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+        </button>
+        <button class="bottom-nav-item" data-tab="settings" title="設定">
+            <svg viewBox="0 0 24 24" width="25" height="25" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- 新增選項下拉選單 -->
+    <div id="add-menu-overlay" class="sidebar-overlay"></div>
+    <div id="add-menu" class="add-menu">
+        <div class="add-menu-item" id="add-card-opt">課卡</div>
+        <div class="add-menu-item" id="add-schedule-opt">排程</div>
+        <div class="add-menu-item" id="add-shopping-opt">購物</div>
+        <div class="add-menu-item" id="add-other-opt">其他</div>
+    </div>
+
+    <!-- 新增排程的彈出視窗 (Modal) -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="modal-title">新增排程</h2>
+            <form id="schedule-form">
+                <div class="form-group">
+                    <label>日期與時間設定</label>
+                    <div class="custom-date-trigger" id="schedule-date-trigger" tabindex="0">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span id="schedule-date-display">選擇日期與時間</span>
+                        <input type="hidden" id="schedule-date" name="schedule-date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>類型</label>
+                    <div class="type-tags">
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="花滑團課" required checked>
+                            <span style="background-color: #b69898; color: #efead6;">花滑團課</span>
+                        </label>
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="花滑私課">
+                            <span style="background-color: #836a77; color: #efdede;">花滑私課</span>
+                        </label>
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="花滑練習">
+                            <span style="background-color: #eacaca; color: #836a77;">花滑練習</span>
+                        </label>
+                        <label class="type-tag">
+                            <input type="radio" name="schedule-type" value="芭蕾">
+                            <span style="background-color: #ead1dc; color: #836a77;">芭蕾</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group" id="linked-card-group">
+                    <label>扣抵課卡</label>
+                    <div class="custom-select-wrapper" id="linked-card-wrapper">
+                        <input type="hidden" id="linked-card-select" value="">
+                        <div class="custom-select-trigger" id="linked-card-trigger" tabindex="0">
+                            <span id="linked-card-display">(無/單次付費)</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="linked-card-menu"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schedule-note">備註 (選填)</label>
+                    <textarea id="schedule-note" rows="5"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
+                    <button type="button" id="cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增課卡的彈出視窗 (Card Modal) -->
+    <div id="card-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="card-modal-title">新增課卡</h2>
+            <form id="card-form">
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label>開始日期</label>
+                        <div class="custom-date-trigger" id="card-start-date-trigger" tabindex="0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span id="card-start-date-display">開始日期</span>
+                            <input type="hidden" id="card-start-date" required>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>到期日期</label>
+                        <div class="custom-date-trigger" id="card-end-date-trigger" tabindex="0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span id="card-end-date-display">到期日期</span>
+                            <input type="hidden" id="card-end-date" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>課卡類型</label>
+                    <div class="custom-select-wrapper" id="card-type-wrapper">
+                        <input type="hidden" id="card-type-select" name="card-type" value="月卡" required>
+                        <div class="custom-select-trigger" id="card-type-trigger" tabindex="0">
+                            <span id="card-type-display">月卡</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="card-type-menu">
+                            <div class="custom-select-option selected" data-value="月卡">月卡</div>
+                            <div class="custom-select-option" data-value="單次入場">單次入場</div>
+                            <div class="custom-select-option" data-value="團體課卡(平)">團體課卡(平)</div>
+                            <div class="custom-select-option" data-value="團體課卡(假)">團體課卡(假)</div>
+                            <div class="custom-select-option" data-value="私人課卡(平)">私人課卡(平)</div>
+                            <div class="custom-select-option" data-value="私人課卡(假)">私人課卡(假)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="coach-level-group" style="display: none;">
+                    <label>教練階級</label>
+                    <div class="custom-select-wrapper" id="coach-level-wrapper">
+                        <input type="hidden" id="coach-level-select" name="coach-level" value="一般">
+                        <div class="custom-select-trigger" id="coach-level-trigger" tabindex="0">
+                            <span id="coach-level-display">一般</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="coach-level-menu">
+                            <div class="custom-select-option selected" data-value="一般">一般</div>
+                            <div class="custom-select-option" data-value="高級">高級</div>
+                            <div class="custom-select-option" data-value="國家級">國家級</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>價格</label>
+                    <div class="custom-select-wrapper" id="card-price-wrapper">
+                        <input type="hidden" id="card-price-select" name="card-price" value="" required>
+                        <div class="custom-select-trigger" id="card-price-trigger" tabindex="0">
+                            <span id="card-price-display">請選擇價格</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="card-price-menu">
+                            <!-- 由 JS 動態產生價格選項 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="card-note">備註 (選填)</label>
+                    <textarea id="card-note" rows="3"></textarea>
+                </div>
+                <div class="form-group" id="card-usage-history-group" style="display: none;">
+                    <label>使用紀錄</label>
+                    <div id="card-usage-history-list" class="card-usage-history-list"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="card-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
+                    <button type="button" id="card-cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增購物的彈出視窗 (Shopping Modal) -->
+    <div id="shopping-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="shopping-modal-title">新增購物</h2>
+            <form id="shopping-form">
+                <div class="form-group">
+                    <label for="shopping-name">名稱</label>
+                    <input type="text" id="shopping-name" required placeholder="例如：Edea 冰刀鞋">
+                </div>
+
+                <div class="form-group">
+                    <label>日期</label>
+                    <div class="custom-date-trigger" id="shopping-date-trigger" tabindex="0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span id="shopping-date-display">選擇日期</span>
+                        <input type="hidden" id="shopping-date" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>類型</label>
+                    <div class="custom-select-wrapper" id="shopping-type-wrapper">
+                        <input type="hidden" id="shopping-type-select" name="shopping-type" value="冰刀鞋" required>
+                        <div class="custom-select-trigger" id="shopping-type-trigger" tabindex="0">
+                            <span id="shopping-type-display">冰刀鞋</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="shopping-type-menu">
+                            <div class="custom-select-option selected" data-value="冰刀鞋">冰刀鞋</div>
+                            <div class="custom-select-option" data-value="護具">護具</div>
+                            <div class="custom-select-option" data-value="配件">配件</div>
+                            <div class="custom-select-option" data-value="訓練用具">訓練用具</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shopping-url">網址 (選填)</label>
+                    <input type="url" id="shopping-url" placeholder="例如：https://shopee.tw/...">
+                </div>
+
+                <div class="form-group">
+                    <label for="shopping-price">金額</label>
+                    <input type="text" id="shopping-price" required placeholder="例如：12000">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="shopping-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
+                    <button type="button" id="shopping-cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增其他的彈出視窗 (Other Modal) -->
+    <div id="other-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="other-modal-title">新增其他行程</h2>
+            <form id="other-form">
+                <div class="form-group">
+                    <label for="other-name">名稱</label>
+                    <input type="text" id="other-name" required placeholder="例如：台北公開賽">
+                </div>
+
+                <div class="form-group">
+                    <label>類型</label>
+                    <div class="custom-select-wrapper" id="other-type-wrapper">
+                        <input type="hidden" id="other-type-select" name="other-type" value="比賽" required>
+                        <div class="custom-select-trigger" id="other-type-trigger" tabindex="0">
+                            <span id="other-type-display">比賽</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="other-type-menu">
+                            <div class="custom-select-option selected" data-value="比賽">比賽</div>
+                            <div class="custom-select-option" data-value="颱風假">颱風假</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label>開始日期</label>
+                        <div class="custom-date-trigger" id="other-start-date-trigger" tabindex="0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span id="other-start-date-display">開始日期</span>
+                            <input type="hidden" id="other-start-date" required>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>結束日期</label>
+                        <div class="custom-date-trigger" id="other-end-date-trigger" tabindex="0">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span id="other-end-date-display">結束日期</span>
+                            <input type="hidden" id="other-end-date" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="other-note">備註</label>
+                    <textarea id="other-note" rows="3" placeholder="選填"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="other-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
+                    <button type="button" id="other-cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增/編輯影片的彈出視窗 (Video Modal) -->
+    <div id="video-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="video-modal-title">新增影片</h2>
+            <form id="video-form">
+                <div class="form-group">
+                    <label for="video-title">影片標題</label>
+                    <input type="text" id="video-title" required placeholder="例如：Axel 1A 跳躍起跳細節拆解">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-url">影片網址 (URL)</label>
+                    <input type="url" id="video-url" required placeholder="支援 YouTube, Shorts, IG Reels, 小紅書等連結">
+                </div>
+
+                <div class="form-group">
+                    <label>動作分類</label>
+                    <div class="custom-select-wrapper" id="video-category-wrapper">
+                        <input type="hidden" id="video-category-select" name="video-category" value="跳躍" required>
+                        <div class="custom-select-trigger" id="video-category-trigger" tabindex="0">
+                            <span id="video-category-display">跳躍</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="video-category-menu">
+                            <div class="custom-select-option selected" data-value="跳躍">跳躍</div>
+                            <div class="custom-select-option" data-value="旋轉">旋轉</div>
+                            <div class="custom-select-option" data-value="步法">步法</div>
+                            <div class="custom-select-option" data-value="滑行基礎">滑行基礎</div>
+                            <div class="custom-select-option" data-value="陸上訓練">陸上訓練</div>
+                            <div class="custom-select-option" data-value="其他">其他</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-cover">自訂封面圖片網址 (選填)</label>
+                    <input type="url" id="video-cover" placeholder="適用於 IG / 小紅書或客製封面 (留空則自動生成)">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-note">練習備註 (選填)</label>
+                    <textarea id="video-note" rows="3" placeholder="記錄起跳點、重心控制等練習要點..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="video-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
+                    <button type="button" id="video-cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 搜尋視窗 -->
+    <div id="search-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2>搜尋排程與課卡</h2>
+            <div class="form-group" style="display: flex; gap: 8px;">
+                <input type="text" id="search-input" placeholder="輸入關鍵字..." style="flex: 1;">
+            </div>
+            <div id="search-results" style="max-height: 200px; overflow-y: auto; margin-top: 12px;">
+                <!-- 搜尋結果將顯示在這裡 -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="close-search-btn" class="btn btn-secondary">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 聊天視窗 -->
+    <div id="ai-chat-window" class="ai-chat-window">
+        <div class="ai-chat-header">
+            <h3>Gemini AI 助理</h3>
+            <button id="close-ai-chat" class="icon-btn" style="padding: 4px;">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div id="ai-chat-messages" class="ai-chat-messages">
+            <!-- 對話內容會顯示在這裡 -->
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="ai-chat-input" placeholder="請輸入訊息...">
+            <button id="ai-send-btn" class="btn btn-primary" style="padding: 8px 12px;">送出</button>
+        </div>
+    </div>
+
+    <!-- 自製 DatePicker 彈窗 Modal (包含開始與結束時間選擇) -->
+    <div id="custom-datepicker-overlay" class="modal-overlay" style="z-index: 3000;">
+        <div class="custom-datepicker-modal">
+            <div class="dp-header">
+                <button type="button" id="dp-prev-month" class="icon-btn" title="上個月">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <div id="dp-month-year-title" class="dp-title">2026 年 9 月</div>
+                <button type="button" id="dp-next-month" class="icon-btn" title="下個月">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            <div class="dp-weekdays">
+                <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div>
+            </div>
+            <div id="dp-days-grid" class="dp-days-grid">
+                <!-- 日期將由 JS 動態產生 -->
+            </div>
+            
+            <!-- 時間選擇區塊 (支援直接鍵入編輯與下拉選擇，時長為淺灰色字體) -->
+            <div id="dp-time-container" class="dp-time-container" style="flex-direction: column; gap: 8px; border-top: 1px solid #f0e6e4; padding-top: 10px; margin-top: 6px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div class="dp-time-label">開始時間：</div>
+                    <div class="dp-time-inputs">
+                        <div class="custom-time-select-wrapper">
+                            <div class="custom-time-input-group">
+                                <input type="text" id="dp-start-time-input" class="custom-time-editable-input" value="17:00" placeholder="17:00" maxlength="5">
+                                <button type="button" id="dp-start-time-dropdown-btn" class="custom-time-btn" title="選擇刻度時間" tabindex="-1">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                            </div>
+                            <div id="dp-start-time-dropdown" class="custom-time-dropdown"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div class="dp-time-label">結束時間：</div>
+                    <div class="dp-time-inputs">
+                        <div class="custom-time-select-wrapper">
+                            <div class="custom-time-input-group">
+                                <input type="text" id="dp-end-time-input" class="custom-time-editable-input" value="18:30" placeholder="18:30" maxlength="5">
+                                <span id="dp-end-time-dur-badge" class="duration-text" style="color: #b5a4a2; font-size: 12px; margin-right: 4px; white-space: nowrap;">1.5小時</span>
+                                <button type="button" id="dp-end-time-dropdown-btn" class="custom-time-btn" title="選擇刻度時間" tabindex="-1">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                            </div>
+                            <div id="dp-end-time-dropdown" class="custom-time-dropdown"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dp-actions">
+                <button type="button" id="dp-today-btn" class="btn btn-secondary" style="margin-right: auto; padding: 6px 12px; font-size: 13px;">今天</button>
+                <button type="button" id="dp-cancel-btn" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">取消</button>
+                <button type="button" id="dp-confirm-btn" class="btn btn-primary" style="padding: 6px 14px; font-size: 13px;">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 綜合明細彈窗 -->
+    <div class="modal-overlay" id="breakdown-modal-overlay">
+        <div class="modal">
+            <h2 id="breakdown-modal-title">明細</h2>
+            <div style="max-height: 50vh; overflow-y: auto; padding: 4px 16px 4px 4px; margin-bottom: 16px;">
+                <div id="breakdown-list">
+                    <!-- 明細由 JS 動態生成 -->
+                </div>
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-weight: 600; font-size: 16px; color: var(--text-main);">總計</div>
+                    <div id="breakdown-total" style="font-weight: 700; font-size: 18px; color: #715a57;">0</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="close-breakdown-modal" style="width: 100%;">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
