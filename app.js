@@ -1267,11 +1267,10 @@ function startApp() {
 
         setupMonthObserver();
 
-        if (currentActiveBlock && !window._calendarInitialScrolled) {
-            window._calendarInitialScrolled = true;
+        if (currentActiveBlock) {
             setTimeout(() => {
                 currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }, 60);
+            }, 50);
         }
     }
 

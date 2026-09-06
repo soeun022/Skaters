@@ -372,7 +372,7 @@ body {
 }
 
 .mini-month-title.current-month-title {
-    color: #715a57;
+    color: #d39e9e;
     font-weight: 800;
 }
 
@@ -4578,11 +4578,10 @@ function startApp() {
 
         setupMonthObserver();
 
-        if (currentActiveBlock && !window._calendarInitialScrolled) {
-            window._calendarInitialScrolled = true;
+        if (currentActiveBlock) {
             setTimeout(() => {
                 currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }, 60);
+            }, 50);
         }
     }
 
