@@ -5448,8 +5448,9 @@ function startApp() {
 
         let html = '';
         types.forEach(t => {
+            const cardBg = getSoftCardBg(t.bg);
             html += `
-                <div class="settings-type-item">
+                <div class="settings-type-item" style="background-color: ${cardBg};">
                     <div class="settings-type-info">
                         <span class="settings-type-badge" style="background-color: ${t.bg}; color: ${t.text};">${t.name}</span>
                     </div>
