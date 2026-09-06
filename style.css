@@ -860,20 +860,30 @@ body {
 .dashboard-month-selector {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    padding: 4px 10px;
+    gap: 8px;
+    padding: 6px 14px;
+    height: 42px;
     border-radius: 9999px;
+    background: rgba(247, 237, 235, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 2px 8px rgba(113, 90, 87, 0.08);
+    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+.dashboard-month-selector:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .stats-month-label {
     font-family: 'NumberFont', 'Hoefler Text', Georgia, 'Times New Roman', serif !important;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 700;
+    color: #715a57;
 }
 
 .stats-filter-pill {
@@ -1975,22 +1985,24 @@ label {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 9999px;
-    background: #f7f5f3;
-    border: 1px solid var(--border-color);
+    background: rgba(247, 237, 235, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
     color: #715a57;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(113, 90, 87, 0.05);
+    transition: all 0.25s ease;
     flex-shrink: 0;
 }
 
 .db-hamburger-btn:hover {
-    border-color: #d7c9c9;
-    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4);
-    background: #f7f5f3;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
     color: #715a57;
 }
 
