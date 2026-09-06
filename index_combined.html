@@ -4250,20 +4250,35 @@ function startApp() {
     }
 
     // ---- 月曆與年曆切換按鈕事件 ----
+    function getCurrentlyVisibleMonthBlock() {
+        const blocks = Array.from(document.querySelectorAll('.month-block'));
+        if (blocks.length === 0) return null;
+
+        const targetY = 80;
+        let closestBlock = blocks[0];
+        let minDistance = Math.abs(blocks[0].getBoundingClientRect().top - targetY);
+
+        for (let i = 1; i < blocks.length; i++) {
+            const dist = Math.abs(blocks[i].getBoundingClientRect().top - targetY);
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestBlock = blocks[i];
+            }
+        }
+        return closestBlock;
+    }
+
     function scrollToAdjacentMonth(direction) {
         const blocks = Array.from(document.querySelectorAll('.month-block'));
         if (blocks.length === 0) return;
 
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth();
+        const currentBlock = getCurrentlyVisibleMonthBlock();
+        if (!currentBlock) return;
 
-        let currentIndex = blocks.findIndex(b => parseInt(b.dataset.year, 10) === currentYear && parseInt(b.dataset.month, 10) === currentMonth);
-        if (currentIndex === -1) currentIndex = 0;
+        const currentIndex = blocks.indexOf(currentBlock);
+        const targetIndex = Math.max(0, Math.min(blocks.length - 1, currentIndex + direction));
 
-        let targetIndex = currentIndex + direction;
-        if (targetIndex >= 0 && targetIndex < blocks.length) {
-            blocks[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        blocks[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     if (prevMonthBtn) {
@@ -4539,16 +4554,26 @@ function startApp() {
             if (firstDayIndex === -1) firstDayIndex = 6;
 
             const totalDays = lastDayOfMonth.getDate();
-            // 上個月空白對齊格 (無重複日期數字，僅用於對齊星期欄位)
+            const totalCellsNeeded = Math.ceil((firstDayIndex + totalDays) / 7) * 7;
+
+            // 1. 上個月空白對齊格 (無數字，完全覆蓋莫蘭迪背景色)
             for (let i = 0; i < firstDayIndex; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = 'day-cell empty-day-cell';
                 grid.appendChild(emptyCell);
             }
 
-            // 當月所有日期 (1 ~ totalDays)
+            // 2. 當月所有日期 (1 ~ totalDays)
             for (let i = 1; i <= totalDays; i++) {
                 grid.appendChild(createDayCell(i, false, year, month));
+            }
+
+            // 3. 結尾空白填充格 (補齊該行剩餘格子，確保填滿背景色，絕不曝露底層灰色)
+            const trailingCells = totalCellsNeeded - (firstDayIndex + totalDays);
+            for (let i = 0; i < trailingCells; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell empty-day-cell';
+                grid.appendChild(emptyCell);
             }
 
             monthBlock.appendChild(grid);
@@ -4576,20 +4601,16 @@ function startApp() {
 
         const options = {
             root: null,
-            rootMargin: '-100px 0px -60% 0px',
-            threshold: 0.05
+            rootMargin: '-76px 0px -70% 0px',
+            threshold: 0
         };
 
         monthObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const title = entry.target.dataset.title;
-                    const year = parseInt(entry.target.dataset.year, 10);
-                    const month = parseInt(entry.target.dataset.month, 10);
                     if (title && monthTitle) {
                         monthTitle.textContent = title;
-                        currentDate.setFullYear(year);
-                        currentDate.setMonth(month);
                     }
                 }
             });
