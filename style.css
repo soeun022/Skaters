@@ -228,11 +228,11 @@ body {
     padding: 3px 6px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.92);
+    background: rgba(247, 237, 235, 0.5);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 /* 右側搜尋與新增獨立懸浮橢圓毛玻璃選單 (放大搜尋新增 DOCK) */
@@ -243,11 +243,11 @@ body {
     padding: 4px 10px;
     height: 48px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.92);
+    background: rgba(247, 237, 235, 0.5);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .top-month-dock .icon-btn {
@@ -864,11 +864,11 @@ body {
     padding: 6px 14px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.88);
+    background: rgba(247, 237, 235, 0.5);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
     transition: all 0.25s ease;
     box-sizing: border-box;
     cursor: pointer;
@@ -1962,11 +1962,11 @@ label {
     gap: 8px;
     padding: 11px 24px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.88);
+    background: rgba(247, 237, 235, 0.5);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
     color: #715a57;
     font-size: 16px;
     font-weight: 700;
@@ -1999,27 +1999,28 @@ label {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.88);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     color: #715a57;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.2s ease;
     flex-shrink: 0;
+    padding: 0;
 }
 
 .db-hamburger-btn:hover,
 .db-hamburger-btn.active {
-    background: rgba(215, 201, 201, 0.6);
-    border-color: rgba(255, 255, 255, 0.95);
-    transform: translateY(-1px);
-    box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    background: rgba(113, 90, 87, 0.08);
     color: #715a57;
+    transform: scale(1.05);
+    box-shadow: none;
+    border: none;
 }
 
 .db-menu-dropdown {
