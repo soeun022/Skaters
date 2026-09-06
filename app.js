@@ -1286,12 +1286,16 @@ function startApp() {
             threshold: 0
         };
 
+        let titleTimer = null;
         monthObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const title = entry.target.dataset.title;
                     if (title && monthTitle) {
-                        monthTitle.textContent = title;
+                        if (titleTimer) clearTimeout(titleTimer);
+                        titleTimer = setTimeout(() => {
+                            monthTitle.textContent = title;
+                        }, 40);
                     }
                 }
             });
@@ -3383,7 +3387,7 @@ function startApp() {
         const totalSessions = monthSchedules.length;
 
         if (metricSessions) metricSessions.textContent = `${totalSessions} 堂`;
-        if (metricSessionsSub) metricSessionsSub.textContent = `團課 ${groupClass} | 私課 ${privateClass} | 練習 ${practice} | 芭蕾 ${ballet}`;
+        if (metricSessionsSub) metricSessionsSub.innerHTML = `團課 ${groupClass} | 私課 ${privateClass}<br>練習 ${practice} | 芭蕾 ${ballet}`;
 
         // 計算總運動時數
         let totalHours = 0;
@@ -3522,7 +3526,7 @@ function startApp() {
         totalCost = Math.round(totalCost);
 
         if (metricCost) metricCost.textContent = `NT$ ${totalCost.toLocaleString()}`;
-        if (metricCostSub) metricCostSub.textContent = `${monthSchedules.length} 堂課程 | ${monthCardDetailsCount} 張當月有效/購買課卡`;
+        if (metricCostSub) metricCostSub.innerHTML = `${monthSchedules.length} 堂課程<br>${monthCardDetailsCount} 張當月有效/購買課卡`;
 
         // 計算當月總購物花費
         let totalShoppingCost = 0;
@@ -3959,7 +3963,7 @@ function startApp() {
         const avgSessionHours = totalSessions > 0 ? (totalHours / totalSessions).toFixed(1) : '0';
 
         if (yearlyMetricSessions) yearlyMetricSessions.textContent = `${totalSessions} 堂`;
-        if (yearlyMetricSessionsSub) yearlyMetricSessionsSub.textContent = `團課 ${groupClass} | 私課 ${privateClass} | 練習 ${practice} | 芭蕾 ${ballet}`;
+        if (yearlyMetricSessionsSub) yearlyMetricSessionsSub.innerHTML = `團課 ${groupClass} | 私課 ${privateClass}<br>練習 ${practice} | 芭蕾 ${ballet}`;
 
         if (yearlyMetricHours) yearlyMetricHours.textContent = `${totalHours.toFixed(1)} 小時`;
         if (yearlyMetricHoursSub) yearlyMetricHoursSub.textContent = `平均每月 ${avgMonthlyHours} 小時 | 每堂 ${avgSessionHours} 小時`;
@@ -4045,7 +4049,7 @@ function startApp() {
 
         totalCost = Math.round(totalCost);
         if (yearlyMetricCost) yearlyMetricCost.textContent = `NT$ ${totalCost.toLocaleString()}`;
-        if (yearlyMetricCostSub) yearlyMetricCostSub.textContent = `${yearSchedules.length} 堂課程 | ${yearCardDetailsCount} 張當年度有效/購買課卡`;
+        if (yearlyMetricCostSub) yearlyMetricCostSub.innerHTML = `${yearSchedules.length} 堂課程<br>${yearCardDetailsCount} 張當年度有效/購買課卡`;
 
         // 3. 篩選與計算當年度購物花費
         let totalShoppingCost = 0;
@@ -4394,7 +4398,7 @@ function startApp() {
         const avgSessionHours = totalSessions > 0 ? (totalHours / totalSessions).toFixed(1) : '0';
 
         if (alltimeMetricSessions) alltimeMetricSessions.textContent = `${totalSessions} 堂`;
-        if (alltimeMetricSessionsSub) alltimeMetricSessionsSub.textContent = `團課 ${groupClass} | 私課 ${privateClass} | 練習 ${practice} | 芭蕾 ${ballet}`;
+        if (alltimeMetricSessionsSub) alltimeMetricSessionsSub.innerHTML = `團課 ${groupClass} | 私課 ${privateClass}<br>練習 ${practice} | 芭蕾 ${ballet}`;
 
         if (alltimeMetricHours) alltimeMetricHours.textContent = `${totalHours.toFixed(1)} 小時`;
         if (alltimeMetricHoursSub) alltimeMetricHoursSub.textContent = `平均每月 ${avgMonthlyHours} 小時 | 每堂 ${avgSessionHours} 小時`;
@@ -4439,7 +4443,7 @@ function startApp() {
 
         totalCost = Math.round(totalCost);
         if (alltimeMetricCost) alltimeMetricCost.textContent = `NT$ ${totalCost.toLocaleString()}`;
-        if (alltimeMetricCostSub) alltimeMetricCostSub.textContent = `${allSchedules.length} 堂課程 | ${cardDetailsCount} 張全期間課卡`;
+        if (alltimeMetricCostSub) alltimeMetricCostSub.innerHTML = `${allSchedules.length} 堂課程<br>${cardDetailsCount} 張全期間課卡`;
 
         // 3. 篩選與計算全期間購物花費
         let totalShoppingCost = 0;
@@ -5037,15 +5041,15 @@ function startApp() {
     function changeMonthByScroll(delta) {
         if (scrollTimeout || currentTab !== 'calendar') return;
         if (currentViewMode === 'month') {
-            currentDate.setDate(1);
-            currentDate.setMonth(currentDate.getMonth() + delta);
+            // 月視圖採用順暢原生垂直連續捲動，不觸發 renderView 重繪
+            return;
         } else {
             currentDate.setFullYear(currentDate.getFullYear() + delta);
         }
         renderView();
         scrollTimeout = setTimeout(() => {
             scrollTimeout = null;
-        }, 400);
+        }, 500);
     }
 
     const scrollTarget = calendarGrid || yearCalendarView;
