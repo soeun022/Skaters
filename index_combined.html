@@ -321,7 +321,7 @@ body {
 }
 
 
-/* 年曆視圖 (Year Calendar View) */
+/* 年曆視圖 (Year Calendar View - 自適應手機螢幕防溢出) */
 .year-calendar-view {
     padding: 10px 16px 95px 16px;
     background-color: var(--bg-color);
@@ -340,7 +340,8 @@ body {
 .year-months-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px 12px;
+    gap: 16px 10px;
+    width: 100%;
 }
 
 .mini-month-card {
@@ -352,6 +353,8 @@ body {
     transition: transform 0.15s ease;
     user-select: none;
     -webkit-user-select: none;
+    width: 100%;
+    min-width: 0;
 }
 
 @media (hover: hover) {
@@ -362,7 +365,7 @@ body {
 
 .mini-month-title {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang TC", sans-serif;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 800;
     color: var(--text-primary);
     margin-bottom: 6px;
@@ -379,7 +382,8 @@ body {
 .mini-days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 2px 1px;
+    gap: 2px 0;
+    width: 100%;
     user-select: none;
     -webkit-user-select: none;
     touch-action: pan-y;
@@ -387,18 +391,20 @@ body {
 
 .mini-day {
     font-family: 'NumberFont', -apple-system, BlinkMacSystemFont, sans-serif;
-    height: 20px;
-    width: 20px;
+    width: 100%;
+    max-width: 18px;
+    aspect-ratio: 1;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 500;
     border-radius: 50%;
     color: var(--text-primary);
     position: relative;
     transition: all 0.15s ease;
+    box-sizing: border-box;
 }
 
 .mini-day.empty-mini-day {
@@ -415,19 +421,19 @@ body {
 
 @media (max-width: 768px) {
     .year-calendar-view {
-        padding: 8px 12px 90px 12px;
+        padding: 6px 8px 90px 8px;
+        max-width: 100%;
     }
     .year-months-grid {
-        gap: 14px 8px;
+        gap: 12px 6px;
     }
     .mini-month-title {
-        font-size: 15px;
+        font-size: 13.5px;
         margin-bottom: 4px;
     }
     .mini-day {
-        height: 18px;
-        width: 18px;
-        font-size: 10px;
+        max-width: 15px;
+        font-size: 9px;
     }
 }
 
