@@ -74,6 +74,8 @@
 }
 
 .type-tag {
+    display: inline-flex;
+    align-items: center;
     cursor: pointer;
 }
 
@@ -82,14 +84,18 @@
 }
 
 .type-tag span {
-    display: inline-block;
-    padding: 6px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 16px;
     border-radius: 9999px;
     font-size: 14px;
     font-weight: 500;
     opacity: 0.55;
     transition: all 0.2s;
     border: 2px solid transparent;
+    box-sizing: border-box;
 }
 
 .type-tag input[type="radio"]:checked + span {
@@ -113,6 +119,8 @@
     cursor: pointer;
     transition: background-color 0.2s, transform 0.15s;
     outline: none !important;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .type-tag-add-btn:hover {
