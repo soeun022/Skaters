@@ -231,8 +231,8 @@ body {
     background: rgba(247, 237, 235, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(232, 207, 203, 0.5);
+    box-shadow: 0 4px 16px rgba(113, 90, 87, 0.08);
 }
 
 /* 右側搜尋與新增獨立懸浮橢圓毛玻璃選單 (放大搜尋新增 DOCK) */
@@ -246,8 +246,8 @@ body {
     background: rgba(247, 237, 235, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(232, 207, 203, 0.5);
+    box-shadow: 0 4px 16px rgba(113, 90, 87, 0.08);
 }
 
 .top-month-dock .icon-btn {
@@ -864,19 +864,20 @@ body {
     padding: 6px 14px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.88);
+    background: rgba(247, 237, 235, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(232, 207, 203, 0.5);
+    box-shadow: 0 4px 16px rgba(113, 90, 87, 0.08);
     transition: all 0.25s ease;
     box-sizing: border-box;
 }
 
 .dashboard-month-selector:hover {
     background: rgba(255, 255, 255, 0.95);
+    border-color: #d7c9c9;
     transform: translateY(-1px);
-    box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 20px rgba(113, 90, 87, 0.12);
 }
 
 .stats-month-label {
@@ -1951,11 +1952,11 @@ label {
     gap: 8px;
     padding: 11px 24px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.88);
+    background: rgba(247, 237, 235, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(232, 207, 203, 0.5);
+    box-shadow: 0 4px 16px rgba(113, 90, 87, 0.08);
     color: #715a57;
     font-size: 16px;
     font-weight: 700;
@@ -1970,8 +1971,9 @@ label {
 
 .video-add-btn:hover {
     background: rgba(255, 255, 255, 0.95);
+    border-color: #d7c9c9;
     transform: translateY(-1px);
-    box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 20px rgba(113, 90, 87, 0.12);
 }
 
 .video-db-title-area {
@@ -1988,11 +1990,11 @@ label {
     width: 42px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.88);
+    background: rgba(247, 237, 235, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.14), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(232, 207, 203, 0.5);
+    box-shadow: 0 4px 16px rgba(113, 90, 87, 0.08);
     color: #715a57;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -2001,8 +2003,9 @@ label {
 
 .db-hamburger-btn:hover {
     background: rgba(255, 255, 255, 0.95);
+    border-color: #d7c9c9;
     transform: translateY(-1px);
-    box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 20px rgba(113, 90, 87, 0.12);
     color: #715a57;
 }
 
