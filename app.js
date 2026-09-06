@@ -1168,7 +1168,7 @@ function startApp() {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
                 if (nextMonthBtn) nextMonthBtn.style.display = 'none';
-                if (topActionDock) topActionDock.style.display = 'flex';
+                if (topActionDock) topActionDock.style.display = 'none';
                 if (monthTitle) monthTitle.textContent = 'Database';
                 
                 if (calendarViewContainer) calendarViewContainer.style.display = 'none';
@@ -1185,7 +1185,7 @@ function startApp() {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
                 if (nextMonthBtn) nextMonthBtn.style.display = 'none';
-                if (topActionDock) topActionDock.style.display = 'flex';
+                if (topActionDock) topActionDock.style.display = 'none';
                 if (monthTitle) monthTitle.textContent = 'Statistics';
 
                 if (calendarViewContainer) calendarViewContainer.style.display = 'none';
@@ -1208,7 +1208,7 @@ function startApp() {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
                 if (nextMonthBtn) nextMonthBtn.style.display = 'none';
-                if (topActionDock) topActionDock.style.display = 'flex';
+                if (topActionDock) topActionDock.style.display = 'none';
                 if (monthTitle) monthTitle.textContent = 'Settings';
 
                 if (calendarViewContainer) calendarViewContainer.style.display = 'none';
