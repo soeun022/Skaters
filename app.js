@@ -3409,7 +3409,7 @@ function startApp() {
                     subtitleHtml = item.name || item.note || '購物紀錄';
                     rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57;">NT$ ${price.toLocaleString()}</div>`;
                     if (item.url) {
-                        const linkIcon = `<a href="${item.url}" target="_blank" onclick="event.stopPropagation();" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                        const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
                         rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
                     }
                 } else {
@@ -5055,7 +5055,7 @@ function startApp() {
 
                 let rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>`;
                 if (item.url) {
-                    const linkIcon = `<a href="${item.url}" target="_blank" onclick="event.stopPropagation();" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
                     rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
                 }
 
@@ -5386,7 +5386,16 @@ function startApp() {
             if (addBookmarkBtn) addBookmarkBtn.style.display = 'flex';
             renderBookmarkView();
         }
+    function safeOpenUrl(url) {
+        if (!url || typeof url !== 'string') return;
+        let targetUrl = url.trim();
+        if (!targetUrl) return;
+        if (!/^https?:\/\//i.test(targetUrl)) {
+            targetUrl = 'https://' + targetUrl;
+        }
+        window.location.href = targetUrl;
     }
+    window.safeOpenUrl = safeOpenUrl;
 
     function detectVideoPlatform(url) {
         if (!url || typeof url !== 'string') return { platform: 'other', label: 'Video', videoId: '' };
@@ -5495,7 +5504,7 @@ function startApp() {
                     </div>
                     <div class="video-card-note">${video.note || '無練習備註'}</div>
                     <div class="video-card-footer">
-                        <a href="${video.url}" target="_blank" rel="noopener noreferrer" class="video-open-link-btn">
+                        <a href="javascript:void(0)" class="video-open-link-btn">
                             在 ${platformInfo.label} 觀看
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                         </a>
@@ -5508,10 +5517,19 @@ function startApp() {
                 </div>
             `;
 
+            const openBtn = card.querySelector('.video-open-link-btn');
+            if (openBtn) {
+                openBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    safeOpenUrl(video.url);
+                });
+            }
+
             const thumbWrapper = card.querySelector('.video-thumb-wrapper');
             if (thumbWrapper) {
                 thumbWrapper.addEventListener('click', () => {
-                    window.open(video.url, '_blank');
+                    safeOpenUrl(video.url);
                 });
             }
 
@@ -5723,7 +5741,7 @@ function startApp() {
                     </div>
                     <div class="bookmark-card-note">${bm.note || '無備註'}</div>
                     <div class="video-card-footer">
-                        <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="video-open-link-btn">
+                        <a href="javascript:void(0)" class="video-open-link-btn">
                             前往網站
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                         </a>
@@ -5736,9 +5754,18 @@ function startApp() {
                 </div>
             `;
 
+            const openBtn = card.querySelector('.video-open-link-btn');
+            if (openBtn) {
+                openBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    safeOpenUrl(bm.url);
+                });
+            }
+
             card.addEventListener('click', (e) => {
                 if (!e.target.closest('.edit-bookmark-btn') && !e.target.closest('.video-open-link-btn')) {
-                    window.open(bm.url, '_blank');
+                    safeOpenUrl(bm.url);
                 }
             });
 
