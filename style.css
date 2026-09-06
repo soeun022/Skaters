@@ -876,10 +876,17 @@ body {
 
 .dashboard-month-selector:hover,
 .dashboard-month-selector:active {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.95);
+    background: #666666;
+    border-color: #666666;
     transform: translateY(-1px);
     box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-month-selector:hover .stats-month-label,
+.dashboard-month-selector:hover .icon-btn,
+.dashboard-month-selector:active .stats-month-label,
+.dashboard-month-selector:active .icon-btn {
+    color: #efdede !important;
 }
 
 .stats-month-label {
@@ -887,6 +894,7 @@ body {
     font-size: 16px;
     font-weight: 700;
     color: #715a57;
+    transition: color 0.25s ease;
 }
 
 .stats-filter-pill {
@@ -1973,11 +1981,11 @@ label {
 
 .video-add-btn:hover,
 .video-add-btn:active {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.95);
+    background: #666666;
+    border-color: #666666;
     transform: translateY(-1px);
     box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
-    color: #715a57;
+    color: #efdede;
 }
 
 .video-db-title-area {
@@ -2007,11 +2015,11 @@ label {
 
 .db-hamburger-btn:hover,
 .db-hamburger-btn.active {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(255, 255, 255, 0.95);
+    background: #666666;
+    border-color: #666666;
     transform: translateY(-1px);
     box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
-    color: #715a57;
+    color: #efdede;
 }
 
 .db-menu-dropdown {
