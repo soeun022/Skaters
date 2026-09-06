@@ -1210,11 +1210,6 @@ function startApp() {
             monthBlock.dataset.month = month;
             monthBlock.dataset.title = `${monthNames[month]} ${year}`;
 
-            const header = document.createElement('div');
-            header.className = 'month-block-header';
-            header.textContent = `${monthNames[month]} ${year}`;
-            monthBlock.appendChild(header);
-
             const grid = document.createElement('div');
             grid.className = 'month-grid';
 

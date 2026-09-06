@@ -521,12 +521,11 @@ body {
     background-color: rgba(215, 201, 201, 0.35);
 }
 
-/* 月曆網格 (鎖定邊界避免微幅晃動) */
-/* 月曆順暢連續上下捲動容器 (Continuous Vertical Month Scroll) */
+/* 月曆順暢無縫連續上下捲動容器 (Continuous Vertical Month Scroll - 完全無分隔線) */
 .calendar-grid-continuous {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 0;
     padding-bottom: 90px;
     background-color: var(--bg-color);
 }
@@ -535,17 +534,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    scroll-margin-top: 105px;
-}
-
-.month-block-header {
-    font-family: 'NumberFont', 'Hoefler Text', Georgia, serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: #715a57;
-    padding: 8px 16px 6px 16px;
-    background-color: var(--bg-color);
-    border-bottom: 1px dashed rgba(113, 90, 87, 0.2);
+    scroll-margin-top: 100px;
 }
 
 .month-grid {
@@ -4532,11 +4521,6 @@ function startApp() {
             monthBlock.dataset.year = year;
             monthBlock.dataset.month = month;
             monthBlock.dataset.title = `${monthNames[month]} ${year}`;
-
-            const header = document.createElement('div');
-            header.className = 'month-block-header';
-            header.textContent = `${monthNames[month]} ${year}`;
-            monthBlock.appendChild(header);
 
             const grid = document.createElement('div');
             grid.className = 'month-grid';
