@@ -1176,7 +1176,11 @@ function startApp() {
                 if (statsView) statsView.style.display = 'none';
                 if (settingsView) settingsView.style.display = 'none';
                 if (dayViewContainer) dayViewContainer.style.display = 'none';
-                renderDatabaseView();
+                if (activeDbTab === 'bookmark') {
+                    renderBookmarkView();
+                } else {
+                    renderDatabaseView();
+                }
             } else if (currentTab === 'stats') {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
@@ -5118,11 +5122,17 @@ function startApp() {
         }, { passive: true });
     }
 
-    // ---- 動作練習影片資料庫邏輯 (Video Database Logic) ----
+    // ---- 動作練習影片 / 參考資料庫 邏輯 (Database & Bookmark Logic) ----
+    let activeDbTab = 'video'; // 'video' | 'bookmark'
     let videos = loadVideos();
     let currentSelectedCategory = 'ALL';
     let videoSearchKeyword = '';
     let editingVideoId = null;
+
+    let bookmarks = loadBookmarks();
+    let currentBookmarkCategory = 'ALL';
+    let bookmarkSearchKeyword = '';
+    let editingBookmarkId = null;
 
     function loadVideos() {
         try {
@@ -5167,6 +5177,109 @@ function startApp() {
             localStorage.setItem('skating_videos_db', JSON.stringify(data));
         } catch (e) {
             console.error('Failed to save videos:', e);
+        }
+    }
+
+    function loadBookmarks() {
+        try {
+            const raw = localStorage.getItem('skating_bookmarks_db');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (e) {
+            console.error('Failed to load bookmarks:', e);
+        }
+        return [
+            {
+                id: 'bm1',
+                title: 'ISU 花式滑冰單人滑與雙人滑技術規則指南',
+                url: 'https://www.isu.org/figure-skating/rules/sandp-handbooks-faq',
+                category: '跳躍',
+                note: '包含跳躍週數（Under-rotated / Downgraded）判定標準與 GOE 加減分細節。'
+            },
+            {
+                id: 'bm2',
+                title: 'U.S. Figure Skating 官方練習與訓練技巧教學資料庫',
+                url: 'https://www.usfigureskating.org/skate/skills-and-levels',
+                category: '步法',
+                note: '提供 Moves in the Field 各等級步法刃邊（Edges）與壓步訓練建議。'
+            },
+            {
+                id: 'bm3',
+                title: '陸上轉體與花滑核心爆發力訓練專題',
+                url: 'https://www.skatingfirst.com/off-ice-training-guide',
+                category: '陸上訓練',
+                note: '適合居家練習的垂直跳躍、旋轉軸心與伸展拉筋技巧教學。'
+            }
+        ];
+    }
+
+    function saveBookmarks(data) {
+        try {
+            localStorage.setItem('skating_bookmarks_db', JSON.stringify(data));
+        } catch (e) {
+            console.error('Failed to save bookmarks:', e);
+        }
+    }
+
+    // 漢堡選單與分頁切換邏輯
+    const dbHamburgerBtn = document.getElementById('db-hamburger-btn');
+    const dbMenuDropdown = document.getElementById('db-menu-dropdown');
+    const dbCurrentTitle = document.getElementById('db-current-title');
+    const videoSubview = document.getElementById('video-subview');
+    const bookmarkSubview = document.getElementById('bookmark-subview');
+    const addVideoBtn = document.getElementById('add-video-btn');
+    const addBookmarkBtn = document.getElementById('add-bookmark-btn');
+
+    if (dbHamburgerBtn && dbMenuDropdown) {
+        dbHamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isShown = dbMenuDropdown.style.display === 'flex';
+            dbMenuDropdown.style.display = isShown ? 'none' : 'flex';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dbMenuDropdown.contains(e.target) && e.target !== dbHamburgerBtn) {
+                dbMenuDropdown.style.display = 'none';
+            }
+        });
+
+        const menuItems = dbMenuDropdown.querySelectorAll('.db-menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const tab = item.dataset.tab;
+                switchDbSubtab(tab);
+                dbMenuDropdown.style.display = 'none';
+            });
+        });
+    }
+
+    function switchDbSubtab(tab) {
+        activeDbTab = tab;
+        const menuItems = document.querySelectorAll('#db-menu-dropdown .db-menu-item');
+        menuItems.forEach(item => {
+            if (item.dataset.tab === tab) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        if (tab === 'video') {
+            if (dbCurrentTitle) dbCurrentTitle.textContent = '動作練習影片庫';
+            if (videoSubview) videoSubview.style.display = 'block';
+            if (bookmarkSubview) bookmarkSubview.style.display = 'none';
+            if (addVideoBtn) addVideoBtn.style.display = 'flex';
+            if (addBookmarkBtn) addBookmarkBtn.style.display = 'none';
+            renderDatabaseView();
+        } else if (tab === 'bookmark') {
+            if (dbCurrentTitle) dbCurrentTitle.textContent = '參考資料庫';
+            if (videoSubview) videoSubview.style.display = 'none';
+            if (bookmarkSubview) bookmarkSubview.style.display = 'block';
+            if (addVideoBtn) addVideoBtn.style.display = 'none';
+            if (addBookmarkBtn) addBookmarkBtn.style.display = 'flex';
+            renderBookmarkView();
         }
     }
 
@@ -5246,7 +5359,6 @@ function startApp() {
 
             const thumbUrl = getVideoThumbnailUrl(video);
             const platformInfo = detectVideoPlatform(video.url);
-            const catColors = typeColors[video.category] || defaultTypeColor;
 
             let thumbHtml = '';
             if (thumbUrl) {
@@ -5291,7 +5403,6 @@ function startApp() {
                 </div>
             `;
 
-            // 點擊預覽圖或播放按鈕在新分頁打開原始影片
             const thumbWrapper = card.querySelector('.video-thumb-wrapper');
             if (thumbWrapper) {
                 thumbWrapper.addEventListener('click', () => {
@@ -5299,7 +5410,6 @@ function startApp() {
                 });
             }
 
-            // 點擊編輯按鈕
             const editBtn = card.querySelector('.edit-video-btn');
             if (editBtn) {
                 editBtn.addEventListener('click', (e) => {
@@ -5340,7 +5450,6 @@ function startApp() {
     const videoModalTitle = document.getElementById('video-modal-title');
     const videoDeleteBtn = document.getElementById('video-delete-btn');
     const videoCancelBtn = document.getElementById('video-cancel-btn');
-    const addVideoBtn = document.getElementById('add-video-btn');
 
     initCustomSelect('video-category-trigger', 'video-category-menu', 'video-category-wrapper', 'video-category-select', 'video-category-display');
 
@@ -5428,6 +5537,216 @@ function startApp() {
                 saveVideos(videos);
                 renderDatabaseView();
                 closeVideoModal();
+            }
+        });
+    }
+
+    // ---- 參考資料庫 (Bookmark Database Logic) ----
+    function extractDomain(urlStr) {
+        if (!urlStr) return 'LINK';
+        try {
+            const u = new URL(urlStr.startsWith('http') ? urlStr : 'https://' + urlStr);
+            return u.hostname.replace('www.', '');
+        } catch(e) {
+            return 'BOOKMARK';
+        }
+    }
+
+    function renderBookmarkView() {
+        const grid = document.getElementById('bookmark-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+
+        let filtered = bookmarks.filter(b => {
+            if (currentBookmarkCategory !== 'ALL' && b.category !== currentBookmarkCategory) {
+                return false;
+            }
+            if (bookmarkSearchKeyword) {
+                const target = `${b.title || ''} ${b.url || ''} ${b.note || ''} ${b.category || ''}`.toLowerCase();
+                if (!target.includes(bookmarkSearchKeyword.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 40px 20px; font-size: 14px;">
+                    尚無符合條件的學習網址，點選右上角「新增網址」開始收藏！
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach(bm => {
+            const card = document.createElement('div');
+            card.className = 'bookmark-card';
+
+            const domain = extractDomain(bm.url);
+
+            card.innerHTML = `
+                <div class="bookmark-card-top">
+                    <div class="bookmark-icon-badge">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="bookmark-domain-badge">${domain}</span>
+                </div>
+                <div class="bookmark-card-body">
+                    <div class="bookmark-card-header-row">
+                        <h3 class="bookmark-card-title">${bm.title}</h3>
+                        <span class="video-card-category">${bm.category || '未分類'}</span>
+                    </div>
+                    <div class="bookmark-card-url">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        ${bm.url}
+                    </div>
+                    <div class="bookmark-card-note">${bm.note || '無備註'}</div>
+                    <div class="video-card-footer">
+                        <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="video-open-link-btn">
+                            前往網站
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <div class="video-actions-btns">
+                            <button class="video-action-icon edit-bookmark-btn" title="編輯網址">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.edit-bookmark-btn') && !e.target.closest('.video-open-link-btn')) {
+                    window.open(bm.url, '_blank');
+                }
+            });
+
+            const editBtn = card.querySelector('.edit-bookmark-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openBookmarkModalForEdit(bm);
+                });
+            }
+
+            grid.appendChild(card);
+        });
+    }
+
+    // 書籤分類 Pills 與搜尋綁定
+    const bookmarkCategoryPills = document.getElementById('bookmark-category-pills');
+    if (bookmarkCategoryPills) {
+        const pills = bookmarkCategoryPills.querySelectorAll('.video-cat-pill');
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                pills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentBookmarkCategory = pill.dataset.category || 'ALL';
+                renderBookmarkView();
+            });
+        });
+    }
+
+    const bookmarkSearchInput = document.getElementById('bookmark-search-input');
+    if (bookmarkSearchInput) {
+        bookmarkSearchInput.addEventListener('input', (e) => {
+            bookmarkSearchKeyword = e.target.value.trim();
+            renderBookmarkView();
+        });
+    }
+
+    // 書籤 Modal 控制 logic
+    const bookmarkModalOverlay = document.getElementById('bookmark-modal-overlay');
+    const bookmarkForm = document.getElementById('bookmark-form');
+    const bookmarkModalTitle = document.getElementById('bookmark-modal-title');
+    const bookmarkDeleteBtn = document.getElementById('bookmark-delete-btn');
+    const bookmarkCancelBtn = document.getElementById('bookmark-cancel-btn');
+
+    initCustomSelect('bookmark-category-trigger', 'bookmark-category-menu', 'bookmark-category-wrapper', 'bookmark-category-select', 'bookmark-category-display');
+
+    function closeBookmarkModal() {
+        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.remove('show');
+        if (bookmarkForm) bookmarkForm.reset();
+        editingBookmarkId = null;
+    }
+
+    function openBookmarkModal() {
+        editingBookmarkId = null;
+        if (bookmarkModalTitle) bookmarkModalTitle.textContent = '新增網址書籤';
+        if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'none';
+        if (bookmarkForm) bookmarkForm.reset();
+        safeSetRadioValue('bookmark-category', '跳躍');
+        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+    }
+
+    function openBookmarkModalForEdit(bm) {
+        editingBookmarkId = bm.id;
+        if (bookmarkModalTitle) bookmarkModalTitle.textContent = '編輯網址書籤';
+        if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'block';
+
+        const titleInput = document.getElementById('bookmark-title');
+        const urlInput = document.getElementById('bookmark-url');
+        const noteInput = document.getElementById('bookmark-note');
+
+        if (titleInput) titleInput.value = bm.title || '';
+        if (urlInput) urlInput.value = bm.url || '';
+        if (noteInput) noteInput.value = bm.note || '';
+
+        safeSetRadioValue('bookmark-category', bm.category || '跳躍');
+        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+    }
+
+    if (addBookmarkBtn) addBookmarkBtn.addEventListener('click', openBookmarkModal);
+    if (bookmarkCancelBtn) bookmarkCancelBtn.addEventListener('click', closeBookmarkModal);
+    if (bookmarkModalOverlay) {
+        bookmarkModalOverlay.addEventListener('click', (e) => {
+            if (e.target === bookmarkModalOverlay) closeBookmarkModal();
+        });
+    }
+
+    if (bookmarkForm) {
+        bookmarkForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('bookmark-title').value;
+            const url = document.getElementById('bookmark-url').value;
+            const category = safeGetRadioValue('bookmark-category');
+            const note = document.getElementById('bookmark-note').value;
+
+            if (editingBookmarkId) {
+                const idx = bookmarks.findIndex(b => String(b.id) === String(editingBookmarkId));
+                if (idx > -1) {
+                    bookmarks[idx].title = title;
+                    bookmarks[idx].url = url;
+                    bookmarks[idx].category = category;
+                    bookmarks[idx].note = note;
+                }
+            } else {
+                bookmarks.unshift({
+                    id: 'bm-' + Date.now(),
+                    title: title,
+                    url: url,
+                    category: category,
+                    note: note
+                });
+            }
+
+            saveBookmarks(bookmarks);
+            renderBookmarkView();
+            closeBookmarkModal();
+        });
+    }
+
+    if (bookmarkDeleteBtn) {
+        bookmarkDeleteBtn.addEventListener('click', () => {
+            if (editingBookmarkId) {
+                bookmarks = bookmarks.filter(b => String(b.id) !== String(editingBookmarkId));
+                saveBookmarks(bookmarks);
+                renderBookmarkView();
+                closeBookmarkModal();
             }
         });
     }

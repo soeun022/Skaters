@@ -1992,8 +1992,82 @@ label {
 
 .video-db-title-area {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 12px;
+    position: relative;
+}
+
+.db-hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background: rgba(247, 245, 243, 0.95);
+    border: 1px solid var(--border-color);
+    color: #715a57;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(113, 90, 87, 0.08);
+    flex-shrink: 0;
+}
+
+.db-hamburger-btn:hover {
+    background: #9c9c9c;
+    color: #efdede;
+    transform: scale(1.04);
+}
+
+.db-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(232, 207, 203, 0.8);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 12px 32px rgba(113, 90, 87, 0.18);
+    z-index: 100;
+    min-width: 210px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: dbMenuFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dbMenuFadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.db-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.db-menu-item:hover {
+    background: #f7f5f3;
+    color: #715a57;
+}
+
+.db-menu-item.active {
+    background: #9c9c9c;
+    color: #efdede;
 }
 
 .video-db-title {
@@ -2003,9 +2077,109 @@ label {
     margin: 0;
 }
 
-.video-db-subtitle {
-    font-size: 14px;
+/* 參考資料庫 Bookmark Cards */
+.bookmark-card {
+    background: #f7f5f3;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(113, 90, 87, 0.08);
+    border: 1px solid rgba(232, 207, 203, 0.4);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+.bookmark-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(113, 90, 87, 0.14);
+}
+
+.bookmark-card-top {
+    width: 100%;
+    height: 90px;
+    background: linear-gradient(135deg, #f7f5f3 0%, #e8cfcb 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+}
+
+.bookmark-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #715a57;
+    box-shadow: 0 2px 8px rgba(113, 90, 87, 0.1);
+}
+
+.bookmark-domain-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #9c9c9c;
+    color: #efdede;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.bookmark-card-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.bookmark-card-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.bookmark-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.35;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.bookmark-card-url {
+    font-size: 12px;
+    color: #8c7875;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.bookmark-card-note {
+    font-size: 13px;
     color: var(--text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 2px;
 }
 
 .video-filter-bar {
@@ -2462,39 +2636,96 @@ body.modal-open {
         </div>
     </div>
 
-    <!-- 動作練習影片資料庫 View -->
+    <!-- 動作練習影片 / 參考資料庫 View -->
     <div id="database-view" class="page-view-container video-db-container" style="display: none;">
         <div class="video-db-header">
             <div class="video-db-title-area">
-                <h2 class="video-db-title">動作練習影片庫</h2>
-                <span class="video-db-subtitle">動作技術拆解與練習影片收藏</span>
-            </div>
-            <button id="add-video-btn" class="video-add-btn">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                新增影片
-            </button>
-        </div>
+                <button id="db-hamburger-btn" class="db-hamburger-btn" title="切換資料庫分頁" aria-label="切換資料庫分頁">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <h2 id="db-current-title" class="video-db-title">動作練習影片庫</h2>
 
-        <!-- 搜尋與分類滑動列 -->
-        <div class="video-filter-bar">
-            <div class="video-search-box">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#715a57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="video-search-input" placeholder="搜尋影片名稱或關鍵字...">
+                <!-- 漢堡選單彈出面板 Dropdown -->
+                <div id="db-menu-dropdown" class="db-menu-dropdown" style="display: none;">
+                    <button class="db-menu-item active" data-tab="video">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+                            <line x1="7" y1="2" x2="7" y2="22"></line>
+                            <line x1="17" y1="2" x2="17" y2="22"></line>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                        </svg>
+                        動作練習影片庫
+                    </button>
+                    <button class="db-menu-item" data-tab="bookmark">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        參考資料庫
+                    </button>
+                </div>
             </div>
             
-            <div class="video-category-pills" id="video-category-pills">
-                <button class="video-cat-pill active" data-category="ALL">全部</button>
-                <button class="video-cat-pill" data-category="跳躍">跳躍</button>
-                <button class="video-cat-pill" data-category="旋轉">旋轉</button>
-                <button class="video-cat-pill" data-category="步法">步法</button>
-                <button class="video-cat-pill" data-category="滑行基礎">滑行基礎</button>
-                <button class="video-cat-pill" data-category="陸上訓練">陸上訓練</button>
-                <button class="video-cat-pill" data-category="其他">其他</button>
+            <div class="video-db-header-actions">
+                <button id="add-video-btn" class="video-add-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    新增影片
+                </button>
+                <button id="add-bookmark-btn" class="video-add-btn" style="display: none;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    新增網址
+                </button>
             </div>
         </div>
 
-        <!-- 影片網格 Cards Grid -->
-        <div id="video-grid" class="video-grid"></div>
+        <!-- 動作練習影片庫 Subview -->
+        <div id="video-subview" class="db-subview" style="display: block;">
+            <div class="video-filter-bar">
+                <div class="video-search-box">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#715a57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="video-search-input" placeholder="搜尋影片名稱或關鍵字...">
+                </div>
+                
+                <div class="video-category-pills" id="video-category-pills">
+                    <button class="video-cat-pill active" data-category="ALL">全部</button>
+                    <button class="video-cat-pill" data-category="跳躍">跳躍</button>
+                    <button class="video-cat-pill" data-category="旋轉">旋轉</button>
+                    <button class="video-cat-pill" data-category="步法">步法</button>
+                    <button class="video-cat-pill" data-category="滑行基礎">滑行基礎</button>
+                    <button class="video-cat-pill" data-category="陸上訓練">陸上訓練</button>
+                    <button class="video-cat-pill" data-category="其他">其他</button>
+                </div>
+            </div>
+
+            <!-- 影片網格 Cards Grid -->
+            <div id="video-grid" class="video-grid"></div>
+        </div>
+
+        <!-- 參考資料庫 Subview -->
+        <div id="bookmark-subview" class="db-subview" style="display: none;">
+            <div class="video-filter-bar">
+                <div class="video-search-box">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#715a57" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="bookmark-search-input" placeholder="搜尋學習網址、標題或關鍵字...">
+                </div>
+                
+                <div class="video-category-pills" id="bookmark-category-pills">
+                    <button class="video-cat-pill active" data-category="ALL">全部</button>
+                    <button class="video-cat-pill" data-category="跳躍">跳躍</button>
+                    <button class="video-cat-pill" data-category="旋轉">旋轉</button>
+                    <button class="video-cat-pill" data-category="步法">步法</button>
+                    <button class="video-cat-pill" data-category="滑行基礎">滑行基礎</button>
+                    <button class="video-cat-pill" data-category="陸上訓練">陸上訓練</button>
+                    <button class="video-cat-pill" data-category="其他">其他</button>
+                </div>
+            </div>
+
+            <!-- 書籤網格 Cards Grid -->
+            <div id="bookmark-grid" class="video-grid"></div>
+        </div>
     </div>
 
     <!-- 統計視圖 (Stats Dashboard View) -->
@@ -3196,6 +3427,54 @@ body.modal-open {
                 <div class="modal-actions">
                     <button type="button" id="video-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
                     <button type="button" id="video-cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 新增/編輯網址書籤的彈出視窗 (Bookmark Modal) -->
+    <div id="bookmark-modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h2 id="bookmark-modal-title">新增網址書籤</h2>
+            <form id="bookmark-form">
+                <div class="form-group">
+                    <label for="bookmark-title">網址標題</label>
+                    <input type="text" id="bookmark-title" required placeholder="例如：ISU 花式滑冰跳躍判定規則手冊">
+                </div>
+
+                <div class="form-group">
+                    <label for="bookmark-url">學習網址 (URL)</label>
+                    <input type="url" id="bookmark-url" required placeholder="https://example.com/guide">
+                </div>
+
+                <div class="form-group">
+                    <label>動作分類</label>
+                    <div class="custom-select-wrapper" id="bookmark-category-wrapper">
+                        <input type="hidden" id="bookmark-category-select" name="bookmark-category" value="跳躍" required>
+                        <div class="custom-select-trigger" id="bookmark-category-trigger" tabindex="0">
+                            <span id="bookmark-category-display">跳躍</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        <div class="custom-select-menu" id="bookmark-category-menu">
+                            <div class="custom-select-option selected" data-value="跳躍">跳躍</div>
+                            <div class="custom-select-option" data-value="旋轉">旋轉</div>
+                            <div class="custom-select-option" data-value="步法">步法</div>
+                            <div class="custom-select-option" data-value="滑行基礎">滑行基礎</div>
+                            <div class="custom-select-option" data-value="陸上訓練">陸上訓練</div>
+                            <div class="custom-select-option" data-value="其他">其他</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookmark-note">學習備註 (選填)</label>
+                    <textarea id="bookmark-note" rows="3" placeholder="記錄重點摘要、章節或學習心得..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="bookmark-delete-btn" class="btn btn-danger" style="display: none; margin-right: auto;">刪除</button>
+                    <button type="button" id="bookmark-cancel-btn" class="btn btn-secondary">取消</button>
                     <button type="submit" class="btn btn-primary">儲存</button>
                 </div>
             </form>
@@ -4493,7 +4772,11 @@ function startApp() {
                 if (statsView) statsView.style.display = 'none';
                 if (settingsView) settingsView.style.display = 'none';
                 if (dayViewContainer) dayViewContainer.style.display = 'none';
-                renderDatabaseView();
+                if (activeDbTab === 'bookmark') {
+                    renderBookmarkView();
+                } else {
+                    renderDatabaseView();
+                }
             } else if (currentTab === 'stats') {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
@@ -8435,11 +8718,17 @@ function startApp() {
         }, { passive: true });
     }
 
-    // ---- 動作練習影片資料庫邏輯 (Video Database Logic) ----
+    // ---- 動作練習影片 / 參考資料庫 邏輯 (Database & Bookmark Logic) ----
+    let activeDbTab = 'video'; // 'video' | 'bookmark'
     let videos = loadVideos();
     let currentSelectedCategory = 'ALL';
     let videoSearchKeyword = '';
     let editingVideoId = null;
+
+    let bookmarks = loadBookmarks();
+    let currentBookmarkCategory = 'ALL';
+    let bookmarkSearchKeyword = '';
+    let editingBookmarkId = null;
 
     function loadVideos() {
         try {
@@ -8484,6 +8773,109 @@ function startApp() {
             localStorage.setItem('skating_videos_db', JSON.stringify(data));
         } catch (e) {
             console.error('Failed to save videos:', e);
+        }
+    }
+
+    function loadBookmarks() {
+        try {
+            const raw = localStorage.getItem('skating_bookmarks_db');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (e) {
+            console.error('Failed to load bookmarks:', e);
+        }
+        return [
+            {
+                id: 'bm1',
+                title: 'ISU 花式滑冰單人滑與雙人滑技術規則指南',
+                url: 'https://www.isu.org/figure-skating/rules/sandp-handbooks-faq',
+                category: '跳躍',
+                note: '包含跳躍週數（Under-rotated / Downgraded）判定標準與 GOE 加減分細節。'
+            },
+            {
+                id: 'bm2',
+                title: 'U.S. Figure Skating 官方練習與訓練技巧教學資料庫',
+                url: 'https://www.usfigureskating.org/skate/skills-and-levels',
+                category: '步法',
+                note: '提供 Moves in the Field 各等級步法刃邊（Edges）與壓步訓練建議。'
+            },
+            {
+                id: 'bm3',
+                title: '陸上轉體與花滑核心爆發力訓練專題',
+                url: 'https://www.skatingfirst.com/off-ice-training-guide',
+                category: '陸上訓練',
+                note: '適合居家練習的垂直跳躍、旋轉軸心與伸展拉筋技巧教學。'
+            }
+        ];
+    }
+
+    function saveBookmarks(data) {
+        try {
+            localStorage.setItem('skating_bookmarks_db', JSON.stringify(data));
+        } catch (e) {
+            console.error('Failed to save bookmarks:', e);
+        }
+    }
+
+    // 漢堡選單與分頁切換邏輯
+    const dbHamburgerBtn = document.getElementById('db-hamburger-btn');
+    const dbMenuDropdown = document.getElementById('db-menu-dropdown');
+    const dbCurrentTitle = document.getElementById('db-current-title');
+    const videoSubview = document.getElementById('video-subview');
+    const bookmarkSubview = document.getElementById('bookmark-subview');
+    const addVideoBtn = document.getElementById('add-video-btn');
+    const addBookmarkBtn = document.getElementById('add-bookmark-btn');
+
+    if (dbHamburgerBtn && dbMenuDropdown) {
+        dbHamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isShown = dbMenuDropdown.style.display === 'flex';
+            dbMenuDropdown.style.display = isShown ? 'none' : 'flex';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dbMenuDropdown.contains(e.target) && e.target !== dbHamburgerBtn) {
+                dbMenuDropdown.style.display = 'none';
+            }
+        });
+
+        const menuItems = dbMenuDropdown.querySelectorAll('.db-menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const tab = item.dataset.tab;
+                switchDbSubtab(tab);
+                dbMenuDropdown.style.display = 'none';
+            });
+        });
+    }
+
+    function switchDbSubtab(tab) {
+        activeDbTab = tab;
+        const menuItems = document.querySelectorAll('#db-menu-dropdown .db-menu-item');
+        menuItems.forEach(item => {
+            if (item.dataset.tab === tab) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        if (tab === 'video') {
+            if (dbCurrentTitle) dbCurrentTitle.textContent = '動作練習影片庫';
+            if (videoSubview) videoSubview.style.display = 'block';
+            if (bookmarkSubview) bookmarkSubview.style.display = 'none';
+            if (addVideoBtn) addVideoBtn.style.display = 'flex';
+            if (addBookmarkBtn) addBookmarkBtn.style.display = 'none';
+            renderDatabaseView();
+        } else if (tab === 'bookmark') {
+            if (dbCurrentTitle) dbCurrentTitle.textContent = '參考資料庫';
+            if (videoSubview) videoSubview.style.display = 'none';
+            if (bookmarkSubview) bookmarkSubview.style.display = 'block';
+            if (addVideoBtn) addVideoBtn.style.display = 'none';
+            if (addBookmarkBtn) addBookmarkBtn.style.display = 'flex';
+            renderBookmarkView();
         }
     }
 
@@ -8563,7 +8955,6 @@ function startApp() {
 
             const thumbUrl = getVideoThumbnailUrl(video);
             const platformInfo = detectVideoPlatform(video.url);
-            const catColors = typeColors[video.category] || defaultTypeColor;
 
             let thumbHtml = '';
             if (thumbUrl) {
@@ -8608,7 +8999,6 @@ function startApp() {
                 </div>
             `;
 
-            // 點擊預覽圖或播放按鈕在新分頁打開原始影片
             const thumbWrapper = card.querySelector('.video-thumb-wrapper');
             if (thumbWrapper) {
                 thumbWrapper.addEventListener('click', () => {
@@ -8616,7 +9006,6 @@ function startApp() {
                 });
             }
 
-            // 點擊編輯按鈕
             const editBtn = card.querySelector('.edit-video-btn');
             if (editBtn) {
                 editBtn.addEventListener('click', (e) => {
@@ -8657,7 +9046,6 @@ function startApp() {
     const videoModalTitle = document.getElementById('video-modal-title');
     const videoDeleteBtn = document.getElementById('video-delete-btn');
     const videoCancelBtn = document.getElementById('video-cancel-btn');
-    const addVideoBtn = document.getElementById('add-video-btn');
 
     initCustomSelect('video-category-trigger', 'video-category-menu', 'video-category-wrapper', 'video-category-select', 'video-category-display');
 
@@ -8745,6 +9133,216 @@ function startApp() {
                 saveVideos(videos);
                 renderDatabaseView();
                 closeVideoModal();
+            }
+        });
+    }
+
+    // ---- 參考資料庫 (Bookmark Database Logic) ----
+    function extractDomain(urlStr) {
+        if (!urlStr) return 'LINK';
+        try {
+            const u = new URL(urlStr.startsWith('http') ? urlStr : 'https://' + urlStr);
+            return u.hostname.replace('www.', '');
+        } catch(e) {
+            return 'BOOKMARK';
+        }
+    }
+
+    function renderBookmarkView() {
+        const grid = document.getElementById('bookmark-grid');
+        if (!grid) return;
+
+        grid.innerHTML = '';
+
+        let filtered = bookmarks.filter(b => {
+            if (currentBookmarkCategory !== 'ALL' && b.category !== currentBookmarkCategory) {
+                return false;
+            }
+            if (bookmarkSearchKeyword) {
+                const target = `${b.title || ''} ${b.url || ''} ${b.note || ''} ${b.category || ''}`.toLowerCase();
+                if (!target.includes(bookmarkSearchKeyword.toLowerCase())) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 40px 20px; font-size: 14px;">
+                    尚無符合條件的學習網址，點選右上角「新增網址」開始收藏！
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach(bm => {
+            const card = document.createElement('div');
+            card.className = 'bookmark-card';
+
+            const domain = extractDomain(bm.url);
+
+            card.innerHTML = `
+                <div class="bookmark-card-top">
+                    <div class="bookmark-icon-badge">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="bookmark-domain-badge">${domain}</span>
+                </div>
+                <div class="bookmark-card-body">
+                    <div class="bookmark-card-header-row">
+                        <h3 class="bookmark-card-title">${bm.title}</h3>
+                        <span class="video-card-category">${bm.category || '未分類'}</span>
+                    </div>
+                    <div class="bookmark-card-url">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                        ${bm.url}
+                    </div>
+                    <div class="bookmark-card-note">${bm.note || '無備註'}</div>
+                    <div class="video-card-footer">
+                        <a href="${bm.url}" target="_blank" rel="noopener noreferrer" class="video-open-link-btn">
+                            前往網站
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                        <div class="video-actions-btns">
+                            <button class="video-action-icon edit-bookmark-btn" title="編輯網址">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.edit-bookmark-btn') && !e.target.closest('.video-open-link-btn')) {
+                    window.open(bm.url, '_blank');
+                }
+            });
+
+            const editBtn = card.querySelector('.edit-bookmark-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openBookmarkModalForEdit(bm);
+                });
+            }
+
+            grid.appendChild(card);
+        });
+    }
+
+    // 書籤分類 Pills 與搜尋綁定
+    const bookmarkCategoryPills = document.getElementById('bookmark-category-pills');
+    if (bookmarkCategoryPills) {
+        const pills = bookmarkCategoryPills.querySelectorAll('.video-cat-pill');
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                pills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentBookmarkCategory = pill.dataset.category || 'ALL';
+                renderBookmarkView();
+            });
+        });
+    }
+
+    const bookmarkSearchInput = document.getElementById('bookmark-search-input');
+    if (bookmarkSearchInput) {
+        bookmarkSearchInput.addEventListener('input', (e) => {
+            bookmarkSearchKeyword = e.target.value.trim();
+            renderBookmarkView();
+        });
+    }
+
+    // 書籤 Modal 控制 logic
+    const bookmarkModalOverlay = document.getElementById('bookmark-modal-overlay');
+    const bookmarkForm = document.getElementById('bookmark-form');
+    const bookmarkModalTitle = document.getElementById('bookmark-modal-title');
+    const bookmarkDeleteBtn = document.getElementById('bookmark-delete-btn');
+    const bookmarkCancelBtn = document.getElementById('bookmark-cancel-btn');
+
+    initCustomSelect('bookmark-category-trigger', 'bookmark-category-menu', 'bookmark-category-wrapper', 'bookmark-category-select', 'bookmark-category-display');
+
+    function closeBookmarkModal() {
+        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.remove('show');
+        if (bookmarkForm) bookmarkForm.reset();
+        editingBookmarkId = null;
+    }
+
+    function openBookmarkModal() {
+        editingBookmarkId = null;
+        if (bookmarkModalTitle) bookmarkModalTitle.textContent = '新增網址書籤';
+        if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'none';
+        if (bookmarkForm) bookmarkForm.reset();
+        safeSetRadioValue('bookmark-category', '跳躍');
+        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+    }
+
+    function openBookmarkModalForEdit(bm) {
+        editingBookmarkId = bm.id;
+        if (bookmarkModalTitle) bookmarkModalTitle.textContent = '編輯網址書籤';
+        if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'block';
+
+        const titleInput = document.getElementById('bookmark-title');
+        const urlInput = document.getElementById('bookmark-url');
+        const noteInput = document.getElementById('bookmark-note');
+
+        if (titleInput) titleInput.value = bm.title || '';
+        if (urlInput) urlInput.value = bm.url || '';
+        if (noteInput) noteInput.value = bm.note || '';
+
+        safeSetRadioValue('bookmark-category', bm.category || '跳躍');
+        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+    }
+
+    if (addBookmarkBtn) addBookmarkBtn.addEventListener('click', openBookmarkModal);
+    if (bookmarkCancelBtn) bookmarkCancelBtn.addEventListener('click', closeBookmarkModal);
+    if (bookmarkModalOverlay) {
+        bookmarkModalOverlay.addEventListener('click', (e) => {
+            if (e.target === bookmarkModalOverlay) closeBookmarkModal();
+        });
+    }
+
+    if (bookmarkForm) {
+        bookmarkForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('bookmark-title').value;
+            const url = document.getElementById('bookmark-url').value;
+            const category = safeGetRadioValue('bookmark-category');
+            const note = document.getElementById('bookmark-note').value;
+
+            if (editingBookmarkId) {
+                const idx = bookmarks.findIndex(b => String(b.id) === String(editingBookmarkId));
+                if (idx > -1) {
+                    bookmarks[idx].title = title;
+                    bookmarks[idx].url = url;
+                    bookmarks[idx].category = category;
+                    bookmarks[idx].note = note;
+                }
+            } else {
+                bookmarks.unshift({
+                    id: 'bm-' + Date.now(),
+                    title: title,
+                    url: url,
+                    category: category,
+                    note: note
+                });
+            }
+
+            saveBookmarks(bookmarks);
+            renderBookmarkView();
+            closeBookmarkModal();
+        });
+    }
+
+    if (bookmarkDeleteBtn) {
+        bookmarkDeleteBtn.addEventListener('click', () => {
+            if (editingBookmarkId) {
+                bookmarks = bookmarks.filter(b => String(b.id) !== String(editingBookmarkId));
+                saveBookmarks(bookmarks);
+                renderBookmarkView();
+                closeBookmarkModal();
             }
         });
     }
