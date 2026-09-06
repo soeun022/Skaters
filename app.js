@@ -687,10 +687,31 @@ function startApp() {
         '訓練用具': { bg: '#f0d8d5', text: '#856a65', cardBg: '#eee0de' }
     };
 
+    function getSoftCardBg(hexColor) {
+        if (!hexColor || typeof hexColor !== 'string' || !hexColor.startsWith('#')) return '#fdfaf9';
+        let hex = hexColor.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length !== 6) return '#fdfaf9';
+        
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        const mixR = Math.round(253 * 0.85 + r * 0.15);
+        const mixG = Math.round(250 * 0.85 + g * 0.15);
+        const mixB = Math.round(249 * 0.85 + b * 0.15);
+        
+        return `#${mixR.toString(16).padStart(2, '0')}${mixG.toString(16).padStart(2, '0')}${mixB.toString(16).padStart(2, '0')}`;
+    }
+
     function updateTypeColorsMap() {
         const types = getScheduleTypes();
         types.forEach(t => {
-            typeColors[t.name] = { bg: t.bg, text: t.text, cardBg: null };
+            typeColors[t.name] = { 
+                bg: t.bg, 
+                text: t.text, 
+                cardBg: t.cardBg || getSoftCardBg(t.bg) 
+            };
         });
     }
 
@@ -3695,6 +3716,7 @@ function startApp() {
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
+                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600;">${s.type}</span>
@@ -4215,6 +4237,7 @@ function startApp() {
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
+                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
@@ -4606,6 +4629,7 @@ function startApp() {
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
+                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
