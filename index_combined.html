@@ -255,7 +255,7 @@ body {
     z-index: 100;
 }
 
-/* 中間月份/年份懸浮橢圓毛玻璃選單 (精簡縮短標題 DOCK) */
+/* 中間月份/年份懸浮橢圓液態玻璃選單 (Liquid Glass DOCK) */
 .top-month-dock {
     display: flex;
     align-items: center;
@@ -263,14 +263,20 @@ body {
     padding: 3px 6px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.3);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
+    background: rgba(247, 237, 235, 0.42);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
+        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
+        0 12px 36px rgba(113, 90, 87, 0.14),
+        0 3px 10px rgba(0, 0, 0, 0.04);
+    position: relative;
 }
 
-/* 右側搜尋與新增獨立懸浮橢圓毛玻璃選單 (放大搜尋新增 DOCK) */
+/* 右側搜尋與新增獨立懸浮橢圓液態玻璃選單 (Liquid Glass DOCK) */
 .top-action-dock {
     display: flex;
     align-items: center;
@@ -278,11 +284,17 @@ body {
     padding: 4px 10px;
     height: 48px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.3);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
+    background: rgba(247, 237, 235, 0.42);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
+        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
+        0 12px 36px rgba(113, 90, 87, 0.14),
+        0 3px 10px rgba(0, 0, 0, 0.04);
+    position: relative;
 }
 
 .top-month-dock .icon-btn {
@@ -790,7 +802,7 @@ body {
     outline: none !important;
 }
 
-/* 畫面下方懸浮橢圓選單 (Floating Oval Bottom Dock - 僅圖示) */
+/* 畫面下方懸浮橢圓液態玻璃選單 (Liquid Glass Bottom Dock) */
 .bottom-nav-dock {
     position: fixed;
     bottom: 22px;
@@ -803,16 +815,46 @@ body {
     gap: 10px;
     padding: 7px 15px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.3);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 10px 32px rgba(113, 90, 87, 0.12), 0 3px 10px rgba(0, 0, 0, 0.04);
+    background: rgba(247, 237, 235, 0.42);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
+        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
+        0 14px 40px rgba(113, 90, 87, 0.16),
+        0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 液態玻璃邊緣動態高光光暈 */
+.bottom-nav-dock::before,
+.top-month-dock::before,
+.top-action-dock::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    border-radius: 9999px 9999px 0 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+}
+
+/* 支援 SVG 液態折射與扭曲濾鏡 */
+@supports (backdrop-filter: url(#liquid-glass-refraction)) {
+    .bottom-nav-dock,
+    .top-month-dock,
+    .top-action-dock {
+        backdrop-filter: url(#liquid-glass-refraction) blur(24px) saturate(200%);
+        -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(24px) saturate(200%);
+    }
 }
 
 .bottom-nav-item {
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     outline: none !important;
     cursor: pointer;
     display: flex;
@@ -825,7 +867,7 @@ body {
     flex-shrink: 0;
     border-radius: 50%;
     color: var(--text-secondary);
-    transition: transform 0.15s ease, opacity 0.15s ease, color 0.15s ease;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     opacity: 0.65;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
@@ -833,22 +875,28 @@ body {
 
 .bottom-nav-item:hover {
     opacity: 0.9;
-    background-color: rgba(215, 201, 201, 0.4);
+    background-color: rgba(215, 201, 201, 0.35);
 }
 
 .bottom-nav-item:active {
     transform: scale(0.92);
     opacity: 0.95;
-    background-color: rgba(215, 201, 201, 0.6);
+    background-color: rgba(215, 201, 201, 0.55);
 }
 
-/* 停留在當前分頁時高亮亮起灰紫色色塊 */
+/* 停留在當前分頁時高亮亮起液態結晶膠囊 (Liquid Active Pill) */
 .bottom-nav-item.active {
     opacity: 1;
-    background-color: rgba(215, 201, 201, 0.6) !important;
+    background: rgba(215, 201, 201, 0.55) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.65) !important;
     color: #715a57;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(113, 90, 87, 0.12);
+    transform: scale(1.06);
+    box-shadow: 
+        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 1px 0 rgba(113, 90, 87, 0.1),
+        0 4px 14px rgba(113, 90, 87, 0.15) !important;
 }
 
 .bottom-nav-item svg {
@@ -905,14 +953,20 @@ body {
     padding: 6px 14px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.3);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(113, 90, 87, 0.1), 0 2px 8px rgba(0, 0, 0, 0.03);
+    background: rgba(247, 237, 235, 0.42);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 
+        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
+        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
+        0 12px 36px rgba(113, 90, 87, 0.14),
+        0 3px 10px rgba(0, 0, 0, 0.04);
     transition: all 0.25s ease;
     box-sizing: border-box;
     cursor: pointer;
+    position: relative;
 }
 
 .dashboard-month-selector:hover,
@@ -3682,6 +3736,16 @@ body.modal-open {
             </div>
         </div>
     </div>
+
+    <!-- 液態玻璃 (Liquid Glass) 光學折射與扭曲濾鏡 SVG Defs -->
+    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+        <defs>
+            <filter id="liquid-glass-refraction" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.03" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+            </filter>
+        </defs>
+    </svg>
 
     <script>
 function startApp() {

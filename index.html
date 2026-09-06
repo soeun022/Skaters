@@ -1067,6 +1067,16 @@
         </div>
     </div>
 
+    <!-- 液態玻璃 (Liquid Glass) 光學折射與扭曲濾鏡 SVG Defs -->
+    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+        <defs>
+            <filter id="liquid-glass-refraction" x="-10%" y="-10%" width="120%" height="120%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.03" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+            </filter>
+        </defs>
+    </svg>
+
     <script src="app.js"></script>
 </body>
 </html>
