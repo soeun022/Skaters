@@ -831,19 +831,24 @@ body {
     user-select: none;
 }
 
-.bottom-nav-item:active {
-    transform: scale(0.88);
-    opacity: 0.95;
-    background-color: rgba(113, 90, 87, 0.12);
+.bottom-nav-item:hover {
+    opacity: 0.9;
+    background-color: rgba(215, 201, 201, 0.4);
 }
 
-/* 點擊後不保留持續亮起的色塊，僅高亮圖示並微升尺寸 */
+.bottom-nav-item:active {
+    transform: scale(0.92);
+    opacity: 0.95;
+    background-color: rgba(215, 201, 201, 0.6);
+}
+
+/* 停留在當前分頁時高亮亮起灰紫色色塊 */
 .bottom-nav-item.active {
     opacity: 1;
-    background-color: transparent !important;
+    background-color: rgba(215, 201, 201, 0.6) !important;
     color: #715a57;
-    transform: scale(1.12);
-    box-shadow: none !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(113, 90, 87, 0.12);
 }
 
 .bottom-nav-item svg {
