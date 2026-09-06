@@ -971,6 +971,23 @@
         </div>
     </div>
 
+    <!-- 自訂排程類型彈窗 Modal -->
+    <div id="type-prompt-modal-overlay" class="modal-overlay" style="z-index: 3500;">
+        <div class="modal" style="max-width: 380px;">
+            <h2 id="type-prompt-modal-title">新增排程類型</h2>
+            <form id="type-prompt-form">
+                <div class="form-group" style="margin-top: 16px;">
+                    <label id="type-prompt-modal-label" for="type-prompt-input" style="font-size: 14px; color: var(--text-secondary); display: block; margin-bottom: 8px;">請輸入排程類型的名稱：</label>
+                    <input type="text" id="type-prompt-input" placeholder="例如：滑行訓練、重訓" required style="width: 100%; box-sizing: border-box;">
+                </div>
+                <div class="modal-actions" style="margin-top: 24px;">
+                    <button type="button" id="type-prompt-cancel-btn" class="btn btn-secondary">取消</button>
+                    <button type="submit" id="type-prompt-submit-btn" class="btn btn-primary">確認</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- 自製 DatePicker 彈窗 Modal (包含開始與結束時間選擇) -->
     <div id="custom-datepicker-overlay" class="modal-overlay" style="z-index: 3000;">
         <div class="custom-datepicker-modal">

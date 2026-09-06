@@ -2119,43 +2119,120 @@ function startApp() {
         }
     }
 
+    // ---- 自訂風格 Prompt 彈窗 ----
+    function showCustomPromptModal({ title, label, defaultValue = '', placeholder = '', onConfirm }) {
+        let overlay = document.getElementById('type-prompt-modal-overlay');
+        if (!overlay) {
+            const overlayHtml = `
+                <div id="type-prompt-modal-overlay" class="modal-overlay" style="z-index: 3500;">
+                    <div class="modal" style="max-width: 380px;">
+                        <h2 id="type-prompt-modal-title">新增排程類型</h2>
+                        <form id="type-prompt-form">
+                            <div class="form-group" style="margin-top: 16px;">
+                                <label id="type-prompt-modal-label" for="type-prompt-input" style="font-size: 14px; color: var(--text-secondary); display: block; margin-bottom: 8px;">請輸入排程類型的名稱：</label>
+                                <input type="text" id="type-prompt-input" placeholder="例如：滑行訓練、重訓" required style="width: 100%; box-sizing: border-box;">
+                            </div>
+                            <div class="modal-actions" style="margin-top: 24px;">
+                                <button type="button" id="type-prompt-cancel-btn" class="btn btn-secondary">取消</button>
+                                <button type="submit" id="type-prompt-submit-btn" class="btn btn-primary">確認</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', overlayHtml);
+            overlay = document.getElementById('type-prompt-modal-overlay');
+        }
+
+        const titleEl = document.getElementById('type-prompt-modal-title');
+        const labelEl = document.getElementById('type-prompt-modal-label');
+        const inputEl = document.getElementById('type-prompt-input');
+        const formEl = document.getElementById('type-prompt-form');
+        const cancelBtn = document.getElementById('type-prompt-cancel-btn');
+
+        if (titleEl) titleEl.textContent = title || '新增排程類型';
+        if (labelEl) labelEl.textContent = label || '請輸入排程類型的名稱：';
+        if (inputEl) {
+            inputEl.value = defaultValue;
+            inputEl.placeholder = placeholder || '請輸入名稱...';
+        }
+
+        const closePrompt = () => {
+            overlay.classList.remove('show');
+        };
+
+        const handleCancel = (e) => {
+            e.preventDefault();
+            closePrompt();
+        };
+
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            const val = inputEl.value.trim();
+            if (!val) return;
+            closePrompt();
+            if (onConfirm) onConfirm(val);
+        };
+
+        if (cancelBtn) cancelBtn.onclick = handleCancel;
+        if (formEl) formEl.onsubmit = handleSubmit;
+
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                closePrompt();
+            }
+        };
+
+        overlay.classList.add('show');
+        setTimeout(() => {
+            if (inputEl) {
+                inputEl.focus();
+                inputEl.select();
+            }
+        }, 50);
+    }
+
     function handleAddNewScheduleType() {
-        const newName = prompt('請輸入新增排程類型的名稱 (例如：滑行訓練、重訓)：');
-        if (!newName || !newName.trim()) return;
-        const cleanName = newName.trim();
+        showCustomPromptModal({
+            title: '新增排程類型',
+            label: '請輸入新增排程類型的名稱：',
+            placeholder: '例如：滑行訓練、重訓',
+            defaultValue: '',
+            onConfirm: (cleanName) => {
+                const types = getScheduleTypes();
+                if (types.some(t => t.name === cleanName)) {
+                    alert('該排程類型已經存在！');
+                    renderScheduleTypePills(cleanName);
+                    return;
+                }
 
-        const types = getScheduleTypes();
-        if (types.some(t => t.name === cleanName)) {
-            alert('該排程類型已經存在！');
-            renderScheduleTypePills(cleanName);
-            return;
-        }
+                const morandiColors = [
+                    { bg: '#b69898', text: '#efead6' },
+                    { bg: '#836a77', text: '#efdede' },
+                    { bg: '#eacaca', text: '#836a77' },
+                    { bg: '#ead1dc', text: '#836a77' },
+                    { bg: '#c5a6a0', text: '#5e4844' },
+                    { bg: '#d4b7b1', text: '#69524e' },
+                    { bg: '#e2c8c3', text: '#78605b' },
+                    { bg: '#d7c9c9', text: '#715a57' }
+                ];
+                const color = morandiColors[types.length % morandiColors.length];
 
-        const morandiColors = [
-            { bg: '#b69898', text: '#efead6' },
-            { bg: '#836a77', text: '#efdede' },
-            { bg: '#eacaca', text: '#836a77' },
-            { bg: '#ead1dc', text: '#836a77' },
-            { bg: '#c5a6a0', text: '#5e4844' },
-            { bg: '#d4b7b1', text: '#69524e' },
-            { bg: '#e2c8c3', text: '#78605b' },
-            { bg: '#d7c9c9', text: '#715a57' }
-        ];
-        const color = morandiColors[types.length % morandiColors.length];
+                types.push({
+                    id: 'type_' + Date.now(),
+                    name: cleanName,
+                    bg: color.bg,
+                    text: color.text
+                });
 
-        types.push({
-            id: 'type_' + Date.now(),
-            name: cleanName,
-            bg: color.bg,
-            text: color.text
+                saveScheduleTypes(types);
+                renderScheduleTypePills(cleanName);
+                if (currentTab === 'settings') {
+                    renderSettingsScheduleTypes();
+                }
+                renderView();
+            }
         });
-
-        saveScheduleTypes(types);
-        renderScheduleTypePills(cleanName);
-        if (currentTab === 'settings') {
-            renderSettingsScheduleTypes();
-        }
-        renderView();
     }
 
     function renderSettingsScheduleTypes() {
@@ -2211,27 +2288,32 @@ function startApp() {
     }
 
     function handleEditScheduleType(typeId, oldName) {
-        const newName = prompt('請輸入修改後的排程類型名稱：', oldName);
-        if (!newName || !newName.trim() || newName.trim() === oldName) return;
-        const cleanName = newName.trim();
+        showCustomPromptModal({
+            title: '編輯排程類型',
+            label: '請輸入修改後的排程類型名稱：',
+            defaultValue: oldName,
+            onConfirm: (cleanName) => {
+                if (cleanName === oldName) return;
 
-        let types = getScheduleTypes();
-        const target = types.find(t => t.id === typeId || t.name === oldName);
-        if (target) {
-            target.name = cleanName;
-            saveScheduleTypes(types);
+                let types = getScheduleTypes();
+                const target = types.find(t => t.id === typeId || t.name === oldName);
+                if (target) {
+                    target.name = cleanName;
+                    saveScheduleTypes(types);
 
-            schedules.forEach(s => {
-                if (s.type === oldName) {
-                    s.type = cleanName;
+                    schedules.forEach(s => {
+                        if (s.type === oldName) {
+                            s.type = cleanName;
+                        }
+                    });
+                    saveSchedules();
+
+                    renderSettingsScheduleTypes();
+                    renderScheduleTypePills(cleanName);
+                    renderView();
                 }
-            });
-            saveSchedules();
-
-            renderSettingsScheduleTypes();
-            renderScheduleTypePills(cleanName);
-            renderView();
-        }
+            }
+        });
     }
 
     function handleDeleteScheduleType(typeId, name) {
