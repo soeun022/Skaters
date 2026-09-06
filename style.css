@@ -178,7 +178,7 @@ body {
 }
 
 
-/* 年曆視圖 (Year Calendar View - 手機頁面寬度適配、無卡片背景全透淡粉色) */
+/* 年曆視圖 (Year Calendar View - 手機頁面寬度適配、鎖定邊界防晃動) */
 .year-calendar-view {
     padding: 8px 12px;
     display: grid;
@@ -188,6 +188,12 @@ body {
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .mini-month-card {
@@ -197,12 +203,18 @@ body {
     padding: 4px 2px;
     box-shadow: none;
     cursor: pointer;
-    transition: transform 0.2s;
     border: none;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
 }
 
-.mini-month-card:hover {
-    transform: translateY(-1px);
+@media (hover: hover) {
+    .mini-month-card:hover {
+        transform: translateY(-1px);
+    }
 }
 
 .mini-month-card.current-month .mini-month-title {
@@ -235,6 +247,9 @@ body {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 1px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
 }
 
 .mini-day {
@@ -249,7 +264,9 @@ body {
     border-radius: 50%;
     color: var(--text-primary);
     position: relative;
-    transition: transform 0.15s, background-color 0.15s;
+    transition: background-color 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .mini-day.other-month {
@@ -266,11 +283,18 @@ body {
 @media (max-width: 768px) {
     .year-calendar-view {
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        padding: 6px;
+        gap: 6px 2px;
+        padding: 6px 4px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        touch-action: pan-y;
+        overscroll-behavior: contain;
     }
     .mini-month-card {
-        padding: 4px 2px;
+        padding: 2px 1px;
+        overflow: hidden;
     }
     .mini-month-title {
         font-size: 11px;
@@ -279,9 +303,12 @@ body {
     .mini-weekdays {
         font-size: 8px;
     }
+    .mini-days-grid {
+        gap: 0px;
+    }
     .mini-day {
-        height: 18px;
-        width: 18px;
+        height: 16px;
+        width: 16px;
         font-size: 8px;
     }
 }
