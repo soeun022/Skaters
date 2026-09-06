@@ -159,27 +159,38 @@
 }
 
 .settings-type-btn {
-    background: none;
+    background-color: rgba(247, 237, 235, 0.8);
     border: 1px solid var(--border-color);
-    padding: 5px 12px;
-    border-radius: 8px;
+    padding: 5px 14px;
+    border-radius: 9999px;
     font-size: 12.5px;
+    font-weight: 500;
     color: var(--text-primary);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .settings-type-btn:hover {
-    background-color: rgba(0,0,0,0.06);
+    background-color: rgba(215, 201, 201, 0.45);
+}
+
+.settings-type-btn:active {
+    transform: scale(0.95);
 }
 
 .settings-type-btn.delete {
-    color: #c0392b;
-    border-color: #f2d7d5;
+    color: #b85b56;
+    background-color: rgba(253, 242, 242, 0.8);
+    border-color: #eccbc8;
 }
 
 .settings-type-btn.delete:hover {
-    background-color: #fadbd8;
+    background-color: #f7dcd9;
+    border-color: #e3b6b1;
+}
+
+.settings-type-btn.delete:active {
+    transform: scale(0.95);
 }
 
 @font-face {
