@@ -650,11 +650,31 @@ function startApp() {
         }
     });
 
+    // ---- 排程類型自訂管理邏輯 (Custom Schedule Types) ----
+    const DEFAULT_SCHEDULE_TYPES = [
+        { id: 'type_1', name: '花滑團課', bg: '#b69898', text: '#efead6' },
+        { id: 'type_2', name: '花滑私課', bg: '#836a77', text: '#efdede' },
+        { id: 'type_3', name: '花滑練習', bg: '#eacaca', text: '#836a77' },
+        { id: 'type_4', name: '芭蕾', bg: '#ead1dc', text: '#836a77' }
+    ];
+
+    function getScheduleTypes() {
+        try {
+            const saved = localStorage.getItem('skaters_custom_schedule_types');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e){}
+        return DEFAULT_SCHEDULE_TYPES;
+    }
+
+    function saveScheduleTypes(types) {
+        localStorage.setItem('skaters_custom_schedule_types', JSON.stringify(types));
+        updateTypeColorsMap();
+    }
+
     const typeColors = {
-        '花滑團課': { bg: '#b69898', text: '#efead6', cardBg: '#e4d9d9' },
-        '花滑私課': { bg: '#836a77', text: '#efdede', cardBg: '#d7c9c9' },
-        '花滑練習': { bg: '#eacaca', text: '#836a77', cardBg: '#f7edeb' },
-        '芭蕾': { bg: '#ead1dc', text: '#836a77', cardBg: '#f4e3ee' },
         '月卡': { bg: '#d7c9c9', text: '#666666', cardBg: '#e4dfdf' },
         '單次入場': { bg: '#d3c5c3', text: '#836a77', cardBg: '#f3ebea' },
         '團體課卡(平)': { bg: '#e4d9d9', text: '#715a57', cardBg: '#eee6e6' },
@@ -666,6 +686,15 @@ function startApp() {
         '配件': { bg: '#e2c8c3', text: '#78605b', cardBg: '#e8d9d7' },
         '訓練用具': { bg: '#f0d8d5', text: '#856a65', cardBg: '#eee0de' }
     };
+
+    function updateTypeColorsMap() {
+        const types = getScheduleTypes();
+        types.forEach(t => {
+            typeColors[t.name] = { bg: t.bg, text: t.text, cardBg: t.bg };
+        });
+    }
+
+    updateTypeColorsMap();
 
     const CARD_RULES = {
         '月卡': { durationMonths: 3, maxPractices: Infinity, maxClasses: Infinity, infiniteGroupClass: true, isMonthly: true, isGroupClass: true, isPrivateClass: false },
@@ -930,19 +959,20 @@ function startApp() {
         });
     }
 
-    // ---- 手機版左右滑動切換月份/年份手勢 ----
+    // ---- 手機版左右滑動切換月份/年份/當日模式手勢 ----
     let calendarTouchStartX = 0;
     let calendarTouchStartY = 0;
 
-    if (calendarViewContainer) {
-        calendarViewContainer.addEventListener('touchstart', (e) => {
+    function setupSwipeGesture(containerEl) {
+        if (!containerEl) return;
+        containerEl.addEventListener('touchstart', (e) => {
             if (e.touches && e.touches.length === 1) {
                 calendarTouchStartX = e.touches[0].clientX;
                 calendarTouchStartY = e.touches[0].clientY;
             }
         }, { passive: true });
 
-        calendarViewContainer.addEventListener('touchend', (e) => {
+        containerEl.addEventListener('touchend', (e) => {
             if (e.changedTouches && e.changedTouches.length === 1) {
                 const endX = e.changedTouches[0].clientX;
                 const endY = e.changedTouches[0].clientY;
@@ -952,16 +982,28 @@ function startApp() {
                 // 水平滑動閾值 >= 45px 且水平運動高於垂直運動
                 if (Math.abs(diffX) >= 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
                     if (diffX < 0) {
-                        // 向左滑動 -> 下個月
+                        // 向左滑動 -> 下一個 (下個月/下一年/下一天)
                         if (nextMonthBtn) nextMonthBtn.click();
                     } else {
-                        // 向右滑動 -> 上個月
+                        // 向右滑動 -> 上一個 (上個月/上一年/前一天)
                         if (prevMonthBtn) prevMonthBtn.click();
                     }
                 }
             }
         }, { passive: true });
     }
+
+    setupSwipeGesture(calendarViewContainer);
+    setupSwipeGesture(dayViewContainer);
+
+    // 點擊 DOCK 與按鈕後自動取消焦點高亮 (避免殘留點亮色塊)
+    document.querySelectorAll('.bottom-nav-item, .icon-btn, .month-title-wrapper').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                document.activeElement.blur();
+            }
+        });
+    });
 
     // 統一渲染控制
     function updateSystemAlert() {
@@ -1056,7 +1098,7 @@ function startApp() {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
                 if (nextMonthBtn) nextMonthBtn.style.display = 'none';
-                if (topActionDock) topActionDock.style.display = 'none';
+                if (topActionDock) topActionDock.style.display = 'flex';
                 if (monthTitle) monthTitle.textContent = 'Database';
                 
                 if (calendarViewContainer) calendarViewContainer.style.display = 'none';
@@ -1069,7 +1111,7 @@ function startApp() {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
                 if (nextMonthBtn) nextMonthBtn.style.display = 'none';
-                if (topActionDock) topActionDock.style.display = 'none';
+                if (topActionDock) topActionDock.style.display = 'flex';
                 if (monthTitle) monthTitle.textContent = 'Statistics';
 
                 if (calendarViewContainer) calendarViewContainer.style.display = 'none';
@@ -1092,7 +1134,7 @@ function startApp() {
                 if (topNavbar) topNavbar.style.display = 'flex';
                 if (prevMonthBtn) prevMonthBtn.style.display = 'none';
                 if (nextMonthBtn) nextMonthBtn.style.display = 'none';
-                if (topActionDock) topActionDock.style.display = 'none';
+                if (topActionDock) topActionDock.style.display = 'flex';
                 if (monthTitle) monthTitle.textContent = 'Settings';
 
                 if (calendarViewContainer) calendarViewContainer.style.display = 'none';
@@ -1100,10 +1142,12 @@ function startApp() {
                 if (statsView) statsView.style.display = 'none';
                 if (settingsView) settingsView.style.display = 'block';
                 if (dayViewContainer) dayViewContainer.style.display = 'none';
+
+                renderSettingsScheduleTypes();
             } else if (currentTab === 'day-view') {
                 if (topNavbar) topNavbar.style.display = 'flex';
-                if (prevMonthBtn) prevMonthBtn.style.display = 'block';
-                if (nextMonthBtn) nextMonthBtn.style.display = 'block';
+                if (prevMonthBtn) prevMonthBtn.style.display = 'flex';
+                if (nextMonthBtn) nextMonthBtn.style.display = 'flex';
                 if (topActionDock) topActionDock.style.display = 'flex';
                 
                 const year = selectedDayDate.getFullYear();
@@ -1757,7 +1801,7 @@ function startApp() {
         const dateTimeValue = timePart ? `${datePart}T${timePart}` : datePart;
         CustomDatePicker.setValue('schedule-date-trigger', dateTimeValue, Boolean(timePart), schedule.endTime || '');
         
-        safeSetRadioValue('schedule-type', schedule.type);
+        renderScheduleTypePills(schedule.type);
         populateLinkedCardSelect(schedule.linkedCardId);
         const noteEl = document.getElementById('schedule-note');
         if (noteEl) noteEl.value = schedule.note || '';
@@ -1885,8 +1929,168 @@ function startApp() {
         const defaultEndTime = '18:30';
         
         CustomDatePicker.setValue('schedule-date-trigger', `${dateStr}T${timeStr}`, true, defaultEndTime);
+        renderScheduleTypePills();
         populateLinkedCardSelect();
         openModal();
+    }
+
+    // ---- 排程類型渲染與控制函數 ----
+    function renderScheduleTypePills(selectedTypeName) {
+        const typeContainer = document.querySelector('#schedule-form .type-tags');
+        if (!typeContainer) return;
+
+        const types = getScheduleTypes();
+        let html = '';
+        types.forEach((t, idx) => {
+            const isChecked = selectedTypeName ? (t.name === selectedTypeName) : (idx === 0);
+            html += `
+                <label class="type-tag">
+                    <input type="radio" name="schedule-type" value="${t.name}" ${isChecked ? 'checked' : ''}>
+                    <span style="background-color: ${t.bg}; color: ${t.text};">${t.name}</span>
+                </label>
+            `;
+        });
+        html += `
+            <button type="button" id="inline-add-type-btn" class="type-tag-add-btn" title="新增排程類型">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+        `;
+        typeContainer.innerHTML = html;
+
+        const inlineAddBtn = document.getElementById('inline-add-type-btn');
+        if (inlineAddBtn) {
+            inlineAddBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleAddNewScheduleType();
+            });
+        }
+    }
+
+    function handleAddNewScheduleType() {
+        const newName = prompt('請輸入新增排程類型的名稱 (例如：滑行訓練、重訓)：');
+        if (!newName || !newName.trim()) return;
+        const cleanName = newName.trim();
+
+        const types = getScheduleTypes();
+        if (types.some(t => t.name === cleanName)) {
+            alert('該排程類型已經存在！');
+            renderScheduleTypePills(cleanName);
+            return;
+        }
+
+        const morandiColors = [
+            { bg: '#b69898', text: '#efead6' },
+            { bg: '#836a77', text: '#efdede' },
+            { bg: '#eacaca', text: '#836a77' },
+            { bg: '#ead1dc', text: '#836a77' },
+            { bg: '#c5a6a0', text: '#5e4844' },
+            { bg: '#d4b7b1', text: '#69524e' },
+            { bg: '#e2c8c3', text: '#78605b' },
+            { bg: '#d7c9c9', text: '#715a57' }
+        ];
+        const color = morandiColors[types.length % morandiColors.length];
+
+        types.push({
+            id: 'type_' + Date.now(),
+            name: cleanName,
+            bg: color.bg,
+            text: color.text
+        });
+
+        saveScheduleTypes(types);
+        renderScheduleTypePills(cleanName);
+        if (currentTab === 'settings') {
+            renderSettingsScheduleTypes();
+        }
+        renderView();
+    }
+
+    function renderSettingsScheduleTypes() {
+        const listContainer = document.getElementById('settings-type-list');
+        if (!listContainer) return;
+
+        const types = getScheduleTypes();
+        if (types.length === 0) {
+            listContainer.innerHTML = '<p style="font-size: 13px; color: var(--text-secondary);">尚無自訂排程類型</p>';
+            return;
+        }
+
+        let html = '';
+        types.forEach(t => {
+            html += `
+                <div class="settings-type-item">
+                    <div class="settings-type-info">
+                        <span class="settings-type-badge" style="background-color: ${t.bg}; color: ${t.text};">${t.name}</span>
+                    </div>
+                    <div class="settings-type-actions">
+                        <button type="button" class="settings-type-btn edit-type-btn" data-id="${t.id}" data-name="${t.name}">編輯</button>
+                        <button type="button" class="settings-type-btn delete delete-type-btn" data-id="${t.id}" data-name="${t.name}">刪除</button>
+                    </div>
+                </div>
+            `;
+        });
+        listContainer.innerHTML = html;
+
+        listContainer.querySelectorAll('.edit-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const typeId = btn.getAttribute('data-id');
+                const oldName = btn.getAttribute('data-name');
+                handleEditScheduleType(typeId, oldName);
+            });
+        });
+
+        listContainer.querySelectorAll('.delete-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const typeId = btn.getAttribute('data-id');
+                const name = btn.getAttribute('data-name');
+                handleDeleteScheduleType(typeId, name);
+            });
+        });
+
+        const settingsAddTypeBtn = document.getElementById('settings-add-type-btn');
+        if (settingsAddTypeBtn && !settingsAddTypeBtn.hasAttribute('data-bound')) {
+            settingsAddTypeBtn.setAttribute('data-bound', 'true');
+            settingsAddTypeBtn.addEventListener('click', () => {
+                handleAddNewScheduleType();
+            });
+        }
+    }
+
+    function handleEditScheduleType(typeId, oldName) {
+        const newName = prompt('請輸入修改後的排程類型名稱：', oldName);
+        if (!newName || !newName.trim() || newName.trim() === oldName) return;
+        const cleanName = newName.trim();
+
+        let types = getScheduleTypes();
+        const target = types.find(t => t.id === typeId || t.name === oldName);
+        if (target) {
+            target.name = cleanName;
+            saveScheduleTypes(types);
+
+            schedules.forEach(s => {
+                if (s.type === oldName) {
+                    s.type = cleanName;
+                }
+            });
+            saveSchedules();
+
+            renderSettingsScheduleTypes();
+            renderScheduleTypePills(cleanName);
+            renderView();
+        }
+    }
+
+    function handleDeleteScheduleType(typeId, name) {
+        if (!confirm(`確定要刪除「${name}」排程類型嗎？`)) return;
+
+        let types = getScheduleTypes();
+        types = types.filter(t => t.id !== typeId && t.name !== name);
+        saveScheduleTypes(types);
+
+        renderSettingsScheduleTypes();
+        renderScheduleTypePills();
+        renderView();
     }
 
     function openCardModal(prefillDateStr) {
