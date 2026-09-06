@@ -4970,39 +4970,66 @@ function startApp() {
         }, 200);
     }
 
+    function updateActiveMonthFromScroll() {
+        if (isInitialScrolling || currentTab !== 'calendar' || currentViewMode !== 'month') return;
+
+        const Y_TARGET = 120;
+        const blocks = Array.from(document.querySelectorAll('.month-block'));
+        if (blocks.length === 0) return;
+
+        let targetBlock = blocks.find(b => {
+            const rect = b.getBoundingClientRect();
+            return rect.top <= Y_TARGET && rect.bottom > Y_TARGET;
+        });
+
+        if (!targetBlock) {
+            const firstRect = blocks[0].getBoundingClientRect();
+            if (firstRect.top > Y_TARGET) {
+                targetBlock = blocks[0];
+            } else {
+                targetBlock = blocks[blocks.length - 1];
+            }
+        }
+
+        if (targetBlock) {
+            const yearStr = targetBlock.dataset.year;
+            const monthStr = targetBlock.dataset.month;
+            const title = targetBlock.dataset.title;
+
+            if (yearStr !== undefined && monthStr !== undefined) {
+                const year = parseInt(yearStr);
+                const month = parseInt(monthStr);
+                if (currentDate.getFullYear() !== year || currentDate.getMonth() !== month) {
+                    currentDate = new Date(year, month, 1);
+                    if (monthTitle && title) {
+                        monthTitle.textContent = title;
+                    }
+                }
+            }
+        }
+    }
+
+    let scrollRafId = null;
+    window.addEventListener('scroll', () => {
+        if (scrollRafId) return;
+        scrollRafId = requestAnimationFrame(() => {
+            scrollRafId = null;
+            updateActiveMonthFromScroll();
+        });
+    }, { passive: true });
+
     function setupMonthObserver() {
         if (monthObserver) {
             monthObserver.disconnect();
         }
 
-        const options = {
-            root: null,
-            rootMargin: '-76px 0px -70% 0px',
-            threshold: 0
-        };
-
-        let titleTimer = null;
-        monthObserver = new IntersectionObserver((entries) => {
+        monthObserver = new IntersectionObserver(() => {
             if (isInitialScrolling) return;
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const title = entry.target.dataset.title;
-                    const yearStr = entry.target.dataset.year;
-                    const monthStr = entry.target.dataset.month;
-
-                    if (yearStr !== undefined && monthStr !== undefined) {
-                        currentDate = new Date(parseInt(yearStr), parseInt(monthStr), 1);
-                    }
-
-                    if (title && monthTitle) {
-                        if (titleTimer) clearTimeout(titleTimer);
-                        titleTimer = setTimeout(() => {
-                            monthTitle.textContent = title;
-                        }, 40);
-                    }
-                }
-            });
-        }, options);
+            updateActiveMonthFromScroll();
+        }, {
+            root: null,
+            threshold: [0, 0.1, 0.5]
+        });
 
         document.querySelectorAll('.month-block').forEach(block => {
             monthObserver.observe(block);
