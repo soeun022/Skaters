@@ -1248,6 +1248,8 @@ function startApp() {
     // ---- 順暢無縫垂直連續捲動月曆 (Continuous Scroll Month View) ----
     let monthObserver = null;
 
+    let isInitialScrolling = false;
+
     function renderCalendar() {
         if (!calendarGrid) return;
         calendarGrid.innerHTML = '';
@@ -1311,13 +1313,19 @@ function startApp() {
             }
         }
 
+        isInitialScrolling = true;
         setupMonthObserver();
 
         if (currentActiveBlock) {
-            setTimeout(() => {
-                currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }, 50);
+            currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
+            if (monthTitle) {
+                monthTitle.textContent = currentActiveBlock.dataset.title;
+            }
         }
+
+        setTimeout(() => {
+            isInitialScrolling = false;
+        }, 200);
     }
 
     function setupMonthObserver() {
@@ -1333,6 +1341,7 @@ function startApp() {
 
         let titleTimer = null;
         monthObserver = new IntersectionObserver((entries) => {
+            if (isInitialScrolling) return;
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const title = entry.target.dataset.title;
