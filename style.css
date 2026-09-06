@@ -295,12 +295,9 @@ body {
 }
 
 
-/* 年曆視圖 (Year Calendar View - 增加月份上下間距、放大字體與底欄防遮擋) */
+/* iOS 行事曆風格年曆視圖 (iOS Style Year View) */
 .year-calendar-view {
-    padding: 12px 12px 90px 12px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px 8px;
+    padding: 10px 16px 95px 16px;
     background-color: var(--bg-color);
     width: 100%;
     max-width: 480px;
@@ -313,66 +310,93 @@ body {
     -webkit-user-select: none;
 }
 
+/* iOS 年份大標題區域 */
+.year-view-header {
+    margin-bottom: 14px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.year-title-group {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.year-title-main {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang TC", "Helvetica Neue", sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #c85a54;
+    letter-spacing: -0.5px;
+}
+
+.year-title-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.year-view-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    width: 100%;
+    opacity: 0.6;
+}
+
+/* 12 個月 3 欄 Grid */
+.year-months-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px 12px;
+}
+
 .mini-month-card {
     background-color: transparent;
-    color: var(--text-primary);
-    border-radius: 8px;
-    padding: 6px 4px;
-    box-shadow: none;
     cursor: pointer;
     border: none;
+    padding: 0;
     box-sizing: border-box;
+    transition: transform 0.15s ease;
     user-select: none;
     -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: pan-y;
 }
 
 @media (hover: hover) {
     .mini-month-card:hover {
-        transform: translateY(-1px);
+        transform: scale(1.02);
     }
 }
 
-.mini-month-card.current-month .mini-month-title {
-    color: #715a57;
-    font-weight: 700;
-}
-
 .mini-month-title {
-    font-family: 'NumberFont', 'Hoefler Text', Georgia, 'Times New Roman', serif !important;
-    font-size: 14.5px;
-    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang TC", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
     color: var(--text-primary);
     margin-bottom: 6px;
-    text-align: center;
-    padding-bottom: 3px;
-    border-bottom: 1px dashed rgba(113, 90, 87, 0.25);
+    text-align: left;
+    padding-left: 2px;
+    border: none !important;
 }
 
-.mini-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-size: 10.5px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-    font-weight: 600;
+.mini-month-title.current-month-title {
+    color: #c85a54;
 }
 
 .mini-days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
+    gap: 2px 1px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: pan-y;
 }
 
 .mini-day {
-    font-family: 'NumberFont', 'Hoefler Text', Georgia, serif;
-    height: 22px;
-    width: 22px;
+    font-family: 'NumberFont', -apple-system, BlinkMacSystemFont, sans-serif;
+    height: 20px;
+    width: 20px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -382,55 +406,39 @@ body {
     border-radius: 50%;
     color: var(--text-primary);
     position: relative;
-    transition: background-color 0.15s;
-    user-select: none;
-    -webkit-user-select: none;
+    transition: all 0.15s ease;
 }
 
-.mini-day.other-month {
-    color: var(--text-light);
-    opacity: 0.3;
+.mini-day.empty-mini-day {
+    background: transparent;
+    pointer-events: none;
 }
 
 .mini-day.today {
-    background-color: #e8cfcb;
-    color: #715a57;
-    font-weight: bold;
+    background-color: #c85a54 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 6px rgba(200, 90, 84, 0.35);
 }
 
 @media (max-width: 768px) {
     .year-calendar-view {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px 2px;
-        padding: 10px 4px 88px 4px;
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        overflow-x: hidden;
-        touch-action: pan-y;
-        overscroll-behavior: contain;
+        padding: 8px 12px 90px 12px;
     }
-    .mini-month-card {
-        padding: 2px 0px;
-        overflow: hidden;
+    .year-title-main {
+        font-size: 28px;
+    }
+    .year-months-grid {
+        gap: 14px 8px;
     }
     .mini-month-title {
-        font-size: 12.5px;
-        margin-bottom: 3px;
-        padding-bottom: 2px;
-    }
-    .mini-weekdays {
-        font-size: 8.5px;
-        margin-bottom: 2px;
-    }
-    .mini-days-grid {
-        gap: 0px;
+        font-size: 15px;
+        margin-bottom: 4px;
     }
     .mini-day {
-        height: 16px;
-        width: 16px;
-        max-width: 16px;
-        font-size: 8.5px;
+        height: 18px;
+        width: 18px;
+        font-size: 10px;
     }
 }
 

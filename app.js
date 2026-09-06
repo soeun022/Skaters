@@ -1603,7 +1603,19 @@ function startApp() {
         return cell;
     }
 
-    // ---- 年曆視圖渲染邏輯 (Year View) ----
+    function getChineseYearInfo(year) {
+        const stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+        const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+        const zodiacs = ["鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"];
+        
+        const offset = year - 4;
+        const stemIdx = (offset % 10 + 10) % 10;
+        const branchIdx = (offset % 12 + 12) % 12;
+        
+        return `${stems[stemIdx]}${branches[branchIdx]}${zodiacs[branchIdx]}年`;
+    }
+
+    // ---- 年曆視圖渲染邏輯 (iOS Calendar Style Year View) ----
     function renderYearCalendar() {
         if (!yearCalendarView) return;
         yearCalendarView.innerHTML = '';
@@ -1613,22 +1625,49 @@ function startApp() {
             monthTitle.textContent = `${year}`;
         }
 
-        const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        // 1. 年份大標題區域 (比照 iOS 行事曆：紅色大標題 + 農曆年號 + 分隔線)
+        const header = document.createElement('div');
+        header.className = 'year-view-header';
+        
+        const titleGroup = document.createElement('div');
+        titleGroup.className = 'year-title-group';
+        
+        const yearTitleMain = document.createElement('span');
+        yearTitleMain.className = 'year-title-main';
+        yearTitleMain.textContent = `${year}年`;
+        
+        const yearTitleSub = document.createElement('span');
+        yearTitleSub.className = 'year-title-sub';
+        yearTitleSub.textContent = getChineseYearInfo(year);
+        
+        titleGroup.appendChild(yearTitleMain);
+        titleGroup.appendChild(yearTitleSub);
+        header.appendChild(titleGroup);
+        
+        const divider = document.createElement('div');
+        divider.className = 'year-view-divider';
+        header.appendChild(divider);
+        
+        yearCalendarView.appendChild(header);
 
-        // 收集有資料的日期集合以利效能比對
-        const datesWithSchedules = new Set(schedules.map(s => normalizeDateStr(s.date)));
+        // 2. 12 個月 3 欄 Grid 迷你月曆
+        const monthContainer = document.createElement('div');
+        monthContainer.className = 'year-months-grid';
+
+        const monthNamesCN = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
         const realToday = new Date();
 
         for (let m = 0; m < 12; m++) {
             const card = document.createElement('div');
             card.className = 'mini-month-card';
-            if (realToday.getFullYear() === year && realToday.getMonth() === m) {
+            const isCurrentMonth = (realToday.getFullYear() === year && realToday.getMonth() === m);
+            if (isCurrentMonth) {
                 card.classList.add('current-month');
             }
 
             const title = document.createElement('div');
-            title.className = 'mini-month-title';
-            title.textContent = monthNamesFull[m];
+            title.className = `mini-month-title ${isCurrentMonth ? 'current-month-title' : ''}`;
+            title.textContent = monthNamesCN[m];
             card.appendChild(title);
 
             const daysGrid = document.createElement('div');
@@ -1641,18 +1680,15 @@ function startApp() {
             if (firstDayIndex === -1) firstDayIndex = 6;
 
             const totalDays = lastDayOfMonth.getDate();
-            const prevMonthLastDay = new Date(year, m, 0).getDate();
 
-            // 上個月 filler
-            for (let i = firstDayIndex; i > 0; i--) {
-                const dayNum = prevMonthLastDay - i + 1;
-                const miniDay = document.createElement('div');
-                miniDay.className = 'mini-day other-month';
-                miniDay.textContent = dayNum;
-                daysGrid.appendChild(miniDay);
+            // 1. 空白 filler (iOS 行事曆：不顯示上月日期數字，僅留白補位)
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'mini-day empty-mini-day';
+                daysGrid.appendChild(emptyDay);
             }
 
-            // 這個月
+            // 2. 當月所有日期 (1 ~ totalDays)
             for (let d = 1; d <= totalDays; d++) {
                 const miniDay = document.createElement('div');
                 miniDay.className = 'mini-day';
@@ -1661,24 +1697,24 @@ function startApp() {
                 const actualDate = new Date(year, m, d);
                 const dateStr = formatLocalDate(actualDate);
 
-                const todayStr = formatLocalDate(realToday);
+                const isToday = (actualDate.getDate() === realToday.getDate() &&
+                                 actualDate.getMonth() === realToday.getMonth() &&
+                                 actualDate.getFullYear() === realToday.getFullYear());
 
-                if (actualDate.getDate() === realToday.getDate() &&
-                    actualDate.getMonth() === realToday.getMonth() &&
-                    actualDate.getFullYear() === realToday.getFullYear()) {
+                if (isToday) {
                     miniDay.classList.add('today');
-                } else if (dateStr < todayStr) {
-                    miniDay.classList.add('past-day');
                 }
 
-                // 檢查該日期是否有排程，不包含課卡、購物、其他
+                // 檢查該日期是否有排程
                 const matchingSchedules = schedules.filter(s => !s.isCard && !s.isShopping && !s.isOther && getScheduleMatchOnDate(s, dateStr).matched);
                 if (matchingSchedules.length > 0) {
-                    const primarySchedule = matchingSchedules[0];
-                    const colors = typeColors[primarySchedule.type] || defaultTypeColor;
-                    miniDay.style.backgroundColor = colors.bg;
-                    miniDay.style.color = colors.text;
-                    miniDay.style.fontWeight = '600';
+                    if (!isToday) {
+                        const primarySchedule = matchingSchedules[0];
+                        const colors = typeColors[primarySchedule.type] || defaultTypeColor;
+                        miniDay.style.backgroundColor = colors.bg;
+                        miniDay.style.color = colors.text;
+                        miniDay.style.fontWeight = '700';
+                    }
                     miniDay.title = matchingSchedules.map(s => (s.displayTitle || s.type)).join('\n');
                 }
 
@@ -1694,8 +1730,10 @@ function startApp() {
                 renderView();
             });
 
-            yearCalendarView.appendChild(card);
+            monthContainer.appendChild(card);
         }
+
+        yearCalendarView.appendChild(monthContainer);
 
         if (currentTab === 'stats') {
             const modeSelect = document.getElementById('stats-mode-select');

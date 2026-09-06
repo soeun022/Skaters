@@ -321,12 +321,9 @@ body {
 }
 
 
-/* 年曆視圖 (Year Calendar View - 增加月份上下間距、放大字體與底欄防遮擋) */
+/* iOS 行事曆風格年曆視圖 (iOS Style Year View) */
 .year-calendar-view {
-    padding: 12px 12px 90px 12px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px 8px;
+    padding: 10px 16px 95px 16px;
     background-color: var(--bg-color);
     width: 100%;
     max-width: 480px;
@@ -339,66 +336,93 @@ body {
     -webkit-user-select: none;
 }
 
+/* iOS 年份大標題區域 */
+.year-view-header {
+    margin-bottom: 14px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.year-title-group {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.year-title-main {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang TC", "Helvetica Neue", sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #c85a54;
+    letter-spacing: -0.5px;
+}
+
+.year-title-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.year-view-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    width: 100%;
+    opacity: 0.6;
+}
+
+/* 12 個月 3 欄 Grid */
+.year-months-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px 12px;
+}
+
 .mini-month-card {
     background-color: transparent;
-    color: var(--text-primary);
-    border-radius: 8px;
-    padding: 6px 4px;
-    box-shadow: none;
     cursor: pointer;
     border: none;
+    padding: 0;
     box-sizing: border-box;
+    transition: transform 0.15s ease;
     user-select: none;
     -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: pan-y;
 }
 
 @media (hover: hover) {
     .mini-month-card:hover {
-        transform: translateY(-1px);
+        transform: scale(1.02);
     }
 }
 
-.mini-month-card.current-month .mini-month-title {
-    color: #715a57;
-    font-weight: 700;
-}
-
 .mini-month-title {
-    font-family: 'NumberFont', 'Hoefler Text', Georgia, 'Times New Roman', serif !important;
-    font-size: 14.5px;
-    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang TC", sans-serif;
+    font-size: 16px;
+    font-weight: 800;
     color: var(--text-primary);
     margin-bottom: 6px;
-    text-align: center;
-    padding-bottom: 3px;
-    border-bottom: 1px dashed rgba(113, 90, 87, 0.25);
+    text-align: left;
+    padding-left: 2px;
+    border: none !important;
 }
 
-.mini-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-size: 10.5px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-    font-weight: 600;
+.mini-month-title.current-month-title {
+    color: #c85a54;
 }
 
 .mini-days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
+    gap: 2px 1px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: pan-y;
 }
 
 .mini-day {
-    font-family: 'NumberFont', 'Hoefler Text', Georgia, serif;
-    height: 22px;
-    width: 22px;
+    font-family: 'NumberFont', -apple-system, BlinkMacSystemFont, sans-serif;
+    height: 20px;
+    width: 20px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -408,55 +432,39 @@ body {
     border-radius: 50%;
     color: var(--text-primary);
     position: relative;
-    transition: background-color 0.15s;
-    user-select: none;
-    -webkit-user-select: none;
+    transition: all 0.15s ease;
 }
 
-.mini-day.other-month {
-    color: var(--text-light);
-    opacity: 0.3;
+.mini-day.empty-mini-day {
+    background: transparent;
+    pointer-events: none;
 }
 
 .mini-day.today {
-    background-color: #e8cfcb;
-    color: #715a57;
-    font-weight: bold;
+    background-color: #c85a54 !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 6px rgba(200, 90, 84, 0.35);
 }
 
 @media (max-width: 768px) {
     .year-calendar-view {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px 2px;
-        padding: 10px 4px 88px 4px;
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        overflow-x: hidden;
-        touch-action: pan-y;
-        overscroll-behavior: contain;
+        padding: 8px 12px 90px 12px;
     }
-    .mini-month-card {
-        padding: 2px 0px;
-        overflow: hidden;
+    .year-title-main {
+        font-size: 28px;
+    }
+    .year-months-grid {
+        gap: 14px 8px;
     }
     .mini-month-title {
-        font-size: 12.5px;
-        margin-bottom: 3px;
-        padding-bottom: 2px;
-    }
-    .mini-weekdays {
-        font-size: 8.5px;
-        margin-bottom: 2px;
-    }
-    .mini-days-grid {
-        gap: 0px;
+        font-size: 15px;
+        margin-bottom: 4px;
     }
     .mini-day {
-        height: 16px;
-        width: 16px;
-        max-width: 16px;
-        font-size: 8.5px;
+        height: 18px;
+        width: 18px;
+        font-size: 10px;
     }
 }
 
@@ -4943,7 +4951,19 @@ function startApp() {
         return cell;
     }
 
-    // ---- 年曆視圖渲染邏輯 (Year View) ----
+    function getChineseYearInfo(year) {
+        const stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
+        const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
+        const zodiacs = ["鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"];
+        
+        const offset = year - 4;
+        const stemIdx = (offset % 10 + 10) % 10;
+        const branchIdx = (offset % 12 + 12) % 12;
+        
+        return `${stems[stemIdx]}${branches[branchIdx]}${zodiacs[branchIdx]}年`;
+    }
+
+    // ---- 年曆視圖渲染邏輯 (iOS Calendar Style Year View) ----
     function renderYearCalendar() {
         if (!yearCalendarView) return;
         yearCalendarView.innerHTML = '';
@@ -4953,22 +4973,49 @@ function startApp() {
             monthTitle.textContent = `${year}`;
         }
 
-        const monthNamesFull = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        // 1. 年份大標題區域 (比照 iOS 行事曆：紅色大標題 + 農曆年號 + 分隔線)
+        const header = document.createElement('div');
+        header.className = 'year-view-header';
+        
+        const titleGroup = document.createElement('div');
+        titleGroup.className = 'year-title-group';
+        
+        const yearTitleMain = document.createElement('span');
+        yearTitleMain.className = 'year-title-main';
+        yearTitleMain.textContent = `${year}年`;
+        
+        const yearTitleSub = document.createElement('span');
+        yearTitleSub.className = 'year-title-sub';
+        yearTitleSub.textContent = getChineseYearInfo(year);
+        
+        titleGroup.appendChild(yearTitleMain);
+        titleGroup.appendChild(yearTitleSub);
+        header.appendChild(titleGroup);
+        
+        const divider = document.createElement('div');
+        divider.className = 'year-view-divider';
+        header.appendChild(divider);
+        
+        yearCalendarView.appendChild(header);
 
-        // 收集有資料的日期集合以利效能比對
-        const datesWithSchedules = new Set(schedules.map(s => normalizeDateStr(s.date)));
+        // 2. 12 個月 3 欄 Grid 迷你月曆
+        const monthContainer = document.createElement('div');
+        monthContainer.className = 'year-months-grid';
+
+        const monthNamesCN = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
         const realToday = new Date();
 
         for (let m = 0; m < 12; m++) {
             const card = document.createElement('div');
             card.className = 'mini-month-card';
-            if (realToday.getFullYear() === year && realToday.getMonth() === m) {
+            const isCurrentMonth = (realToday.getFullYear() === year && realToday.getMonth() === m);
+            if (isCurrentMonth) {
                 card.classList.add('current-month');
             }
 
             const title = document.createElement('div');
-            title.className = 'mini-month-title';
-            title.textContent = monthNamesFull[m];
+            title.className = `mini-month-title ${isCurrentMonth ? 'current-month-title' : ''}`;
+            title.textContent = monthNamesCN[m];
             card.appendChild(title);
 
             const daysGrid = document.createElement('div');
@@ -4981,18 +5028,15 @@ function startApp() {
             if (firstDayIndex === -1) firstDayIndex = 6;
 
             const totalDays = lastDayOfMonth.getDate();
-            const prevMonthLastDay = new Date(year, m, 0).getDate();
 
-            // 上個月 filler
-            for (let i = firstDayIndex; i > 0; i--) {
-                const dayNum = prevMonthLastDay - i + 1;
-                const miniDay = document.createElement('div');
-                miniDay.className = 'mini-day other-month';
-                miniDay.textContent = dayNum;
-                daysGrid.appendChild(miniDay);
+            // 1. 空白 filler (iOS 行事曆：不顯示上月日期數字，僅留白補位)
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'mini-day empty-mini-day';
+                daysGrid.appendChild(emptyDay);
             }
 
-            // 這個月
+            // 2. 當月所有日期 (1 ~ totalDays)
             for (let d = 1; d <= totalDays; d++) {
                 const miniDay = document.createElement('div');
                 miniDay.className = 'mini-day';
@@ -5001,24 +5045,24 @@ function startApp() {
                 const actualDate = new Date(year, m, d);
                 const dateStr = formatLocalDate(actualDate);
 
-                const todayStr = formatLocalDate(realToday);
+                const isToday = (actualDate.getDate() === realToday.getDate() &&
+                                 actualDate.getMonth() === realToday.getMonth() &&
+                                 actualDate.getFullYear() === realToday.getFullYear());
 
-                if (actualDate.getDate() === realToday.getDate() &&
-                    actualDate.getMonth() === realToday.getMonth() &&
-                    actualDate.getFullYear() === realToday.getFullYear()) {
+                if (isToday) {
                     miniDay.classList.add('today');
-                } else if (dateStr < todayStr) {
-                    miniDay.classList.add('past-day');
                 }
 
-                // 檢查該日期是否有排程，不包含課卡、購物、其他
+                // 檢查該日期是否有排程
                 const matchingSchedules = schedules.filter(s => !s.isCard && !s.isShopping && !s.isOther && getScheduleMatchOnDate(s, dateStr).matched);
                 if (matchingSchedules.length > 0) {
-                    const primarySchedule = matchingSchedules[0];
-                    const colors = typeColors[primarySchedule.type] || defaultTypeColor;
-                    miniDay.style.backgroundColor = colors.bg;
-                    miniDay.style.color = colors.text;
-                    miniDay.style.fontWeight = '600';
+                    if (!isToday) {
+                        const primarySchedule = matchingSchedules[0];
+                        const colors = typeColors[primarySchedule.type] || defaultTypeColor;
+                        miniDay.style.backgroundColor = colors.bg;
+                        miniDay.style.color = colors.text;
+                        miniDay.style.fontWeight = '700';
+                    }
                     miniDay.title = matchingSchedules.map(s => (s.displayTitle || s.type)).join('\n');
                 }
 
@@ -5034,8 +5078,10 @@ function startApp() {
                 renderView();
             });
 
-            yearCalendarView.appendChild(card);
+            monthContainer.appendChild(card);
         }
+
+        yearCalendarView.appendChild(monthContainer);
 
         if (currentTab === 'stats') {
             const modeSelect = document.getElementById('stats-mode-select');
