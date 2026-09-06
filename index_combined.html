@@ -263,16 +263,15 @@ body {
     padding: 3px 6px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.42);
+    border: 1px solid transparent;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.45), rgba(247, 237, 235, 0.45)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
     backdrop-filter: blur(28px) saturate(200%);
     -webkit-backdrop-filter: blur(28px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 
-        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
-        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
-        0 12px 36px rgba(113, 90, 87, 0.14),
-        0 3px 10px rgba(0, 0, 0, 0.04);
+        0 10px 30px rgba(113, 90, 87, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
 }
 
@@ -284,16 +283,15 @@ body {
     padding: 4px 10px;
     height: 48px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.42);
+    border: 1px solid transparent;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.45), rgba(247, 237, 235, 0.45)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
     backdrop-filter: blur(28px) saturate(200%);
     -webkit-backdrop-filter: blur(28px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 
-        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
-        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
-        0 12px 36px rgba(113, 90, 87, 0.14),
-        0 3px 10px rgba(0, 0, 0, 0.04);
+        0 10px 30px rgba(113, 90, 87, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.04);
     position: relative;
 }
 
@@ -815,40 +813,32 @@ body {
     gap: 10px;
     padding: 7px 15px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.42);
+    border: 1px solid transparent;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.45), rgba(247, 237, 235, 0.45)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
     backdrop-filter: blur(28px) saturate(200%);
     -webkit-backdrop-filter: blur(28px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 
-        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
-        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
         0 14px 40px rgba(113, 90, 87, 0.16),
         0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* 液態玻璃邊緣動態高光光暈 */
+/* 液態玻璃邊緣高光已併入 135deg 對角線邊框 (左上與右下反光) */
 .bottom-nav-dock::before,
 .top-month-dock::before,
 .top-action-dock::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    border-radius: 9999px 9999px 0 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
+    display: none;
 }
 
 /* 支援 SVG 液態折射與扭曲濾鏡 */
 @supports (backdrop-filter: url(#liquid-glass-refraction)) {
     .bottom-nav-dock,
     .top-month-dock,
-    .top-action-dock {
-        backdrop-filter: url(#liquid-glass-refraction) blur(24px) saturate(200%);
-        -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(24px) saturate(200%);
+    .top-action-dock,
+    .dashboard-month-selector {
+        backdrop-filter: url(#liquid-glass-refraction) blur(28px) saturate(200%);
+        -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(28px) saturate(200%);
     }
 }
 
@@ -887,16 +877,15 @@ body {
 /* 停留在當前分頁時高亮亮起液態結晶膠囊 (Liquid Active Pill) */
 .bottom-nav-item.active {
     opacity: 1;
-    background: rgba(215, 201, 201, 0.55) !important;
+    background: 
+        linear-gradient(rgba(215, 201, 201, 0.55), rgba(215, 201, 201, 0.55)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.2) 35%, rgba(255, 255, 255, 0.2) 65%, rgba(255, 255, 255, 0.85) 100%) border-box !important;
+    border: 1px solid transparent !important;
     backdrop-filter: blur(16px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.65) !important;
     color: #715a57;
     transform: scale(1.06);
-    box-shadow: 
-        inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.9),
-        inset 0 -1px 1px 0 rgba(113, 90, 87, 0.1),
-        0 4px 14px rgba(113, 90, 87, 0.15) !important;
+    box-shadow: 0 4px 14px rgba(113, 90, 87, 0.15) !important;
 }
 
 .bottom-nav-item svg {
@@ -953,16 +942,15 @@ body {
     padding: 6px 14px;
     height: 42px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.42);
+    border: 1px solid transparent;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.45), rgba(247, 237, 235, 0.45)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
     backdrop-filter: blur(28px) saturate(200%);
     -webkit-backdrop-filter: blur(28px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.55);
     box-shadow: 
-        inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
-        inset 0 -1.5px 2px 0 rgba(113, 90, 87, 0.08),
-        inset 0 0 16px 0 rgba(255, 255, 255, 0.4),
-        0 12px 36px rgba(113, 90, 87, 0.14),
-        0 3px 10px rgba(0, 0, 0, 0.04);
+        0 10px 30px rgba(113, 90, 87, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.04);
     transition: all 0.25s ease;
     box-sizing: border-box;
     cursor: pointer;
@@ -971,8 +959,9 @@ body {
 
 .dashboard-month-selector:hover,
 .dashboard-month-selector:active {
-    background: rgba(215, 201, 201, 0.6);
-    border-color: rgba(255, 255, 255, 0.95);
+    background: 
+        linear-gradient(rgba(215, 201, 201, 0.6), rgba(215, 201, 201, 0.6)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.3) 35%, rgba(255, 255, 255, 0.3) 65%, rgba(255, 255, 255, 0.95) 100%) border-box;
     transform: translateY(-1px);
     box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
@@ -3737,12 +3726,12 @@ body.modal-open {
         </div>
     </div>
 
-    <!-- 液態玻璃 (Liquid Glass) 光學折射與扭曲濾鏡 SVG Defs -->
+    <!-- 液態玻璃 (Liquid Glass) 背景扭曲折射濾鏡 SVG Defs -->
     <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
         <defs>
-            <filter id="liquid-glass-refraction" x="-10%" y="-10%" width="120%" height="120%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.03" numOctaves="2" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+            <filter id="liquid-glass-refraction" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.025" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" result="displaced" />
             </filter>
         </defs>
     </svg>
