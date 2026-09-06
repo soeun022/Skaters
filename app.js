@@ -944,16 +944,12 @@ function startApp() {
         }
     };
 
-    // ---- 點擊標題切換月曆/年曆 (僅在月曆分頁生效) ----
+    // ---- 點擊標題切換月曆/年曆 (僅在月曆分頁生效，完全依據頂部大標題 DOCK 顯示之月份) ----
     if (monthTitleWrapper) {
         monthTitleWrapper.addEventListener('click', () => {
             if (document.activeElement) document.activeElement.blur();
             if (currentTab === 'calendar') {
                 if (currentViewMode === 'month') {
-                    const visibleBlock = getCurrentlyVisibleMonthBlock();
-                    if (visibleBlock && visibleBlock.dataset.year && visibleBlock.dataset.month) {
-                        currentDate = new Date(parseInt(visibleBlock.dataset.year), parseInt(visibleBlock.dataset.month), 1);
-                    }
                     currentViewMode = 'year';
                 } else {
                     currentViewMode = 'month';
@@ -972,36 +968,20 @@ function startApp() {
         });
     }
 
-    // ---- 月曆與年曆切換按鈕事件 ----
-    function getCurrentlyVisibleMonthBlock() {
-        const blocks = Array.from(document.querySelectorAll('.month-block'));
-        if (blocks.length === 0) return null;
+    // ---- 月曆與年曆切換按鈕事件 (依據當前 currentDate 進行平滑捲動) ----
+    function scrollToAdjacentMonth(direction) {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const nextDate = new Date(year, month + direction, 1);
 
-        const targetY = 80;
-        let closestBlock = blocks[0];
-        let minDistance = Math.abs(blocks[0].getBoundingClientRect().top - targetY);
-
-        for (let i = 1; i < blocks.length; i++) {
-            const dist = Math.abs(blocks[i].getBoundingClientRect().top - targetY);
-            if (dist < minDistance) {
-                minDistance = dist;
-                closestBlock = blocks[i];
+        const targetBlock = document.querySelector(`.month-block[data-year="${nextDate.getFullYear()}"][data-month="${nextDate.getMonth()}"]`);
+        if (targetBlock) {
+            currentDate = nextDate;
+            targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (monthTitle) {
+                monthTitle.textContent = targetBlock.dataset.title;
             }
         }
-        return closestBlock;
-    }
-
-    function scrollToAdjacentMonth(direction) {
-        const blocks = Array.from(document.querySelectorAll('.month-block'));
-        if (blocks.length === 0) return;
-
-        const currentBlock = getCurrentlyVisibleMonthBlock();
-        if (!currentBlock) return;
-
-        const currentIndex = blocks.indexOf(currentBlock);
-        const targetIndex = Math.max(0, Math.min(blocks.length - 1, currentIndex + direction));
-
-        blocks[targetIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     if (prevMonthBtn) {
