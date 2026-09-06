@@ -5552,6 +5552,16 @@ function startApp() {
         }
     }
 
+    function getBookmarkPreviewUrl(bm) {
+        if (bm.cover && bm.cover.trim() !== '') {
+            return bm.cover.trim();
+        }
+        if (bm.url && typeof bm.url === 'string') {
+            return 'https://s0.wp.com/mshots/v1/' + encodeURIComponent(bm.url.trim()) + '?w=600';
+        }
+        return '';
+    }
+
     function renderBookmarkView() {
         const grid = document.getElementById('bookmark-grid');
         if (!grid) return;
@@ -5585,14 +5595,16 @@ function startApp() {
             card.className = 'bookmark-card';
 
             const domain = extractDomain(bm.url);
+            const previewUrl = getBookmarkPreviewUrl(bm);
+
+            let thumbHtml = '';
+            if (previewUrl) {
+                thumbHtml = `<img src="${previewUrl}" class="bookmark-thumb-img" alt="${bm.title}" loading="lazy" onerror="this.style.display='none';">`;
+            }
 
             card.innerHTML = `
                 <div class="bookmark-card-top">
-                    <div class="bookmark-icon-badge">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                    </div>
+                    ${thumbHtml}
                     <span class="bookmark-domain-badge">${domain}</span>
                 </div>
                 <div class="bookmark-card-body">
@@ -5690,10 +5702,12 @@ function startApp() {
 
         const titleInput = document.getElementById('bookmark-title');
         const urlInput = document.getElementById('bookmark-url');
+        const coverInput = document.getElementById('bookmark-cover');
         const noteInput = document.getElementById('bookmark-note');
 
         if (titleInput) titleInput.value = bm.title || '';
         if (urlInput) urlInput.value = bm.url || '';
+        if (coverInput) coverInput.value = bm.cover || '';
         if (noteInput) noteInput.value = bm.note || '';
 
         safeSetRadioValue('bookmark-category', bm.category || '跳躍');
@@ -5714,6 +5728,7 @@ function startApp() {
             const title = document.getElementById('bookmark-title').value;
             const url = document.getElementById('bookmark-url').value;
             const category = safeGetRadioValue('bookmark-category');
+            const cover = document.getElementById('bookmark-cover') ? document.getElementById('bookmark-cover').value : '';
             const note = document.getElementById('bookmark-note').value;
 
             if (editingBookmarkId) {
@@ -5722,6 +5737,7 @@ function startApp() {
                     bookmarks[idx].title = title;
                     bookmarks[idx].url = url;
                     bookmarks[idx].category = category;
+                    bookmarks[idx].cover = cover;
                     bookmarks[idx].note = note;
                 }
             } else {
@@ -5730,6 +5746,7 @@ function startApp() {
                     title: title,
                     url: url,
                     category: category,
+                    cover: cover,
                     note: note
                 });
             }
