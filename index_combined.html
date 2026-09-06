@@ -4992,28 +4992,31 @@ function startApp() {
     function updateActiveMonthFromScroll() {
         if (isInitialScrolling || currentTab !== 'calendar' || currentViewMode !== 'month') return;
 
-        const Y_TARGET = 120;
         const blocks = Array.from(document.querySelectorAll('.month-block'));
         if (blocks.length === 0) return;
 
-        let targetBlock = blocks.find(b => {
-            const rect = b.getBoundingClientRect();
-            return rect.top <= Y_TARGET && rect.bottom > Y_TARGET;
+        const viewportTop = 70;
+        const viewportBottom = window.innerHeight;
+
+        let maxVisibleHeight = -1;
+        let mostVisibleBlock = null;
+
+        blocks.forEach(block => {
+            const rect = block.getBoundingClientRect();
+            const top = Math.max(viewportTop, rect.top);
+            const bottom = Math.min(viewportBottom, rect.bottom);
+            const visibleHeight = bottom - top;
+
+            if (visibleHeight > maxVisibleHeight) {
+                maxVisibleHeight = visibleHeight;
+                mostVisibleBlock = block;
+            }
         });
 
-        if (!targetBlock) {
-            const firstRect = blocks[0].getBoundingClientRect();
-            if (firstRect.top > Y_TARGET) {
-                targetBlock = blocks[0];
-            } else {
-                targetBlock = blocks[blocks.length - 1];
-            }
-        }
-
-        if (targetBlock) {
-            const yearStr = targetBlock.dataset.year;
-            const monthStr = targetBlock.dataset.month;
-            const title = targetBlock.dataset.title;
+        if (mostVisibleBlock) {
+            const yearStr = mostVisibleBlock.dataset.year;
+            const monthStr = mostVisibleBlock.dataset.month;
+            const title = mostVisibleBlock.dataset.title;
 
             if (yearStr !== undefined && monthStr !== undefined) {
                 const year = parseInt(yearStr);
