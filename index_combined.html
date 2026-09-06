@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Skaters</title>
     <!-- iOS / Android Web App Standalone Mode & PWA Manifest -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -179,21 +179,25 @@ body {
     cursor: pointer;
     transition: background-color 0.2s, transform 0.15s;
     user-select: none;
+    outline: none !important;
 }
 
 .month-title-wrapper:hover {
     background-color: rgba(0, 0, 0, 0.08);
 }
 
-.month-title-wrapper:active {
+.month-title-wrapper:active,
+.month-title-wrapper:focus {
     transform: scale(0.96);
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 #month-title,
 .month-nav h1 {
     font-family: 'NumberFont', 'Hoefler Text', Georgia, 'Times New Roman', serif !important;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16.5px;
+    font-weight: 700;
     text-align: center;
     color: var(--text-primary);
     white-space: nowrap;
@@ -338,9 +342,11 @@ body {
     padding: 12px 0;
     background-color: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
-    font-size: 14px;
-    color: var(--text-secondary);
-    font-weight: 500;
+    font-size: 15px;
+    color: #715a57;
+    font-weight: 600;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 /* 下拉選單 (Add Menu) */
@@ -354,7 +360,7 @@ body {
     display: none;
     flex-direction: column;
     gap: 2px;
-    min-width: 130px;
+    min-width: 140px;
     padding: 6px;
 }
 
@@ -363,8 +369,9 @@ body {
 }
 
 .add-menu-item {
-    padding: 10px 16px;
-    font-size: 14px;
+    padding: 11px 18px;
+    font-size: 15.5px;
+    font-weight: 600;
     color: var(--text-primary);
     cursor: pointer;
     text-align: center;
@@ -380,15 +387,26 @@ body {
     background-color: rgba(215, 201, 201, 0.35);
 }
 
-/* 月曆網格 */
+/* 月曆網格 (鎖定邊界避免微幅晃動) */
+#calendar-view {
+    overflow: hidden;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+}
+
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     background-color: var(--bg-white);
-    /* 讓格子有內建的邊框效果 */
     gap: 1px;
     border-bottom: 1px solid var(--border-color);
     background-color: var(--border-color); 
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    overscroll-behavior: contain;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .day-cell {
@@ -400,6 +418,9 @@ body {
     flex-direction: column;
     position: relative;
     cursor: pointer;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .schedule-more {
@@ -1111,20 +1132,21 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--text-secondary);
 }
 
 .form-group input:not([type="checkbox"]):not([type="radio"]),
 .form-group select {
     width: 100%;
-    height: 40px;
+    height: 44px;
     line-height: 1.5 !important;
     padding: 0 16px;
     border: 1px solid var(--border-color);
     border-radius: 24px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 16px; /* 16px 防止 iOS / Android 鍵盤開起時畫面自動拉近放大 */
     color: var(--text-primary);
     transition: outline 0.2s, border-color 0.2s;
     box-sizing: border-box;
@@ -1136,7 +1158,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 16px;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 16px; /* 16px 防止 iOS / Android 鍵盤開起時畫面自動拉近放大 */
     line-height: 1.5 !important;
     color: var(--text-primary);
     transition: outline 0.2s, border-color 0.2s;
@@ -2219,6 +2241,15 @@ label {
     color: var(--text-light);
     margin: 0;
     letter-spacing: 0.4px;
+}
+
+/* 彈窗/搜尋打開時鎖定背景禁止滾動 */
+body.modal-open {
+    overflow: hidden !important;
+    touch-action: none !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 
@@ -4020,6 +4051,7 @@ function startApp() {
     // ---- 點擊標題切換月曆/年曆 (僅在月曆分頁生效) ----
     if (monthTitleWrapper) {
         monthTitleWrapper.addEventListener('click', () => {
+            if (document.activeElement) document.activeElement.blur();
             if (currentTab === 'calendar') {
                 currentViewMode = currentViewMode === 'month' ? 'year' : 'month';
                 renderView();
@@ -4063,6 +4095,39 @@ function startApp() {
             }
             renderView();
         });
+    }
+
+    // ---- 手機版左右滑動切換月份/年份手勢 ----
+    let calendarTouchStartX = 0;
+    let calendarTouchStartY = 0;
+
+    if (calendarViewContainer) {
+        calendarViewContainer.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                calendarTouchStartX = e.touches[0].clientX;
+                calendarTouchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        calendarViewContainer.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches.length === 1) {
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = endX - calendarTouchStartX;
+                const diffY = endY - calendarTouchStartY;
+
+                // 水平滑動閾值 >= 45px 且水平運動高於垂直運動
+                if (Math.abs(diffX) >= 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
+                    if (diffX < 0) {
+                        // 向左滑動 -> 下個月
+                        if (nextMonthBtn) nextMonthBtn.click();
+                    } else {
+                        // 向右滑動 -> 上個月
+                        if (prevMonthBtn) prevMonthBtn.click();
+                    }
+                }
+            }
+        }, { passive: true });
     }
 
     // 統一渲染控制
@@ -4923,6 +4988,7 @@ function startApp() {
 
     function showModalOverlay(overlayEl) {
         if (!overlayEl) return;
+        document.body.classList.add('modal-open');
         overlayEl.classList.add('show');
         overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; z-index: 1000 !important;';
         const modalEl = overlayEl.querySelector('.modal');
@@ -4933,6 +4999,7 @@ function startApp() {
 
     function hideModalOverlay(overlayEl) {
         if (!overlayEl) return;
+        document.body.classList.remove('modal-open');
         overlayEl.classList.remove('show');
         overlayEl.style.cssText = '';
         const modalEl = overlayEl.querySelector('.modal');
@@ -5160,6 +5227,7 @@ function startApp() {
 
     // 搜尋邏輯
     function openSearchModal() {
+        document.body.classList.add('modal-open');
         if (searchInput) searchInput.value = '';
         if (searchResults) searchResults.innerHTML = '';
         if (searchOverlay) searchOverlay.classList.add('show');
@@ -5167,6 +5235,7 @@ function startApp() {
     }
 
     function closeSearchModal() {
+        document.body.classList.remove('modal-open');
         if (searchOverlay) searchOverlay.classList.remove('show');
     }
 

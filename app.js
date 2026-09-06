@@ -884,6 +884,7 @@ function startApp() {
     // ---- 點擊標題切換月曆/年曆 (僅在月曆分頁生效) ----
     if (monthTitleWrapper) {
         monthTitleWrapper.addEventListener('click', () => {
+            if (document.activeElement) document.activeElement.blur();
             if (currentTab === 'calendar') {
                 currentViewMode = currentViewMode === 'month' ? 'year' : 'month';
                 renderView();
@@ -927,6 +928,39 @@ function startApp() {
             }
             renderView();
         });
+    }
+
+    // ---- 手機版左右滑動切換月份/年份手勢 ----
+    let calendarTouchStartX = 0;
+    let calendarTouchStartY = 0;
+
+    if (calendarViewContainer) {
+        calendarViewContainer.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches.length === 1) {
+                calendarTouchStartX = e.touches[0].clientX;
+                calendarTouchStartY = e.touches[0].clientY;
+            }
+        }, { passive: true });
+
+        calendarViewContainer.addEventListener('touchend', (e) => {
+            if (e.changedTouches && e.changedTouches.length === 1) {
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = endX - calendarTouchStartX;
+                const diffY = endY - calendarTouchStartY;
+
+                // 水平滑動閾值 >= 45px 且水平運動高於垂直運動
+                if (Math.abs(diffX) >= 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
+                    if (diffX < 0) {
+                        // 向左滑動 -> 下個月
+                        if (nextMonthBtn) nextMonthBtn.click();
+                    } else {
+                        // 向右滑動 -> 上個月
+                        if (prevMonthBtn) prevMonthBtn.click();
+                    }
+                }
+            }
+        }, { passive: true });
     }
 
     // 統一渲染控制
@@ -1787,6 +1821,7 @@ function startApp() {
 
     function showModalOverlay(overlayEl) {
         if (!overlayEl) return;
+        document.body.classList.add('modal-open');
         overlayEl.classList.add('show');
         overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; z-index: 1000 !important;';
         const modalEl = overlayEl.querySelector('.modal');
@@ -1797,6 +1832,7 @@ function startApp() {
 
     function hideModalOverlay(overlayEl) {
         if (!overlayEl) return;
+        document.body.classList.remove('modal-open');
         overlayEl.classList.remove('show');
         overlayEl.style.cssText = '';
         const modalEl = overlayEl.querySelector('.modal');
@@ -2024,6 +2060,7 @@ function startApp() {
 
     // 搜尋邏輯
     function openSearchModal() {
+        document.body.classList.add('modal-open');
         if (searchInput) searchInput.value = '';
         if (searchResults) searchResults.innerHTML = '';
         if (searchOverlay) searchOverlay.classList.add('show');
@@ -2031,6 +2068,7 @@ function startApp() {
     }
 
     function closeSearchModal() {
+        document.body.classList.remove('modal-open');
         if (searchOverlay) searchOverlay.classList.remove('show');
     }
 
