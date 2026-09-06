@@ -949,7 +949,15 @@ function startApp() {
         monthTitleWrapper.addEventListener('click', () => {
             if (document.activeElement) document.activeElement.blur();
             if (currentTab === 'calendar') {
-                currentViewMode = currentViewMode === 'month' ? 'year' : 'month';
+                if (currentViewMode === 'month') {
+                    const visibleBlock = getCurrentlyVisibleMonthBlock();
+                    if (visibleBlock && visibleBlock.dataset.year && visibleBlock.dataset.month) {
+                        currentDate = new Date(parseInt(visibleBlock.dataset.year), parseInt(visibleBlock.dataset.month), 1);
+                    }
+                    currentViewMode = 'year';
+                } else {
+                    currentViewMode = 'month';
+                }
                 renderView();
             } else if (currentTab === 'day-view') {
                 currentTab = 'calendar';
@@ -1324,6 +1332,13 @@ function startApp() {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const title = entry.target.dataset.title;
+                    const yearStr = entry.target.dataset.year;
+                    const monthStr = entry.target.dataset.month;
+
+                    if (yearStr !== undefined && monthStr !== undefined) {
+                        currentDate = new Date(parseInt(yearStr), parseInt(monthStr), 1);
+                    }
+
                     if (title && monthTitle) {
                         if (titleTimer) clearTimeout(titleTimer);
                         titleTimer = setTimeout(() => {
