@@ -259,6 +259,9 @@ body {
 .top-month-dock {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    width: 220px;
+    box-sizing: border-box;
     gap: 2px;
     padding: 3px 6px;
     height: 42px;
@@ -308,19 +311,22 @@ body {
 }
 
 .month-title-wrapper {
+    flex: 1;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 2px;
-    padding: 2px 6px;
-    border-radius: 20px;
+    padding: 3px 10px;
+    border-radius: 9999px;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.15s;
     user-select: none;
     outline: none !important;
 }
 
-.month-title-wrapper:hover {
-    background-color: rgba(0, 0, 0, 0.06);
+.month-title-wrapper:hover,
+.month-title-wrapper:active {
+    background-color: rgba(215, 201, 201, 0.55);
 }
 
 .month-title-wrapper:active {
@@ -337,6 +343,7 @@ body {
     text-align: center;
     color: var(--text-primary);
     white-space: nowrap;
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 
@@ -474,8 +481,9 @@ body {
     justify-content: center;
 }
 
-.icon-btn:hover {
-    background-color: rgba(0,0,0,0.05);
+.icon-btn:hover,
+.icon-btn:active {
+    background-color: rgba(215, 201, 201, 0.55);
 }
 
 /* 星期列 (固定頂部，加大與上方懸浮 Dock 陰影的距離) */
@@ -959,20 +967,13 @@ body {
     position: relative;
 }
 
-.dashboard-month-selector:hover,
-.dashboard-month-selector:active {
-    background: 
-        linear-gradient(rgba(215, 201, 201, 0.6), rgba(215, 201, 201, 0.6)) padding-box,
-        linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.3) 35%, rgba(255, 255, 255, 0.3) 65%, rgba(255, 255, 255, 0.95) 100%) border-box;
+.dashboard-month-selector:hover {
     transform: translateY(-1px);
     box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-.dashboard-month-selector:hover .stats-month-label,
-.dashboard-month-selector:hover .icon-btn,
-.dashboard-month-selector:active .stats-month-label,
-.dashboard-month-selector:active .icon-btn {
-    color: #715a57 !important;
+.dashboard-month-selector:active {
+    transform: scale(0.97);
 }
 
 .stats-month-label {
@@ -2098,14 +2099,13 @@ label {
     height: 18px;
 }
 
-.video-add-btn:hover,
-.video-add-btn:active {
-    background: 
-        linear-gradient(rgba(215, 201, 201, 0.5), rgba(215, 201, 201, 0.5)) padding-box,
-        linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.45) 25%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.45) 75%, rgba(255, 255, 255, 0.95) 100%) border-box;
+.video-add-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 12px 36px rgba(113, 90, 87, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
-    color: #715a57;
+}
+
+.video-add-btn:active {
+    transform: scale(0.97);
 }
 
 .video-db-title-area {
@@ -4720,6 +4720,9 @@ function startApp() {
         });
     }
 
+    let isProgrammaticScroll = false;
+    let programmaticScrollTimeout = null;
+
     // ---- 月曆與年曆切換按鈕事件 (依據當前 currentDate 進行平滑捲動) ----
     function scrollToAdjacentMonth(direction) {
         const year = currentDate.getFullYear();
@@ -4729,10 +4732,22 @@ function startApp() {
         const targetBlock = document.querySelector(`.month-block[data-year="${nextDate.getFullYear()}"][data-month="${nextDate.getMonth()}"]`);
         if (targetBlock) {
             currentDate = nextDate;
-            targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            if (monthTitle) {
-                monthTitle.textContent = targetBlock.dataset.title;
+            isProgrammaticScroll = true;
+            if (programmaticScrollTimeout) clearTimeout(programmaticScrollTimeout);
+
+            if (monthTitle && targetBlock.dataset.title) {
+                monthTitle.style.opacity = '0';
+                setTimeout(() => {
+                    monthTitle.textContent = targetBlock.dataset.title;
+                    monthTitle.style.opacity = '1';
+                }, 120);
             }
+
+            targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            programmaticScrollTimeout = setTimeout(() => {
+                isProgrammaticScroll = false;
+            }, 600);
         }
     }
 
@@ -5061,7 +5076,7 @@ function startApp() {
     }
 
     function updateActiveMonthFromScroll() {
-        if (isInitialScrolling || currentTab !== 'calendar' || currentViewMode !== 'month') return;
+        if (isInitialScrolling || isProgrammaticScroll || currentTab !== 'calendar' || currentViewMode !== 'month') return;
 
         const blocks = Array.from(document.querySelectorAll('.month-block'));
         if (blocks.length === 0) return;

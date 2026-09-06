@@ -968,6 +968,9 @@ function startApp() {
         });
     }
 
+    let isProgrammaticScroll = false;
+    let programmaticScrollTimeout = null;
+
     // ---- 月曆與年曆切換按鈕事件 (依據當前 currentDate 進行平滑捲動) ----
     function scrollToAdjacentMonth(direction) {
         const year = currentDate.getFullYear();
@@ -977,10 +980,22 @@ function startApp() {
         const targetBlock = document.querySelector(`.month-block[data-year="${nextDate.getFullYear()}"][data-month="${nextDate.getMonth()}"]`);
         if (targetBlock) {
             currentDate = nextDate;
-            targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            if (monthTitle) {
-                monthTitle.textContent = targetBlock.dataset.title;
+            isProgrammaticScroll = true;
+            if (programmaticScrollTimeout) clearTimeout(programmaticScrollTimeout);
+
+            if (monthTitle && targetBlock.dataset.title) {
+                monthTitle.style.opacity = '0';
+                setTimeout(() => {
+                    monthTitle.textContent = targetBlock.dataset.title;
+                    monthTitle.style.opacity = '1';
+                }, 120);
             }
+
+            targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            programmaticScrollTimeout = setTimeout(() => {
+                isProgrammaticScroll = false;
+            }, 600);
         }
     }
 
@@ -1309,7 +1324,7 @@ function startApp() {
     }
 
     function updateActiveMonthFromScroll() {
-        if (isInitialScrolling || currentTab !== 'calendar' || currentViewMode !== 'month') return;
+        if (isInitialScrolling || isProgrammaticScroll || currentTab !== 'calendar' || currentViewMode !== 'month') return;
 
         const blocks = Array.from(document.querySelectorAll('.month-block'));
         if (blocks.length === 0) return;
