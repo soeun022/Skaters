@@ -767,11 +767,11 @@ body {
     gap: 10px;
     padding: 7px 15px;
     border-radius: 9999px;
-    background: rgba(247, 237, 235, 0.92);
+    background: rgba(247, 237, 235, 0.3);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 10px 32px rgba(113, 90, 87, 0.18), 0 3px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 32px rgba(113, 90, 87, 0.12), 0 3px 10px rgba(0, 0, 0, 0.04);
 }
 
 .bottom-nav-item {
