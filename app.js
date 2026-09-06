@@ -959,7 +959,7 @@ function startApp() {
         });
     }
 
-    // ---- 手機版左右滑動切換月份/年份/當日模式手勢 ----
+    // ---- 手機版上下與左右滑動切換月份/年份/當日模式手勢 ----
     let calendarTouchStartX = 0;
     let calendarTouchStartY = 0;
 
@@ -979,13 +979,20 @@ function startApp() {
                 const diffX = endX - calendarTouchStartX;
                 const diffY = endY - calendarTouchStartY;
 
-                // 水平滑動閾值 >= 45px 且水平運動高於垂直運動
-                if (Math.abs(diffX) >= 45 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
-                    if (diffX < 0) {
-                        // 向左滑動 -> 下一個 (下個月/下一年/下一天)
+                // 優先處理上下滑動 (diffY)
+                if (Math.abs(diffY) >= 35 && Math.abs(diffY) >= Math.abs(diffX)) {
+                    if (diffY < 0) {
+                        // 手指向上滑動 -> 下一個 (下個月 / 下一年 / 下一天)
                         if (nextMonthBtn) nextMonthBtn.click();
                     } else {
-                        // 向右滑動 -> 上一個 (上個月/上一年/前一天)
+                        // 手向下滑動 -> 上一個 (上個月 / 上一年 / 前一天)
+                        if (prevMonthBtn) prevMonthBtn.click();
+                    }
+                } else if (Math.abs(diffX) >= 40 && Math.abs(diffX) > Math.abs(diffY)) {
+                    // 左右滑動亦兼容
+                    if (diffX < 0) {
+                        if (nextMonthBtn) nextMonthBtn.click();
+                    } else {
                         if (prevMonthBtn) prevMonthBtn.click();
                     }
                 }
@@ -1201,10 +1208,17 @@ function startApp() {
             calendarGrid.appendChild(createDayCell(i, false, year, month));
         }
         
-        const totalCells = calendarGrid.children.length;
-        const remainingCells = 42 - totalCells;
-        for (let i = 1; i <= remainingCells; i++) {
-            calendarGrid.appendChild(createDayCell(i, true, year, month + 1));
+        // 補齊或裁切下個月格數，使總格數精確為 35 格 (5 行 × 7 列 = 35 格)
+        const currentCellCount = calendarGrid.children.length;
+        if (currentCellCount < 35) {
+            const remainingCells = 35 - currentCellCount;
+            for (let i = 1; i <= remainingCells; i++) {
+                calendarGrid.appendChild(createDayCell(i, true, year, month + 1));
+            }
+        } else if (currentCellCount > 35) {
+            while (calendarGrid.children.length > 35) {
+                calendarGrid.removeChild(calendarGrid.lastChild);
+            }
         }
     }
 
