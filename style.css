@@ -241,8 +241,8 @@ body {
     background: 
         linear-gradient(rgba(247, 237, 235, 0.36), rgba(247, 237, 235, 0.36)) padding-box,
         linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(50px) saturate(180%);
+    -webkit-backdrop-filter: blur(50px) saturate(180%);
     box-shadow: 
         0 10px 30px rgba(113, 90, 87, 0.12),
         0 2px 8px rgba(0, 0, 0, 0.04);
@@ -261,8 +261,8 @@ body {
     background: 
         linear-gradient(rgba(247, 237, 235, 0.36), rgba(247, 237, 235, 0.36)) padding-box,
         linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(50px) saturate(180%);
+    -webkit-backdrop-filter: blur(50px) saturate(180%);
     box-shadow: 
         0 10px 30px rgba(113, 90, 87, 0.12),
         0 2px 8px rgba(0, 0, 0, 0.04);
@@ -791,8 +791,8 @@ body {
     background: 
         linear-gradient(rgba(247, 237, 235, 0.36), rgba(247, 237, 235, 0.36)) padding-box,
         linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(50px) saturate(180%);
+    -webkit-backdrop-filter: blur(50px) saturate(180%);
     box-shadow: 
         0 14px 40px rgba(113, 90, 87, 0.16),
         0 4px 12px rgba(0, 0, 0, 0.05);
@@ -811,8 +811,8 @@ body {
     .top-month-dock,
     .top-action-dock,
     .dashboard-month-selector {
-        backdrop-filter: url(#liquid-glass-refraction) blur(12px) saturate(180%);
-        -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(12px) saturate(180%);
+        backdrop-filter: url(#liquid-glass-refraction) blur(50px) saturate(180%);
+        -webkit-backdrop-filter: url(#liquid-glass-refraction) blur(50px) saturate(180%);
     }
 }
 
@@ -918,8 +918,8 @@ body {
     background: 
         linear-gradient(rgba(247, 237, 235, 0.36), rgba(247, 237, 235, 0.36)) padding-box,
         linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.15) 35%, rgba(255, 255, 255, 0.15) 65%, rgba(255, 255, 255, 0.85) 100%) border-box;
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    backdrop-filter: blur(50px) saturate(180%);
+    -webkit-backdrop-filter: blur(50px) saturate(180%);
     box-shadow: 
         0 10px 30px rgba(113, 90, 87, 0.12),
         0 2px 8px rgba(0, 0, 0, 0.04);
