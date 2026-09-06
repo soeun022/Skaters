@@ -5386,6 +5386,8 @@ function startApp() {
             if (addBookmarkBtn) addBookmarkBtn.style.display = 'flex';
             renderBookmarkView();
         }
+    }
+
     function safeOpenUrl(url) {
         if (!url || typeof url !== 'string') return;
         let targetUrl = url.trim();
