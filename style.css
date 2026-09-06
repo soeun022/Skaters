@@ -438,12 +438,13 @@ body {
     background-color: rgba(0,0,0,0.05);
 }
 
-/* 星期列 */
+/* 星期列 (固定頂部，並加大與上方大標題 DOCK 的距離) */
 .weekdays {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     text-align: center;
     padding: 10px 0;
+    margin-top: 14px;
     background-color: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
     font-size: 15px;
@@ -452,7 +453,7 @@ body {
     user-select: none;
     -webkit-user-select: none;
     position: sticky;
-    top: 54px;
+    top: 56px;
     z-index: 99;
 }
 
@@ -495,25 +496,38 @@ body {
 }
 
 /* 月曆網格 (鎖定邊界避免微幅晃動) */
-#calendar-view {
-    overflow: hidden;
-    touch-action: pan-y;
-    overscroll-behavior: contain;
+/* 月曆順暢連續上下捲動容器 (Continuous Vertical Month Scroll) */
+.calendar-grid-continuous {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 90px;
+    background-color: var(--bg-color);
 }
 
-.calendar-grid {
+.month-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    scroll-margin-top: 105px;
+}
+
+.month-block-header {
+    font-family: 'NumberFont', 'Hoefler Text', Georgia, serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #715a57;
+    padding: 8px 16px 6px 16px;
+    background-color: var(--bg-color);
+    border-bottom: 1px dashed rgba(113, 90, 87, 0.2);
+}
+
+.month-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    background-color: var(--bg-white);
     gap: 1px;
+    background-color: var(--border-color);
     border-bottom: 1px solid var(--border-color);
-    background-color: var(--border-color); 
-    touch-action: pan-y;
-    user-select: none;
-    -webkit-user-select: none;
-    overscroll-behavior: contain;
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .day-cell {
