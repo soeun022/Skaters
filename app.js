@@ -697,9 +697,9 @@ function startApp() {
         const g = parseInt(hex.substr(2, 2), 16);
         const b = parseInt(hex.substr(4, 2), 16);
         
-        const mixR = Math.round(253 * 0.85 + r * 0.15);
-        const mixG = Math.round(250 * 0.85 + g * 0.15);
-        const mixB = Math.round(249 * 0.85 + b * 0.15);
+        const mixR = Math.round(250 * 0.68 + r * 0.32);
+        const mixG = Math.round(246 * 0.68 + g * 0.32);
+        const mixB = Math.round(245 * 0.68 + b * 0.32);
         
         return `#${mixR.toString(16).padStart(2, '0')}${mixG.toString(16).padStart(2, '0')}${mixB.toString(16).padStart(2, '0')}`;
     }
