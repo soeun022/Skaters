@@ -690,7 +690,7 @@ function startApp() {
     function updateTypeColorsMap() {
         const types = getScheduleTypes();
         types.forEach(t => {
-            typeColors[t.name] = { bg: t.bg, text: t.text, cardBg: t.bg };
+            typeColors[t.name] = { bg: t.bg, text: t.text, cardBg: null };
         });
     }
 
@@ -3695,7 +3695,6 @@ function startApp() {
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
-                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600;">${s.type}</span>
@@ -4216,7 +4215,6 @@ function startApp() {
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
-                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
@@ -4608,7 +4606,6 @@ function startApp() {
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
-                    if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
