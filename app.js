@@ -5237,11 +5237,17 @@ function startApp() {
             e.stopPropagation();
             const isShown = dbMenuDropdown.style.display === 'flex';
             dbMenuDropdown.style.display = isShown ? 'none' : 'flex';
+            if (!isShown) {
+                dbHamburgerBtn.classList.add('active');
+            } else {
+                dbHamburgerBtn.classList.remove('active');
+            }
         });
 
         document.addEventListener('click', (e) => {
             if (!dbMenuDropdown.contains(e.target) && e.target !== dbHamburgerBtn) {
                 dbMenuDropdown.style.display = 'none';
+                dbHamburgerBtn.classList.remove('active');
             }
         });
 
@@ -5251,6 +5257,7 @@ function startApp() {
                 const tab = item.dataset.tab;
                 switchDbSubtab(tab);
                 dbMenuDropdown.style.display = 'none';
+                dbHamburgerBtn.classList.remove('active');
             });
         });
     }
