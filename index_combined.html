@@ -4015,6 +4015,19 @@ function startApp() {
         return `#${mixR.toString(16).padStart(2, '0')}${mixG.toString(16).padStart(2, '0')}${mixB.toString(16).padStart(2, '0')}`;
     }
 
+    function getTranslucentColor(hexColor, alpha = 0.78) {
+        if (!hexColor || typeof hexColor !== 'string' || !hexColor.startsWith('#')) return hexColor;
+        let hex = hexColor.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+        if (hex.length !== 6) return hexColor;
+        
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
     function updateTypeColorsMap() {
         const types = getScheduleTypes();
         types.forEach(t => {
@@ -4770,8 +4783,9 @@ function startApp() {
             }
 
             const colors = typeColors[schedule.type] || defaultTypeColor;
-            item.style.backgroundColor = colors.bg;
-            item.style.setProperty('--item-bg', colors.bg);
+            const translucentBg = getTranslucentColor(colors.bg, 0.78);
+            item.style.backgroundColor = translucentBg;
+            item.style.setProperty('--item-bg', translucentBg);
             item.style.color = colors.text;
             
             let displayedText = schedule.isShopping ? (schedule.name || schedule.type) : (schedule.isOther ? schedule.title : schedule.type);
