@@ -295,7 +295,7 @@ body {
 }
 
 
-/* iOS 行事曆風格年曆視圖 (iOS Style Year View) */
+/* 年曆視圖 (Year Calendar View) */
 .year-calendar-view {
     padding: 10px 16px 95px 16px;
     background-color: var(--bg-color);
@@ -308,41 +308,6 @@ body {
     overscroll-behavior: contain;
     user-select: none;
     -webkit-user-select: none;
-}
-
-/* iOS 年份大標題區域 */
-.year-view-header {
-    margin-bottom: 14px;
-    padding-left: 2px;
-    padding-right: 2px;
-}
-
-.year-title-group {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-
-.year-title-main {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang TC", "Helvetica Neue", sans-serif;
-    font-size: 32px;
-    font-weight: 800;
-    color: #c85a54;
-    letter-spacing: -0.5px;
-}
-
-.year-title-sub {
-    font-size: 13px;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.year-view-divider {
-    height: 1px;
-    background-color: var(--border-color);
-    width: 100%;
-    opacity: 0.6;
 }
 
 /* 12 個月 3 欄 Grid */
@@ -381,7 +346,8 @@ body {
 }
 
 .mini-month-title.current-month-title {
-    color: #c85a54;
+    color: #715a57;
+    font-weight: 800;
 }
 
 .mini-days-grid {
@@ -415,18 +381,15 @@ body {
 }
 
 .mini-day.today {
-    background-color: #c85a54 !important;
-    color: #ffffff !important;
+    background-color: #e8cfcb !important;
+    color: #715a57 !important;
     font-weight: 800 !important;
-    box-shadow: 0 2px 6px rgba(200, 90, 84, 0.35);
+    box-shadow: none;
 }
 
 @media (max-width: 768px) {
     .year-calendar-view {
         padding: 8px 12px 90px 12px;
-    }
-    .year-title-main {
-        font-size: 28px;
     }
     .year-months-grid {
         gap: 14px 8px;

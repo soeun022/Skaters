@@ -1603,19 +1603,7 @@ function startApp() {
         return cell;
     }
 
-    function getChineseYearInfo(year) {
-        const stems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-        const branches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"];
-        const zodiacs = ["鼠", "牛", "虎", "兔", "龍", "蛇", "馬", "羊", "猴", "雞", "狗", "豬"];
-        
-        const offset = year - 4;
-        const stemIdx = (offset % 10 + 10) % 10;
-        const branchIdx = (offset % 12 + 12) % 12;
-        
-        return `${stems[stemIdx]}${branches[branchIdx]}${zodiacs[branchIdx]}年`;
-    }
-
-    // ---- 年曆視圖渲染邏輯 (iOS Calendar Style Year View) ----
+    // ---- 年曆視圖渲染邏輯 (Year View) ----
     function renderYearCalendar() {
         if (!yearCalendarView) return;
         yearCalendarView.innerHTML = '';
@@ -1625,32 +1613,7 @@ function startApp() {
             monthTitle.textContent = `${year}`;
         }
 
-        // 1. 年份大標題區域 (比照 iOS 行事曆：紅色大標題 + 農曆年號 + 分隔線)
-        const header = document.createElement('div');
-        header.className = 'year-view-header';
-        
-        const titleGroup = document.createElement('div');
-        titleGroup.className = 'year-title-group';
-        
-        const yearTitleMain = document.createElement('span');
-        yearTitleMain.className = 'year-title-main';
-        yearTitleMain.textContent = `${year}年`;
-        
-        const yearTitleSub = document.createElement('span');
-        yearTitleSub.className = 'year-title-sub';
-        yearTitleSub.textContent = getChineseYearInfo(year);
-        
-        titleGroup.appendChild(yearTitleMain);
-        titleGroup.appendChild(yearTitleSub);
-        header.appendChild(titleGroup);
-        
-        const divider = document.createElement('div');
-        divider.className = 'year-view-divider';
-        header.appendChild(divider);
-        
-        yearCalendarView.appendChild(header);
-
-        // 2. 12 個月 3 欄 Grid 迷你月曆
+        // 12 個月 3 欄 Grid 迷你月曆
         const monthContainer = document.createElement('div');
         monthContainer.className = 'year-months-grid';
 
