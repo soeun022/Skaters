@@ -133,20 +133,20 @@
 }
 
 .settings-type-btn {
-    background-color: #614b48;
-    border: 1px solid #614b48;
+    background-color: #9c9c9c;
+    border: 1px solid #9c9c9c;
     padding: 5px 14px;
     border-radius: 9999px;
     font-size: 12.5px;
     font-weight: 500;
-    color: #e9cfcb;
+    color: #efdede;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .settings-type-btn:hover {
-    background-color: #765c58;
-    border-color: #765c58;
+    background-color: #888888;
+    border-color: #888888;
     color: #ffffff;
 }
 
@@ -155,14 +155,14 @@
 }
 
 .settings-type-btn.delete {
-    background-color: #614b48;
-    color: #e9cfcb;
-    border-color: #614b48;
+    background-color: #9c9c9c;
+    color: #efdede;
+    border-color: #9c9c9c;
 }
 
 .settings-type-btn.delete:hover {
-    background-color: #765c58;
-    border-color: #765c58;
+    background-color: #888888;
+    border-color: #888888;
     color: #ffffff;
 }
 
