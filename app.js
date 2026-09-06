@@ -3441,9 +3441,9 @@ function startApp() {
                 }
 
                 row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0;">${item.type}</span>
-                        <div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type}</span>
+                        <div style="min-width: 0; flex: 1;">
                             <div style="font-weight: 700; font-size: 15px;">${titleHtml}</div>
                             <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${subtitleHtml}</div>
                         </div>
@@ -3868,14 +3868,14 @@ function startApp() {
                     row.className = 'stats-log-item';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600;">${s.type}</span>
-                            <div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
+                            <div style="min-width: 0; flex: 1;">
                                 <div style="font-weight: 700; font-size: 15px;">${normalizeDateStr(s.date)} ${timeRange}</div>
                                 <div style="font-size: 13px; color: var(--text-secondary);">${s.note || '無備註'} (${hrs.toFixed(1)}h)</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 15px; color: #715a57;">NT$ ${cost.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 15px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
                     `;
                     statsLogList.appendChild(row);
                 });
@@ -3962,9 +3962,9 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0;">${item.type}</span>
-                            <div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type}</span>
+                            <div style="min-width: 0; flex: 1;">
                                 <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                                     <span>${dateStr}</span>
                                     ${statusBadgeHtml}
@@ -3974,7 +3974,7 @@ function startApp() {
                                 </div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -4010,7 +4010,7 @@ function startApp() {
 
                     row.innerHTML = `
                         <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${item.type || '購物'}</span>
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
                             <div>
                                 <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                                     <span>${dateStr}</span>
@@ -4390,17 +4390,17 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${s.type}</span>
-                            <div>
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                     <span>${title}</span>
                                     ${timeStr ? `<span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(${timeStr})</span>` : ''}
                                 </div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr} · ${hrs.toFixed(1)} 小時</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right;">NT$ ${cost.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -4437,14 +4437,14 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${card.type}</span>
-                            <div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${card.type}</span>
+                            <div style="min-width: 0; flex: 1;">
                                 <div style="font-weight: 700; font-size: 15px;">${displayTitle}</div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">到期日: ${dateStr}</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right;">NT$ ${price.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -4473,16 +4473,16 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${item.type || '購物'}</span>
-                            <div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
+                            <div style="min-width: 0; flex: 1;">
                                 <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                                     <span>${item.name || item.type || '購物'}</span>
                                 </div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right;">NT$ ${price.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -4782,17 +4782,17 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${s.type}</span>
-                            <div>
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                     <span>${title}</span>
                                     ${timeStr ? `<span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(${timeStr})</span>` : ''}
                                 </div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr} · ${hrs.toFixed(1)} 小時</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right;">NT$ ${cost.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -4822,14 +4822,14 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${card.type}</span>
-                            <div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${card.type}</span>
+                            <div style="min-width: 0; flex: 1;">
                                 <div style="font-weight: 700; font-size: 15px;">${displayTitle}</div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">到期日: ${dateStr}</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right;">NT$ ${price.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -4858,16 +4858,16 @@ function startApp() {
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
                     row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${item.type || '購物'}</span>
-                            <div>
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
+                            <div style="min-width: 0; flex: 1;">
                                 <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                                     <span>${item.name || item.type || '購物'}</span>
                                 </div>
                                 <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right;">NT$ ${price.toLocaleString()}</div>
+                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
                     `;
 
                     row.addEventListener('click', () => {
@@ -5032,9 +5032,9 @@ function startApp() {
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
                 
                 row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${item.displayTitle || item.type}</span>
-                        <div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.displayTitle || item.type}</span>
+                        <div style="min-width: 0; flex: 1;">
                             <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                                 <span>${dateStr}</span>
                                 ${statusBadgeHtml}
@@ -5044,7 +5044,7 @@ function startApp() {
                             </div>
                         </div>
                     </div>
-                    <div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>
+                    <div style="font-weight: 700; font-size: 16px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
                 `;
 
                 row.addEventListener('click', () => {
@@ -5078,9 +5078,9 @@ function startApp() {
                 }
 
                 row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; shrink: 0;">${item.type || '購物'}</span>
-                        <div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
+                        <div style="min-width: 0; flex: 1;">
                             <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
                                 <span>${dateStr}</span>
                             </div>

@@ -1203,11 +1203,29 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 11px 20px;
+    padding: 11px 16px;
     background: #fdfaf9;
     border-radius: 9999px;
     border: none;
     font-size: 14.5px;
+    gap: 10px;
+}
+
+/* 最前方運動類型 Tag/Pill 標籤 (強制不換行、防壓縮) */
+.stats-log-item span[style*="border-radius"] {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+}
+
+/* 中間內容區塊 (允許彈性微調) */
+.stats-log-item > div:first-child {
+    min-width: 0;
+}
+
+/* 最後方金額價格標籤 (強制不換行、防壓縮) */
+.stats-log-item > div:last-child {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
 }
 
 /* 右下角 AI 助理按鈕 (避開底欄) */
