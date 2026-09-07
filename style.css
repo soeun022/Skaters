@@ -1239,7 +1239,7 @@ body {
     padding: 13px 16px;
     background: #ffffff;
     border-radius: 14px;
-    border: 1px solid rgba(113, 90, 87, 0.08);
+    border: none;
     box-shadow: 0 2px 6px rgba(113, 90, 87, 0.04);
     font-size: 14px;
     gap: 6px;

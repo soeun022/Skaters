@@ -3518,7 +3518,7 @@ function startApp() {
                     const rule = getCardRule(item);
                     let statusHtml = '';
                     if (item.type === '單次入場') {
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">單次抵扣卡</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">單次抵扣卡</span>`;
                     } else if (rule) {
                         statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
                     }
@@ -3566,9 +3566,9 @@ function startApp() {
                     let statusHtml = '';
                     if (item.linkedCardId) {
                         const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(item.linkedCardId));
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
                     } else {
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
                     }
                     cardHtml = buildStatsRecordCardHtml({
                         type: item.type,
@@ -4096,9 +4096,9 @@ function startApp() {
                     let statusHtml = '';
                     if (s.linkedCardId) {
                         const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
                     } else {
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
                     }
 
                     const row = document.createElement('div');
@@ -4570,9 +4570,9 @@ function startApp() {
                     let statusHtml = '';
                     if (s.linkedCardId) {
                         const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
                     } else {
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
                     }
 
                     const row = document.createElement('div');
@@ -4966,9 +4966,9 @@ function startApp() {
                     let statusHtml = '';
                     if (s.linkedCardId) {
                         const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
                     } else {
-                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
                     }
 
                     const row = document.createElement('div');
