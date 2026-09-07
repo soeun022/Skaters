@@ -2139,10 +2139,10 @@ function startApp() {
         if (!overlayEl) return;
         document.body.classList.add('modal-open');
         overlayEl.classList.add('show');
-        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important;';
+        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important; align-items: center !important; justify-content: center !important; padding: 16px 12px !important; overflow-y: auto !important; box-sizing: border-box !important;';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
-            modalEl.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important;';
+            modalEl.style.cssText = 'display: flex !important; flex-direction: column !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; max-height: 85vh !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; margin: auto !important;';
         }
     }
 
@@ -3512,9 +3512,7 @@ function startApp() {
                 let cardHtml = '';
                 if (item.isCard) {
                     const price = parseCleanPrice(item.price);
-                    const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
-                    const endDate = item.date ? normalizeDateStr(item.date) : '';
-                    const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無期限');
+                    const endDate = normalizeDateStr(item.date);
                     const rule = getCardRule(item);
                     let statusHtml = '';
                     if (item.type === '單次入場') {
@@ -3523,11 +3521,11 @@ function startApp() {
                         statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
                     }
                     cardHtml = buildStatsRecordCardHtml({
-                        type: item.type,
+                        type: `${item.displayTitle || item.type} 到期`,
                         colors: colors,
-                        timeStr: dateStr,
+                        timeStr: `到期日：${endDate}`,
                         durationStr: '',
-                        noteStr: item.note || '購課紀錄',
+                        noteStr: item.note || '無備註',
                         priceStr: price.toLocaleString(),
                         statusHtml: statusHtml
                     });
