@@ -1,6 +1,13 @@
-.DS_Store
-*.pyc
+# 系統快取與暫存檔
 __pycache__/
-*.log
-enlarge_font_sizes.py
-update_icons.py
+*.py[cod]
+*.class
+*.tmp
+.DS_Store
+Thumbs.db
+.venv/
+
+# 個人資料與備份檔案
+*備份*.json
+*.backup.json
+*backup*.json
