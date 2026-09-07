@@ -1063,13 +1063,44 @@ function startApp() {
 
     setupDayViewSwipeGesture(dayViewContainer);
 
-    // 點擊 DOCK 與按鈕後自動取消焦點高亮 (避免殘留點亮色塊)
-    document.querySelectorAll('.bottom-nav-item, .icon-btn, .month-title-wrapper').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (document.activeElement && typeof document.activeElement.blur === 'function') {
-                document.activeElement.blur();
-            }
+    // 頂部大標題 DOCK 與搜尋新增 DOCK 灰紫色聚焦特效 (點擊當下即時反饋，點擊完畢自動平滑消失，絕不停留)
+    const dockInteractiveElements = document.querySelectorAll(
+        '#top-month-dock .month-title-wrapper, #top-month-dock .icon-btn, #top-action-dock .icon-btn, .bottom-nav-item'
+    );
+
+    dockInteractiveElements.forEach(el => {
+        let clearTimer = null;
+
+        const flashEffect = () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            el.classList.add('dock-active');
+            clearTimer = setTimeout(() => {
+                el.classList.remove('dock-active');
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+            }, 200);
+        };
+
+        el.addEventListener('pointerdown', () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            el.classList.add('dock-active');
         });
+
+        const handleRelease = () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            clearTimer = setTimeout(() => {
+                el.classList.remove('dock-active');
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+            }, 180);
+        };
+
+        el.addEventListener('pointerup', handleRelease);
+        el.addEventListener('pointercancel', handleRelease);
+        el.addEventListener('pointerleave', handleRelease);
+        el.addEventListener('click', flashEffect);
     });
 
     // 統一渲染控制

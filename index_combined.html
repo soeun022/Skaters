@@ -302,12 +302,18 @@ body {
     width: 32px;
     height: 32px;
     padding: 4px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
 }
 
 .top-action-dock .icon-btn {
     width: 38px;
     height: 38px;
     padding: 6px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
 }
 
 .month-title-wrapper {
@@ -320,24 +326,34 @@ body {
     border-radius: 9999px;
     cursor: pointer;
     background-color: transparent;
-    transition: background-color 0.15s ease, transform 0.15s ease;
+    transition: background-color 0.2s ease, transform 0.15s ease;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     outline: none !important;
 }
 
-.month-title-wrapper:hover,
 .month-title-wrapper:focus,
 .month-title-wrapper:focus-visible {
-    background-color: transparent !important;
     outline: none !important;
     box-shadow: none !important;
 }
 
+/* 大標題 DOCK 與搜尋新增 DOCK 瞬態灰紫色聚焦特效 (點擊當下即時反饋，放開後自動淡出消失，絕不殘留) */
+.month-title-wrapper.dock-active,
 .month-title-wrapper:active {
-    background-color: rgba(215, 201, 201, 0.55);
+    background-color: rgba(215, 201, 201, 0.55) !important;
     transform: scale(0.96);
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.top-month-dock .icon-btn.dock-active,
+.top-month-dock .icon-btn:active,
+.top-action-dock .icon-btn.dock-active,
+.top-action-dock .icon-btn:active {
+    background-color: rgba(215, 201, 201, 0.55) !important;
+    transform: scale(0.92);
     outline: none !important;
     box-shadow: none !important;
 }
@@ -3233,7 +3249,7 @@ body.modal-open {
                 <img src="Skater icon.png" alt="Skaters" class="settings-app-icon">
             </div>
             <h4 class="settings-app-name">Skaters</h4>
-            <p class="settings-app-version">Version 1.0.4</p>
+            <p class="settings-app-version">Version 1.0.5</p>
             <p class="settings-copyright">© 2026 Skaters All Rights Reserved.</p>
         </div>
     </div>
@@ -4857,13 +4873,44 @@ function startApp() {
 
     setupDayViewSwipeGesture(dayViewContainer);
 
-    // 點擊 DOCK 與按鈕後自動取消焦點高亮 (避免殘留點亮色塊)
-    document.querySelectorAll('.bottom-nav-item, .icon-btn, .month-title-wrapper').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (document.activeElement && typeof document.activeElement.blur === 'function') {
-                document.activeElement.blur();
-            }
+    // 頂部大標題 DOCK 與搜尋新增 DOCK 灰紫色聚焦特效 (點擊當下即時反饋，點擊完畢自動平滑消失，絕不停留)
+    const dockInteractiveElements = document.querySelectorAll(
+        '#top-month-dock .month-title-wrapper, #top-month-dock .icon-btn, #top-action-dock .icon-btn, .bottom-nav-item'
+    );
+
+    dockInteractiveElements.forEach(el => {
+        let clearTimer = null;
+
+        const flashEffect = () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            el.classList.add('dock-active');
+            clearTimer = setTimeout(() => {
+                el.classList.remove('dock-active');
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+            }, 200);
+        };
+
+        el.addEventListener('pointerdown', () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            el.classList.add('dock-active');
         });
+
+        const handleRelease = () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            clearTimer = setTimeout(() => {
+                el.classList.remove('dock-active');
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+            }, 180);
+        };
+
+        el.addEventListener('pointerup', handleRelease);
+        el.addEventListener('pointercancel', handleRelease);
+        el.addEventListener('pointerleave', handleRelease);
+        el.addEventListener('click', flashEffect);
     });
 
     // 統一渲染控制
