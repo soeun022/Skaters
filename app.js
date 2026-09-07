@@ -2139,10 +2139,11 @@ function startApp() {
         if (!overlayEl) return;
         document.body.classList.add('modal-open');
         overlayEl.classList.add('show');
-        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important; align-items: center !important; justify-content: center !important; padding: 16px 12px !important; overflow-y: auto !important; box-sizing: border-box !important;';
+        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important; align-items: center !important; justify-content: center !important; padding: 20px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px !important; overflow-y: auto !important; box-sizing: border-box !important; height: 100dvh !important;';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
-            modalEl.style.cssText = 'display: flex !important; flex-direction: column !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; max-height: 85vh !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; margin: auto !important;';
+            modalEl.style.cssText = 'display: flex !important; flex-direction: column !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; max-height: 80dvh !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; margin: auto !important; padding: 22px 20px 24px 20px !important;';
+            modalEl.scrollTop = 0;
         }
     }
 
