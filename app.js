@@ -12,7 +12,7 @@ function startApp() {
         }
     }
 
-    function saveSchedules(data) {
+    function saveSchedules(data = schedules) {
         try {
             localStorage.setItem('schedules', JSON.stringify(data));
         } catch (e) {
@@ -431,11 +431,13 @@ function startApp() {
         }
 
         if (prevBtn) prevBtn.addEventListener('click', () => {
+            currentViewDate.setDate(1);
             currentViewDate.setMonth(currentViewDate.getMonth() - 1);
             renderGrid();
         });
 
         if (nextBtn) nextBtn.addEventListener('click', () => {
+            currentViewDate.setDate(1);
             currentViewDate.setMonth(currentViewDate.getMonth() + 1);
             renderGrid();
         });
@@ -2340,7 +2342,7 @@ function startApp() {
                             s.type = cleanName;
                         }
                     });
-                    saveSchedules();
+                    saveSchedules(schedules);
 
                     renderSettingsScheduleTypes();
                     renderScheduleTypePills(cleanName);
@@ -2563,9 +2565,13 @@ function startApp() {
             const filtered = schedules.filter(s => {
                 const searchTarget = [
                     s.type,
+                    s.title,
+                    s.name,
                     s.displayTitle,
                     s.note,
                     s.date,
+                    s.startDate,
+                    s.endDate,
                     s.coachLevel,
                     s.price
                 ].filter(Boolean).join(' ').toLowerCase();
@@ -2584,7 +2590,7 @@ function startApp() {
                 item.style.cursor = 'pointer';
                 
                 const typeSpan = document.createElement('span');
-                typeSpan.textContent = schedule.displayTitle || schedule.type;
+                typeSpan.textContent = schedule.isShopping ? `購物：${schedule.type}` : (schedule.isOther ? `活動：${schedule.type}` : (schedule.displayTitle || schedule.type));
                 typeSpan.style.display = 'inline-block';
                 typeSpan.style.padding = '2px 6px';
                 typeSpan.style.borderRadius = '4px';
@@ -2599,7 +2605,14 @@ function startApp() {
                 infoSpan.style.fontSize = '14px';
                 infoSpan.style.color = 'var(--text-primary)';
                 const timeStr = schedule.time ? ` ${schedule.time}` : '';
-                const displayDate = schedule.date ? normalizeDateStr(schedule.date) : '';
+                
+                let dateDisplay = '';
+                if (schedule.isOther && schedule.startDate && schedule.endDate) {
+                    dateDisplay = schedule.startDate === schedule.endDate ? schedule.startDate : `${schedule.startDate}~${schedule.endDate}`;
+                } else {
+                    dateDisplay = schedule.date ? normalizeDateStr(schedule.date) : '';
+                }
+                
                 let extraInfo = '';
                 
                 if (schedule.isCard && CARD_RULES[schedule.type]) {
@@ -2618,7 +2631,10 @@ function startApp() {
                     }
                 }
                 
-                infoSpan.textContent = `${displayDate}${timeStr} - ${schedule.note || '無備註'}${extraInfo}`;
+                const mainLabel = schedule.name || schedule.title || '';
+                const notePart = schedule.note ? ` - ${schedule.note}` : '';
+                const labelPart = mainLabel ? ` [${mainLabel}]` : '';
+                infoSpan.textContent = `${dateDisplay}${timeStr}${labelPart}${notePart}${extraInfo}`;
 
                 item.appendChild(typeSpan);
                 item.appendChild(infoSpan);
@@ -2630,6 +2646,8 @@ function startApp() {
                         openCardModalForEdit(schedule);
                     } else if (schedule.isShopping) {
                         openShoppingModalForEdit(schedule);
+                    } else if (schedule.isOther) {
+                        openOtherModalForEdit(schedule);
                     } else {
                         openScheduleModalForEdit(schedule);
                     }
@@ -3430,6 +3448,15 @@ function startApp() {
                         const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
                         rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
                     }
+                } else if (item.isOther) {
+                    const title = item.name || item.title || item.type;
+                    const startStr = normalizeDateStr(item.startDate || item.date);
+                    const endStr = normalizeDateStr(item.endDate || item.date);
+                    const rangeStr = (startStr === endStr) ? startStr : `${startStr} ~ ${endStr}`;
+                    
+                    titleHtml = `${title}`;
+                    subtitleHtml = item.note ? `${item.note} (${rangeStr})` : rangeStr;
+                    rightSideHtml = `<div style="font-weight: 600; font-size: 14px; color: #715a57;">活動行程</div>`;
                 } else {
                     const hrs = calculateScheduleHours(item);
                     const cost = getDefaultCost(item);
@@ -3654,11 +3681,11 @@ function startApp() {
                 let ruleText = '';
                 
                 if (isExpired) {
-                    singleCost = price / totalUsed;
+                    singleCost = totalUsed > 0 ? (price / totalUsed) : 0;
                     ruleText = '已過期 (依實際使用計單價)';
                 } else {
                     const maxQuota = rule.maxClasses + rule.maxPractices;
-                    singleCost = price / maxQuota;
+                    singleCost = (maxQuota > 0 && maxQuota !== Infinity) ? (price / maxQuota) : (totalUsed > 0 ? (price / totalUsed) : 0);
                     ruleText = '使用中 (依總額度計單價)';
                 }
                 
@@ -4036,7 +4063,6 @@ function startApp() {
 
     const statsPrevBtn = document.getElementById('stats-prev-month');
     const statsNextBtn = document.getElementById('stats-next-month');
-    const statsAllTimeBtn = document.getElementById('stats-all-time-btn');
 
     if (statsPrevBtn) {
         statsPrevBtn.addEventListener('click', () => {
@@ -4185,7 +4211,7 @@ function startApp() {
 
                 if (activeMonthsInYear.length > 0) {
                     yearCardDetailsCount++;
-                    const monthlyCostShare = price / coveredMonths.length;
+                    const monthlyCostShare = coveredMonths.length > 0 ? (price / coveredMonths.length) : 0;
                     const yearCostShare = monthlyCostShare * activeMonthsInYear.length;
                     totalCost += yearCostShare;
 
@@ -5676,6 +5702,7 @@ function startApp() {
     if (videoDeleteBtn) {
         videoDeleteBtn.addEventListener('click', () => {
             if (editingVideoId) {
+                if (!confirm('確定要刪除這部動作練習影片嗎？此操作無法復原。')) return;
                 videos = videos.filter(v => String(v.id) !== String(editingVideoId));
                 saveVideos(videos);
                 renderDatabaseView();
@@ -5912,6 +5939,7 @@ function startApp() {
     if (bookmarkDeleteBtn) {
         bookmarkDeleteBtn.addEventListener('click', () => {
             if (editingBookmarkId) {
+                if (!confirm('確定要刪除這筆參考資料網址嗎？此操作無法復原。')) return;
                 bookmarks = bookmarks.filter(b => String(b.id) !== String(editingBookmarkId));
                 saveBookmarks(bookmarks);
                 renderBookmarkView();
@@ -5930,13 +5958,24 @@ function startApp() {
             let currentVideos = [];
             try {
                 const storedVids = localStorage.getItem('skating_videos_db');
-                currentVideos = storedVids ? JSON.parse(storedVids) : (window.skatingVideos || []);
+                currentVideos = storedVids ? JSON.parse(storedVids) : (videos || []);
             } catch (e) {
-                currentVideos = window.skatingVideos || [];
+                currentVideos = videos || [];
             }
+
+            let currentBookmarks = [];
+            try {
+                const storedBms = localStorage.getItem('skating_bookmarks_db');
+                currentBookmarks = storedBms ? JSON.parse(storedBms) : (bookmarks || []);
+            } catch (e) {
+                currentBookmarks = bookmarks || [];
+            }
+
             const dataToExport = {
                 schedules: schedules,
-                videos: currentVideos
+                videos: currentVideos,
+                bookmarks: currentBookmarks,
+                customScheduleTypes: getScheduleTypes()
             };
             const jsonStr = JSON.stringify(dataToExport, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -5973,12 +6012,18 @@ function startApp() {
                     }
                     
                     if (importedData.videos && Array.isArray(importedData.videos)) {
-                        window.skatingVideos = importedData.videos;
-                        if (typeof saveVideosToStorage === 'function') {
-                            saveVideosToStorage(window.skatingVideos);
-                        } else {
-                            localStorage.setItem('skating_videos_db', JSON.stringify(window.skatingVideos));
-                        }
+                        videos = importedData.videos;
+                        saveVideos(videos);
+                    }
+
+                    if (importedData.bookmarks && Array.isArray(importedData.bookmarks)) {
+                        bookmarks = importedData.bookmarks;
+                        saveBookmarks(bookmarks);
+                    }
+
+                    if (importedData.customScheduleTypes && Array.isArray(importedData.customScheduleTypes)) {
+                        saveScheduleTypes(importedData.customScheduleTypes);
+                        renderScheduleTypePills();
                     }
                     
                     alert('資料匯入成功！系統將為您重新載入畫面。');
