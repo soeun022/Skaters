@@ -3271,7 +3271,7 @@ body.modal-open {
                 <img src="Skater icon.png" alt="Skaters" class="settings-app-icon">
             </div>
             <h4 class="settings-app-name">Skaters</h4>
-            <p class="settings-app-version">Version 1.0.11</p>
+            <p class="settings-app-version">Version 1.0.12</p>
             <p class="settings-copyright">© 2026 Skaters All Rights Reserved.</p>
         </div>
     </div>
@@ -5452,41 +5452,45 @@ function startApp() {
                 item.title = hoverText.trim();
             }
 
-            // 啟用拖拽 (Drag & Drop)
-            item.setAttribute('draggable', 'true');
-            item.addEventListener('dragstart', (e) => {
-                document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.add('dragging'));
-                e.dataTransfer.setData('text/plain', schedule.id);
-                e.dataTransfer.effectAllowed = 'move';
-                
-                if (schedule.isOther && schedule.startDate && schedule.endDate && schedule.startDate !== schedule.endDate) {
-                    const startObj = parseLocalDate(normalizeDateStr(schedule.startDate));
-                    const endObj = parseLocalDate(normalizeDateStr(schedule.endDate));
-                    let days = Math.round((endObj - startObj) / (1000 * 3600 * 24)) + 1;
-                    if (days < 1) days = 1;
+            // 啟用拖拽 (Drag & Drop) - 課卡到期排程設定為不可移動
+            if (!schedule.isCard) {
+                item.setAttribute('draggable', 'true');
+                item.addEventListener('dragstart', (e) => {
+                    document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.add('dragging'));
+                    e.dataTransfer.setData('text/plain', schedule.id);
+                    e.dataTransfer.effectAllowed = 'move';
                     
-                    const ghost = document.createElement('div');
-                    ghost.textContent = schedule.title || '其他排程';
-                    const colors = typeColors[schedule.type] || { bg: '#c1b3b3', text: '#514646' };
-                    ghost.style.backgroundColor = colors.bg;
-                    ghost.style.color = colors.text;
-                    ghost.style.padding = '3px 12px';
-                    ghost.style.borderRadius = '9999px';
-                    ghost.style.fontSize = '11px';
-                    ghost.style.position = 'absolute';
-                    ghost.style.top = '-1000px';
-                    ghost.style.width = `${days * 120}px`;
-                    ghost.style.boxSizing = 'border-box';
-                    
-                    document.body.appendChild(ghost);
-                    e.dataTransfer.setDragImage(ghost, 20, 10);
-                    setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 0);
-                }
-            });
+                    if (schedule.isOther && schedule.startDate && schedule.endDate && schedule.startDate !== schedule.endDate) {
+                        const startObj = parseLocalDate(normalizeDateStr(schedule.startDate));
+                        const endObj = parseLocalDate(normalizeDateStr(schedule.endDate));
+                        let days = Math.round((endObj - startObj) / (1000 * 3600 * 24)) + 1;
+                        if (days < 1) days = 1;
+                        
+                        const ghost = document.createElement('div');
+                        ghost.textContent = schedule.title || '其他排程';
+                        const colors = typeColors[schedule.type] || { bg: '#c1b3b3', text: '#514646' };
+                        ghost.style.backgroundColor = colors.bg;
+                        ghost.style.color = colors.text;
+                        ghost.style.padding = '3px 12px';
+                        ghost.style.borderRadius = '9999px';
+                        ghost.style.fontSize = '11px';
+                        ghost.style.position = 'absolute';
+                        ghost.style.top = '-1000px';
+                        ghost.style.width = `${days * 120}px`;
+                        ghost.style.boxSizing = 'border-box';
+                        
+                        document.body.appendChild(ghost);
+                        e.dataTransfer.setDragImage(ghost, 20, 10);
+                        setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 0);
+                    }
+                });
 
-            item.addEventListener('dragend', () => {
-                document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.remove('dragging'));
-            });
+                item.addEventListener('dragend', () => {
+                    document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.remove('dragging'));
+                });
+            } else {
+                item.setAttribute('draggable', 'false');
+            }
             
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -5545,17 +5549,10 @@ function startApp() {
             const scheduleIndex = schedules.findIndex(s => String(s.id) === String(scheduleId));
             if (scheduleIndex > -1) {
                 const targetSchedule = schedules[scheduleIndex];
-                if (targetSchedule.isCard) {
-                    const oldEnd = parseLocalDate(normalizeDateStr(targetSchedule.date));
-                    const oldStart = parseLocalDate(normalizeDateStr(targetSchedule.startDate || targetSchedule.date));
-                    const diffDays = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 3600 * 24));
+                // 課卡到期排程設定為不可移動，直接略過
+                if (targetSchedule.isCard) return;
 
-                    const newStart = parseLocalDate(dateString);
-                    const newEnd = new Date(newStart.getTime() + diffDays * 24 * 3600 * 1000);
-
-                    targetSchedule.startDate = dateString;
-                    targetSchedule.date = formatLocalDate(newEnd);
-                } else if (targetSchedule.isOther && targetSchedule.startDate && targetSchedule.endDate) {
+                if (targetSchedule.isOther && targetSchedule.startDate && targetSchedule.endDate) {
                     const oldStart = parseLocalDate(normalizeDateStr(targetSchedule.startDate));
                     const oldEnd = parseLocalDate(normalizeDateStr(targetSchedule.endDate));
                     const diffDays = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 3600 * 24));
