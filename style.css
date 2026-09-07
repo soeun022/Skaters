@@ -1332,13 +1332,15 @@ body {
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s;
+    pointer-events: none;
+    transition: opacity 0.2s, visibility 0.2s;
     z-index: 300;
 }
 
 .modal-overlay.show {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .modal {
@@ -2679,10 +2681,6 @@ label {
 /* 彈窗/搜尋打開時鎖定背景禁止滾動 */
 body.modal-open {
     overflow: hidden !important;
-    touch-action: none !important;
-    position: fixed;
-    width: 100%;
-    height: 100%;
 }
 
 

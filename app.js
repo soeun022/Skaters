@@ -2051,11 +2051,25 @@ function startApp() {
         });
     }
 
+    function ensureBodyUnlocked() {
+        const activeModals = document.querySelectorAll(
+            '.modal-overlay.show, #search-overlay.show, .modal.show, #breakdown-modal-overlay.show, #type-prompt-modal-overlay.show'
+        );
+        if (activeModals.length === 0) {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
+            document.body.style.touchAction = '';
+        }
+    }
+
     function showModalOverlay(overlayEl) {
         if (!overlayEl) return;
         document.body.classList.add('modal-open');
         overlayEl.classList.add('show');
-        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; z-index: 1000 !important;';
+        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important;';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
             modalEl.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important;';
@@ -2064,13 +2078,13 @@ function startApp() {
 
     function hideModalOverlay(overlayEl) {
         if (!overlayEl) return;
-        document.body.classList.remove('modal-open');
         overlayEl.classList.remove('show');
         overlayEl.style.cssText = '';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
             modalEl.style.cssText = '';
         }
+        ensureBodyUnlocked();
     }
 
     function openCardModalForEdit(schedule) {
@@ -2195,6 +2209,7 @@ function startApp() {
 
         const closePrompt = () => {
             overlay.classList.remove('show');
+            ensureBodyUnlocked();
         };
 
         const handleCancel = (e) => {
@@ -2543,8 +2558,8 @@ function startApp() {
     }
 
     function closeSearchModal() {
-        document.body.classList.remove('modal-open');
         if (searchOverlay) searchOverlay.classList.remove('show');
+        ensureBodyUnlocked();
     }
 
     if (searchBtn) searchBtn.addEventListener('click', openSearchModal);
@@ -2952,17 +2967,11 @@ function startApp() {
     }
 
     function closeCardModal() {
-        if (cardModalOverlay) {
-            cardModalOverlay.classList.remove('show');
-            cardModalOverlay.style.cssText = '';
-        }
-        const modalEl = cardModalOverlay ? cardModalOverlay.querySelector('.modal') : null;
-        if (modalEl) {
-            modalEl.style.cssText = '';
-        }
+        hideModalOverlay(cardModalOverlay);
         if (cardForm) cardForm.reset();
         updateCardOptions();
         editingScheduleId = null;
+        ensureBodyUnlocked();
     }
 
     if (cardCancelBtn) cardCancelBtn.addEventListener('click', closeCardModal);
@@ -3541,7 +3550,7 @@ function startApp() {
                 totalDisplay.textContent = totalText;
             }
             
-            modal.classList.add('show');
+            showModalOverlay(modal);
         };
     }
 
@@ -5623,9 +5632,10 @@ function startApp() {
     initCustomSelect('video-category-trigger', 'video-category-menu', 'video-category-wrapper', 'video-category-select', 'video-category-display');
 
     function closeVideoModal() {
-        if (videoModalOverlay) videoModalOverlay.classList.remove('show');
+        hideModalOverlay(videoModalOverlay);
         if (videoForm) videoForm.reset();
         editingVideoId = null;
+        ensureBodyUnlocked();
     }
 
     function openVideoModal() {
@@ -5634,7 +5644,7 @@ function startApp() {
         if (videoDeleteBtn) videoDeleteBtn.style.display = 'none';
         if (videoForm) videoForm.reset();
         safeSetRadioValue('video-category', '跳躍');
-        if (videoModalOverlay) videoModalOverlay.classList.add('show');
+        showModalOverlay(videoModalOverlay);
     }
 
     function openVideoModalForEdit(video) {
@@ -5653,7 +5663,7 @@ function startApp() {
         if (noteInput) noteInput.value = video.note || '';
 
         safeSetRadioValue('video-category', video.category || '跳躍');
-        if (videoModalOverlay) videoModalOverlay.classList.add('show');
+        showModalOverlay(videoModalOverlay);
     }
 
     if (addVideoBtn) addVideoBtn.addEventListener('click', openVideoModal);
@@ -5860,9 +5870,10 @@ function startApp() {
     initCustomSelect('bookmark-category-trigger', 'bookmark-category-menu', 'bookmark-category-wrapper', 'bookmark-category-select', 'bookmark-category-display');
 
     function closeBookmarkModal() {
-        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.remove('show');
+        hideModalOverlay(bookmarkModalOverlay);
         if (bookmarkForm) bookmarkForm.reset();
         editingBookmarkId = null;
+        ensureBodyUnlocked();
     }
 
     function openBookmarkModal() {
@@ -5871,7 +5882,7 @@ function startApp() {
         if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'none';
         if (bookmarkForm) bookmarkForm.reset();
         safeSetRadioValue('bookmark-category', '跳躍');
-        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+        showModalOverlay(bookmarkModalOverlay);
     }
 
     function openBookmarkModalForEdit(bm) {
@@ -5890,7 +5901,7 @@ function startApp() {
         if (noteInput) noteInput.value = bm.note || '';
 
         safeSetRadioValue('bookmark-category', bm.category || '跳躍');
-        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+        showModalOverlay(bookmarkModalOverlay);
     }
 
     if (addBookmarkBtn) addBookmarkBtn.addEventListener('click', openBookmarkModal);
@@ -6046,14 +6057,16 @@ function startApp() {
     if (closeBreakdownModalBtn) {
         closeBreakdownModalBtn.addEventListener('click', () => {
             if (breakdownModalOverlay) {
-                breakdownModalOverlay.classList.remove('show');
+                hideModalOverlay(breakdownModalOverlay);
             }
+            ensureBodyUnlocked();
         });
     }
     if (breakdownModalOverlay) {
         breakdownModalOverlay.addEventListener('click', (e) => {
             if (e.target === breakdownModalOverlay) {
-                breakdownModalOverlay.classList.remove('show');
+                hideModalOverlay(breakdownModalOverlay);
+                ensureBodyUnlocked();
             }
         });
     }
