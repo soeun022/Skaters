@@ -955,6 +955,8 @@ function startApp() {
                     currentViewMode = 'year';
                 } else {
                     currentViewMode = 'month';
+                    isInitialScrolling = true;
+                    window.scrollTo(0, 0);
                 }
                 renderView();
             } else if (currentTab === 'day-view') {
@@ -1342,18 +1344,51 @@ function startApp() {
         }
 
         isInitialScrolling = true;
-        setupMonthObserver();
-
-        if (currentActiveBlock) {
-            currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
-            if (monthTitle) {
-                monthTitle.textContent = currentActiveBlock.dataset.title;
-            }
+        if (monthObserver) {
+            monthObserver.disconnect();
         }
 
-        setTimeout(() => {
-            isInitialScrolling = false;
-        }, 200);
+        const targetTitle = currentActiveBlock ? currentActiveBlock.dataset.title : '';
+        if (monthTitle && targetTitle) {
+            monthTitle.textContent = targetTitle;
+        }
+
+        const performScrollToActiveBlock = () => {
+            if (!currentActiveBlock) return;
+            const headerEl = document.querySelector('header.navbar');
+            const weekdaysEl = document.querySelector('.weekdays');
+            const headerOffset = (headerEl ? headerEl.offsetHeight : 0) + (weekdaysEl ? weekdaysEl.offsetHeight : 0) + 12;
+
+            const blockRect = currentActiveBlock.getBoundingClientRect();
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const targetScrollY = currentScrollY + blockRect.top - headerOffset;
+
+            window.scrollTo({
+                top: Math.max(0, targetScrollY),
+                behavior: 'auto'
+            });
+
+            if (typeof currentActiveBlock.scrollIntoView === 'function') {
+                currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
+            }
+
+            if (monthTitle && targetTitle) {
+                monthTitle.textContent = targetTitle;
+            }
+        };
+
+        // 雙重 requestAnimationFrame 確保瀏覽器完成 display 切換與 Reflow 佈局
+        requestAnimationFrame(() => {
+            performScrollToActiveBlock();
+            requestAnimationFrame(() => {
+                performScrollToActiveBlock();
+                setupMonthObserver();
+                // 延長保護窗口至 400ms，徹底防止初始滾動誤觸覆蓋目標月份
+                setTimeout(() => {
+                    isInitialScrolling = false;
+                }, 400);
+            });
+        });
     }
 
     function updateActiveMonthFromScroll() {
@@ -1362,7 +1397,9 @@ function startApp() {
         const blocks = Array.from(document.querySelectorAll('.month-block'));
         if (blocks.length === 0) return;
 
-        const viewportTop = 70;
+        const headerEl = document.querySelector('header.navbar');
+        const weekdaysEl = document.querySelector('.weekdays');
+        const viewportTop = (headerEl ? headerEl.offsetHeight : 0) + (weekdaysEl ? weekdaysEl.offsetHeight : 0) + 5;
         const viewportBottom = window.innerHeight;
 
         let maxVisibleHeight = -1;
@@ -1810,6 +1847,8 @@ function startApp() {
             card.addEventListener('click', () => {
                 currentDate = new Date(year, m, 1);
                 currentViewMode = 'month';
+                isInitialScrolling = true;
+                window.scrollTo(0, 0);
                 renderView();
             });
 
