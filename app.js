@@ -2242,7 +2242,7 @@ function startApp() {
         overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important; align-items: center !important; justify-content: center !important; padding: 20px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px !important; overflow-y: auto !important; box-sizing: border-box !important; height: 100dvh !important;';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
-            modalEl.style.cssText = 'display: flex !important; flex-direction: column !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; max-height: 80dvh !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; margin: auto !important; padding: 22px 20px 24px 20px !important;';
+            modalEl.style.cssText = 'display: flex !important; flex-direction: column !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; max-height: 80dvh !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; margin: auto !important; padding: 22px 20px 16px 20px !important;';
             modalEl.scrollTop = 0;
         }
     }
@@ -2352,7 +2352,7 @@ function startApp() {
                                 <label id="type-prompt-modal-label" for="type-prompt-input" style="font-size: 14px; color: var(--text-secondary); display: block; margin-bottom: 8px;">請輸入排程類型的名稱：</label>
                                 <input type="text" id="type-prompt-input" placeholder="例如：滑行訓練、重訓" required style="width: 100%; box-sizing: border-box;">
                             </div>
-                            <div class="modal-actions" style="margin-top: 24px;">
+                            <div class="modal-actions">
                                 <button type="button" id="type-prompt-cancel-btn" class="btn btn-secondary">取消</button>
                                 <button type="submit" id="type-prompt-submit-btn" class="btn btn-primary">確認</button>
                             </div>

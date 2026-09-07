@@ -1394,7 +1394,7 @@ body {
 
 .modal {
     background-color: #f7f5f3;
-    padding: 22px 20px 24px 20px;
+    padding: 22px 20px 16px 20px;
     border-radius: 16px;
     width: 100%;
     max-width: 420px;
@@ -1729,6 +1729,10 @@ textarea:focus {
     white-space: nowrap;
 }
 
+.modal form .form-group:has(+ .modal-actions),
+.modal form .form-group:has(+ .form-group[style*="display: none"] + .modal-actions),
+.modal form .form-group:has(+ #card-usage-history-group + .modal-actions),
+.modal form .form-group:last-child,
 .modal form .form-group:last-of-type {
     margin-bottom: 0 !important;
 }
@@ -1738,9 +1742,9 @@ textarea:focus {
     justify-content: flex-end;
     align-items: center;
     gap: 12px;
-    margin-top: 10px !important;
-    padding-top: 10px !important;
-    padding-bottom: 2px !important;
+    margin-top: 6px !important;
+    padding-top: 8px !important;
+    padding-bottom: 0px !important;
     border-top: 1px solid rgba(113, 90, 87, 0.1);
     flex-shrink: 0;
     width: 100%;
