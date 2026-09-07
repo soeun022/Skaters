@@ -2335,11 +2335,20 @@ label {
     padding: 0 20px;
     box-shadow: 0 2px 8px rgba(113, 90, 87, 0.05);
     line-height: 1.5;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.video-search-box input {
+.video-search-box:focus-within {
+    border-color: #d7c9c9 !important;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4), 0 2px 8px rgba(113, 90, 87, 0.05) !important;
+    background-color: #ffffff;
+}
+
+.video-search-box input,
+.video-search-box input:focus {
     border: none !important;
     outline: none !important;
+    box-shadow: none !important;
     background: transparent !important;
     font-size: 15px;
     width: 100%;
