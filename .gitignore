@@ -5,7 +5,3 @@ __pycache__/
 *.tmp
 .DS_Store
 Thumbs.db
-
-# 偵錯與臨時除錯檔
-index_debug.html
-index_debug2.html
