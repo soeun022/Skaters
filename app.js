@@ -6159,9 +6159,19 @@ function startApp() {
         item.addEventListener('click', () => {
             const tab = item.dataset.tab;
             if (!tab) return;
+            const prevTab = currentTab;
             currentTab = tab;
             bottomNavItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+
+            // 當從其他分頁跳回主畫面月曆，或點擊月曆分頁時，月曆時間跳回目前月份
+            if (tab === 'calendar') {
+                currentDate = new Date();
+                currentViewMode = 'month';
+                isInitialScrolling = true;
+                window.scrollTo(0, 0);
+            }
+
             renderView();
         });
     });
