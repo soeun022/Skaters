@@ -834,7 +834,6 @@ function startApp() {
     const cardModalOverlay = document.getElementById('card-modal-overlay');
     const cardForm = document.getElementById('card-form');
     const cardModalTitle = document.getElementById('card-modal-title');
-    const cardNote = document.getElementById('card-note');
     const cardDeleteBtn = document.getElementById('card-delete-btn');
     const cardCancelBtn = document.getElementById('card-cancel-btn');
     const coachLevelGroup = document.getElementById('coach-level-group');
@@ -2174,7 +2173,6 @@ function startApp() {
         
         updateCardOptions(schedule.price);
         
-        if (cardNote) cardNote.value = schedule.note || '';
         renderCardUsageHistory(schedule.id);
         if (cardDeleteBtn) cardDeleteBtn.style.display = 'block';
         showModalOverlay(cardModalOverlay);
@@ -3058,7 +3056,6 @@ function startApp() {
             const cardType = safeGetRadioValue('card-type');
             const startDate = document.getElementById('card-start-date').value;
             const endDate = document.getElementById('card-end-date').value;
-            const note = cardNote.value;
 
             const normalizedStartDate = normalizeDateStr(startDate);
             const normalizedEndDate = normalizeDateStr(endDate);
@@ -3088,7 +3085,7 @@ function startApp() {
                     schedules[scheduleIndex].displayTitle = displayTitle;
                     schedules[scheduleIndex].coachLevel = coachLevel;
                     schedules[scheduleIndex].price = price;
-                    schedules[scheduleIndex].note = note;
+                    delete schedules[scheduleIndex].note;
                     schedules[scheduleIndex].isCard = true;
                     schedules[scheduleIndex].time = '';
                 } else {
@@ -3100,7 +3097,6 @@ function startApp() {
                         displayTitle: displayTitle,
                         coachLevel: coachLevel,
                         price: price,
-                        note: note,
                         isCard: true,
                         time: ''
                     });
@@ -3114,7 +3110,6 @@ function startApp() {
                     displayTitle: displayTitle,
                     coachLevel: coachLevel,
                     price: price,
-                    note: note,
                     isCard: true,
                     time: ''
                 };
@@ -3526,7 +3521,7 @@ function startApp() {
                         colors: colors,
                         timeStr: `到期日：${endDate}`,
                         durationStr: '',
-                        noteStr: item.note || '無備註',
+                        noteStr: '',
                         priceStr: price.toLocaleString(),
                         statusHtml: statusHtml
                     });
@@ -3622,10 +3617,10 @@ function startApp() {
             ${durationStr ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 400;">(${durationStr})</span>` : ''}
         </div>`;
 
-        // 第 3 行：備註
-        let row3 = `<div style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; word-break: break-word; width: 100%;">
-            ${noteStr || '無備註'}
-        </div>`;
+        // 第 3 行：備註 (若無備註則不顯示該行)
+        let row3 = (noteStr !== undefined && noteStr !== null && noteStr !== '') ? `<div style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; word-break: break-word; width: 100%;">
+            ${noteStr}
+        </div>` : '';
 
         // 第 4 行：價格
         let row4 = (priceStr !== undefined && priceStr !== null && priceStr !== '') ? `<div style="font-size: 15px; font-weight: 700; color: #715a57; width: 100%;">
@@ -4156,7 +4151,7 @@ function startApp() {
                         colors: colors,
                         timeStr: dateStr,
                         durationStr: '',
-                        noteStr: item.note || item.displayTitle || '購課紀錄',
+                        noteStr: '',
                         priceStr: price.toLocaleString(),
                         statusHtml: statusLineHtml
                     });
@@ -4627,7 +4622,7 @@ function startApp() {
                         colors: colors,
                         timeStr: dateStr,
                         durationStr: '',
-                        noteStr: card.note || card.displayTitle || '購課紀錄',
+                        noteStr: '',
                         priceStr: price.toLocaleString(),
                         statusHtml: statusLineHtml
                     });
@@ -5016,7 +5011,7 @@ function startApp() {
                         colors: colors,
                         timeStr: dateStr,
                         durationStr: '',
-                        noteStr: card.note || card.displayTitle || '購課紀錄',
+                        noteStr: '',
                         priceStr: price.toLocaleString(),
                         statusHtml: statusLineHtml
                     });
@@ -5173,7 +5168,7 @@ function startApp() {
                     colors: colors,
                     timeStr: dateStr,
                     durationStr: '',
-                    noteStr: item.note || '購課紀錄',
+                    noteStr: '',
                     priceStr: price.toLocaleString(),
                     statusHtml: statusLineHtml
                 });
