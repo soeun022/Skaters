@@ -12,7 +12,7 @@ function startApp() {
         }
     }
 
-    function saveSchedules(data) {
+    function saveSchedules(data = schedules) {
         try {
             localStorage.setItem('schedules', JSON.stringify(data));
         } catch (e) {
@@ -185,19 +185,57 @@ function startApp() {
             return times;
         }
 
-        function roundTo15Min(timeStr) {
-            if (!timeStr) return '00:00';
-            const [h, m] = timeStr.split(':').map(Number);
-            const hVal = isNaN(h) ? 0 : h;
-            const mVal = isNaN(m) ? 0 : m;
+        function formatTimeInput(val, isBlur = false) {
+            if (!val) return isBlur ? '17:00' : '';
+            let clean = val.replace(/[^0-9:]/g, '');
             
-            let roundedM = Math.round(mVal / 15) * 15;
-            let finalH = hVal;
-            if (roundedM >= 60) {
-                roundedM = 0;
-                finalH = (finalH + 1) % 24;
+            if (clean.includes(':')) {
+                const parts = clean.split(':');
+                let h = parts[0];
+                let m = parts[1] || '';
+                if (h.length > 2) h = h.slice(0, 2);
+                if (m.length > 2) m = m.slice(0, 2);
+                
+                if (isBlur) {
+                    let hNum = parseInt(h, 10);
+                    let mNum = parseInt(m, 10);
+                    if (isNaN(hNum)) hNum = 0;
+                    if (isNaN(mNum)) mNum = 0;
+                    hNum = Math.min(23, Math.max(0, hNum));
+                    mNum = Math.min(59, Math.max(0, mNum));
+                    return `${String(hNum).padStart(2, '0')}:${String(mNum).padStart(2, '0')}`;
+                }
+                return `${h}:${m}`;
             }
-            return `${String(finalH).padStart(2, '0')}:${String(roundedM).padStart(2, '0')}`;
+            
+            let digits = clean.replace(/[^0-9]/g, '');
+            if (digits.length > 4) digits = digits.slice(0, 4);
+            
+            if (isBlur) {
+                if (digits.length === 0) return '17:00';
+                if (digits.length <= 2) {
+                    let hNum = Math.min(23, Math.max(0, parseInt(digits, 10) || 0));
+                    return `${String(hNum).padStart(2, '0')}:00`;
+                }
+                if (digits.length === 3) {
+                    let hNum = Math.min(23, Math.max(0, parseInt(digits.slice(0, 1), 10) || 0));
+                    let mNum = Math.min(59, Math.max(0, parseInt(digits.slice(1), 10) || 0));
+                    return `${String(hNum).padStart(2, '0')}:${String(mNum).padStart(2, '0')}`;
+                }
+                if (digits.length === 4) {
+                    let hNum = Math.min(23, Math.max(0, parseInt(digits.slice(0, 2), 10) || 0));
+                    let mNum = Math.min(59, Math.max(0, parseInt(digits.slice(2), 10) || 0));
+                    return `${String(hNum).padStart(2, '0')}:${String(mNum).padStart(2, '0')}`;
+                }
+            } else {
+                if (digits.length === 2) {
+                    return `${digits}:`;
+                }
+                if (digits.length > 2) {
+                    return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+                }
+            }
+            return digits;
         }
 
         function getDurationLabel(startTimeStr, endTimeStr) {
@@ -244,12 +282,19 @@ function startApp() {
         function renderStartTimeDropdown() {
             if (!startTimeDropdown) return;
             startTimeDropdown.innerHTML = '';
-            const times = generate15MinTimes();
-            const roundedSelected = roundTo15Min(selectedStartTime);
+            let times = generate15MinTimes();
+            if (selectedStartTime && !times.includes(selectedStartTime) && selectedStartTime.includes(':')) {
+                times.push(selectedStartTime);
+                times.sort((a, b) => {
+                    const [ah, am] = a.split(':').map(Number);
+                    const [bh, bm] = b.split(':').map(Number);
+                    return (ah * 60 + am) - (bh * 60 + bm);
+                });
+            }
 
             times.forEach(t => {
                 const opt = document.createElement('div');
-                const isSelected = t === roundedSelected || t === selectedStartTime;
+                const isSelected = t === selectedStartTime;
                 opt.className = `custom-time-option ${isSelected ? 'selected' : ''}`;
                 opt.innerHTML = `<span class="time-text">${t}</span>`;
                 opt.addEventListener('click', (e) => {
@@ -276,22 +321,36 @@ function startApp() {
         function renderEndTimeDropdown() {
             if (!endTimeDropdown) return;
             endTimeDropdown.innerHTML = '';
-            const times = generate15MinTimes();
-            const roundedSelected = roundTo15Min(selectedEndTime);
 
             const [sh, sm] = (selectedStartTime || '17:00').split(':').map(Number);
             const startTotalMins = (isNaN(sh) ? 0 : sh) * 60 + (isNaN(sm) ? 0 : sm);
 
-            // 只保留晚於開始時間的時間選項
-            const validEndTimes = times.filter(t => {
-                const [h, m] = t.split(':').map(Number);
-                const totalMins = h * 60 + m;
-                return totalMins > startTotalMins;
-            });
+            // 以開始時間為基準，每 15 分鐘為間隔生成結束時間選項 (最多至 +12 小時)
+            const endOptionTimes = [];
+            for (let step = 15; step <= 720; step += 15) {
+                const totalM = (startTotalMins + step) % (24 * 60);
+                const h = String(Math.floor(totalM / 60)).padStart(2, '0');
+                const m = String(totalM % 60).padStart(2, '0');
+                const timeStr = `${h}:${m}`;
+                endOptionTimes.push(timeStr);
+            }
 
-            validEndTimes.forEach(t => {
+            if (selectedEndTime && !endOptionTimes.includes(selectedEndTime) && selectedEndTime.includes(':')) {
+                const [eh, em] = selectedEndTime.split(':').map(Number);
+                const endMins = (isNaN(eh) ? 0 : eh) * 60 + (isNaN(em) ? 0 : em);
+                if (endMins > startTotalMins) {
+                    endOptionTimes.push(selectedEndTime);
+                    endOptionTimes.sort((a, b) => {
+                        const [ah, am] = a.split(':').map(Number);
+                        const [bh, bm] = b.split(':').map(Number);
+                        return (ah * 60 + am) - (bh * 60 + bm);
+                    });
+                }
+            }
+
+            endOptionTimes.forEach(t => {
                 const opt = document.createElement('div');
-                const isSelected = t === roundedSelected || t === selectedEndTime;
+                const isSelected = t === selectedEndTime;
                 opt.className = `custom-time-option ${isSelected ? 'selected' : ''}`;
                 const durLabel = getDurationLabel(selectedStartTime, t);
                 const durSpan = durLabel ? `<span class="duration-text">${durLabel}</span>` : '';
@@ -322,12 +381,30 @@ function startApp() {
         // 綁定輸入框打字與選單按鈕事件
         if (startTimeInput) {
             startTimeInput.addEventListener('input', () => {
+                const formatted = formatTimeInput(startTimeInput.value, false);
+                if (startTimeInput.value !== formatted) {
+                    startTimeInput.value = formatted;
+                }
+                syncUIFromInputs();
+            });
+            startTimeInput.addEventListener('blur', () => {
+                const formatted = formatTimeInput(startTimeInput.value, true);
+                startTimeInput.value = formatted;
                 syncUIFromInputs();
             });
         }
 
         if (endTimeInput) {
             endTimeInput.addEventListener('input', () => {
+                const formatted = formatTimeInput(endTimeInput.value, false);
+                if (endTimeInput.value !== formatted) {
+                    endTimeInput.value = formatted;
+                }
+                syncUIFromInputs();
+            });
+            endTimeInput.addEventListener('blur', () => {
+                const formatted = formatTimeInput(endTimeInput.value, true);
+                endTimeInput.value = formatted;
                 syncUIFromInputs();
             });
         }
@@ -431,11 +508,13 @@ function startApp() {
         }
 
         if (prevBtn) prevBtn.addEventListener('click', () => {
+            currentViewDate.setDate(1);
             currentViewDate.setMonth(currentViewDate.getMonth() - 1);
             renderGrid();
         });
 
         if (nextBtn) nextBtn.addEventListener('click', () => {
+            currentViewDate.setDate(1);
             currentViewDate.setMonth(currentViewDate.getMonth() + 1);
             renderGrid();
         });
@@ -498,7 +577,7 @@ function startApp() {
                     const [dPart, tPart] = initialValue.split('T');
                     selectedDate = parseLocalDate(dPart);
                     if (tPart) {
-                        selectedStartTime = roundTo15Min(tPart);
+                        selectedStartTime = tPart.trim();
                     } else {
                         selectedStartTime = '17:00';
                     }
@@ -512,7 +591,7 @@ function startApp() {
             }
 
             if (initialEndTime) {
-                selectedEndTime = roundTo15Min(initialEndTime);
+                selectedEndTime = initialEndTime.trim();
             } else {
                 const [sh, sm] = selectedStartTime.split(':').map(Number);
                 const defaultEndMin = (sh * 60 + sm + 90) % (24 * 60);
@@ -832,7 +911,6 @@ function startApp() {
     const cardModalOverlay = document.getElementById('card-modal-overlay');
     const cardForm = document.getElementById('card-form');
     const cardModalTitle = document.getElementById('card-modal-title');
-    const cardNote = document.getElementById('card-note');
     const cardDeleteBtn = document.getElementById('card-delete-btn');
     const cardCancelBtn = document.getElementById('card-cancel-btn');
     const coachLevelGroup = document.getElementById('coach-level-group');
@@ -953,6 +1031,8 @@ function startApp() {
                     currentViewMode = 'year';
                 } else {
                     currentViewMode = 'month';
+                    isInitialScrolling = true;
+                    window.scrollTo(0, 0);
                 }
                 renderView();
             } else if (currentTab === 'day-view') {
@@ -1061,13 +1141,44 @@ function startApp() {
 
     setupDayViewSwipeGesture(dayViewContainer);
 
-    // 點擊 DOCK 與按鈕後自動取消焦點高亮 (避免殘留點亮色塊)
-    document.querySelectorAll('.bottom-nav-item, .icon-btn, .month-title-wrapper').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (document.activeElement && typeof document.activeElement.blur === 'function') {
-                document.activeElement.blur();
-            }
+    // 頂部大標題 DOCK 與搜尋新增 DOCK 灰紫色聚焦特效 (點擊當下即時反饋，點擊完畢自動平滑消失，絕不停留)
+    const dockInteractiveElements = document.querySelectorAll(
+        '#top-month-dock .month-title-wrapper, #top-month-dock .icon-btn, #top-action-dock .icon-btn, .bottom-nav-item'
+    );
+
+    dockInteractiveElements.forEach(el => {
+        let clearTimer = null;
+
+        const flashEffect = () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            el.classList.add('dock-active');
+            clearTimer = setTimeout(() => {
+                el.classList.remove('dock-active');
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+            }, 200);
+        };
+
+        el.addEventListener('pointerdown', () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            el.classList.add('dock-active');
         });
+
+        const handleRelease = () => {
+            if (clearTimer) clearTimeout(clearTimer);
+            clearTimer = setTimeout(() => {
+                el.classList.remove('dock-active');
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+            }, 180);
+        };
+
+        el.addEventListener('pointerup', handleRelease);
+        el.addEventListener('pointercancel', handleRelease);
+        el.addEventListener('pointerleave', handleRelease);
+        el.addEventListener('click', flashEffect);
     });
 
     // 統一渲染控制
@@ -1309,18 +1420,51 @@ function startApp() {
         }
 
         isInitialScrolling = true;
-        setupMonthObserver();
-
-        if (currentActiveBlock) {
-            currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
-            if (monthTitle) {
-                monthTitle.textContent = currentActiveBlock.dataset.title;
-            }
+        if (monthObserver) {
+            monthObserver.disconnect();
         }
 
-        setTimeout(() => {
-            isInitialScrolling = false;
-        }, 200);
+        const targetTitle = currentActiveBlock ? currentActiveBlock.dataset.title : '';
+        if (monthTitle && targetTitle) {
+            monthTitle.textContent = targetTitle;
+        }
+
+        const performScrollToActiveBlock = () => {
+            if (!currentActiveBlock) return;
+            const headerEl = document.querySelector('header.navbar');
+            const weekdaysEl = document.querySelector('.weekdays');
+            const headerOffset = (headerEl ? headerEl.offsetHeight : 0) + (weekdaysEl ? weekdaysEl.offsetHeight : 0) + 12;
+
+            const blockRect = currentActiveBlock.getBoundingClientRect();
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const targetScrollY = currentScrollY + blockRect.top - headerOffset;
+
+            window.scrollTo({
+                top: Math.max(0, targetScrollY),
+                behavior: 'auto'
+            });
+
+            if (typeof currentActiveBlock.scrollIntoView === 'function') {
+                currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
+            }
+
+            if (monthTitle && targetTitle) {
+                monthTitle.textContent = targetTitle;
+            }
+        };
+
+        // 雙重 requestAnimationFrame 確保瀏覽器完成 display 切換與 Reflow 佈局
+        requestAnimationFrame(() => {
+            performScrollToActiveBlock();
+            requestAnimationFrame(() => {
+                performScrollToActiveBlock();
+                setupMonthObserver();
+                // 延長保護窗口至 400ms，徹底防止初始滾動誤觸覆蓋目標月份
+                setTimeout(() => {
+                    isInitialScrolling = false;
+                }, 400);
+            });
+        });
     }
 
     function updateActiveMonthFromScroll() {
@@ -1329,7 +1473,9 @@ function startApp() {
         const blocks = Array.from(document.querySelectorAll('.month-block'));
         if (blocks.length === 0) return;
 
-        const viewportTop = 70;
+        const headerEl = document.querySelector('header.navbar');
+        const weekdaysEl = document.querySelector('.weekdays');
+        const viewportTop = (headerEl ? headerEl.offsetHeight : 0) + (weekdaysEl ? weekdaysEl.offsetHeight : 0) + 5;
         const viewportBottom = window.innerHeight;
 
         let maxVisibleHeight = -1;
@@ -1555,41 +1701,45 @@ function startApp() {
                 item.title = hoverText.trim();
             }
 
-            // 啟用拖拽 (Drag & Drop)
-            item.setAttribute('draggable', 'true');
-            item.addEventListener('dragstart', (e) => {
-                document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.add('dragging'));
-                e.dataTransfer.setData('text/plain', schedule.id);
-                e.dataTransfer.effectAllowed = 'move';
-                
-                if (schedule.isOther && schedule.startDate && schedule.endDate && schedule.startDate !== schedule.endDate) {
-                    const startObj = parseLocalDate(normalizeDateStr(schedule.startDate));
-                    const endObj = parseLocalDate(normalizeDateStr(schedule.endDate));
-                    let days = Math.round((endObj - startObj) / (1000 * 3600 * 24)) + 1;
-                    if (days < 1) days = 1;
+            // 啟用拖拽 (Drag & Drop) - 課卡到期排程設定為不可移動
+            if (!schedule.isCard) {
+                item.setAttribute('draggable', 'true');
+                item.addEventListener('dragstart', (e) => {
+                    document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.add('dragging'));
+                    e.dataTransfer.setData('text/plain', schedule.id);
+                    e.dataTransfer.effectAllowed = 'move';
                     
-                    const ghost = document.createElement('div');
-                    ghost.textContent = schedule.title || '其他排程';
-                    const colors = typeColors[schedule.type] || { bg: '#c1b3b3', text: '#514646' };
-                    ghost.style.backgroundColor = colors.bg;
-                    ghost.style.color = colors.text;
-                    ghost.style.padding = '3px 12px';
-                    ghost.style.borderRadius = '9999px';
-                    ghost.style.fontSize = '11px';
-                    ghost.style.position = 'absolute';
-                    ghost.style.top = '-1000px';
-                    ghost.style.width = `${days * 120}px`;
-                    ghost.style.boxSizing = 'border-box';
-                    
-                    document.body.appendChild(ghost);
-                    e.dataTransfer.setDragImage(ghost, 20, 10);
-                    setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 0);
-                }
-            });
+                    if (schedule.isOther && schedule.startDate && schedule.endDate && schedule.startDate !== schedule.endDate) {
+                        const startObj = parseLocalDate(normalizeDateStr(schedule.startDate));
+                        const endObj = parseLocalDate(normalizeDateStr(schedule.endDate));
+                        let days = Math.round((endObj - startObj) / (1000 * 3600 * 24)) + 1;
+                        if (days < 1) days = 1;
+                        
+                        const ghost = document.createElement('div');
+                        ghost.textContent = schedule.title || '其他排程';
+                        const colors = typeColors[schedule.type] || { bg: '#c1b3b3', text: '#514646' };
+                        ghost.style.backgroundColor = colors.bg;
+                        ghost.style.color = colors.text;
+                        ghost.style.padding = '3px 12px';
+                        ghost.style.borderRadius = '9999px';
+                        ghost.style.fontSize = '11px';
+                        ghost.style.position = 'absolute';
+                        ghost.style.top = '-1000px';
+                        ghost.style.width = `${days * 120}px`;
+                        ghost.style.boxSizing = 'border-box';
+                        
+                        document.body.appendChild(ghost);
+                        e.dataTransfer.setDragImage(ghost, 20, 10);
+                        setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 0);
+                    }
+                });
 
-            item.addEventListener('dragend', () => {
-                document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.remove('dragging'));
-            });
+                item.addEventListener('dragend', () => {
+                    document.querySelectorAll(`.schedule-item[data-id="${schedule.id}"]`).forEach(el => el.classList.remove('dragging'));
+                });
+            } else {
+                item.setAttribute('draggable', 'false');
+            }
             
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -1648,17 +1798,10 @@ function startApp() {
             const scheduleIndex = schedules.findIndex(s => String(s.id) === String(scheduleId));
             if (scheduleIndex > -1) {
                 const targetSchedule = schedules[scheduleIndex];
-                if (targetSchedule.isCard) {
-                    const oldEnd = parseLocalDate(normalizeDateStr(targetSchedule.date));
-                    const oldStart = parseLocalDate(normalizeDateStr(targetSchedule.startDate || targetSchedule.date));
-                    const diffDays = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 3600 * 24));
+                // 課卡到期排程設定為不可移動，直接略過
+                if (targetSchedule.isCard) return;
 
-                    const newStart = parseLocalDate(dateString);
-                    const newEnd = new Date(newStart.getTime() + diffDays * 24 * 3600 * 1000);
-
-                    targetSchedule.startDate = dateString;
-                    targetSchedule.date = formatLocalDate(newEnd);
-                } else if (targetSchedule.isOther && targetSchedule.startDate && targetSchedule.endDate) {
+                if (targetSchedule.isOther && targetSchedule.startDate && targetSchedule.endDate) {
                     const oldStart = parseLocalDate(normalizeDateStr(targetSchedule.startDate));
                     const oldEnd = parseLocalDate(normalizeDateStr(targetSchedule.endDate));
                     const diffDays = Math.round((oldEnd.getTime() - oldStart.getTime()) / (1000 * 3600 * 24));
@@ -1777,6 +1920,8 @@ function startApp() {
             card.addEventListener('click', () => {
                 currentDate = new Date(year, m, 1);
                 currentViewMode = 'month';
+                isInitialScrolling = true;
+                window.scrollTo(0, 0);
                 renderView();
             });
 
@@ -1998,77 +2143,119 @@ function startApp() {
     function renderCardUsageHistory(cardId) {
         const historyGroup = document.getElementById('card-usage-history-group');
         const historyList = document.getElementById('card-usage-history-list');
+        const toggleTrigger = document.getElementById('card-usage-history-toggle');
+        const toggleContent = document.getElementById('card-usage-history-content');
+        const countSpan = document.getElementById('card-usage-history-count');
         if (!historyGroup || !historyList) return;
 
         if (!cardId) {
             historyGroup.style.display = 'none';
             historyList.innerHTML = '';
+            if (toggleContent) toggleContent.style.display = 'none';
+            if (toggleTrigger) toggleTrigger.classList.remove('open');
             return;
         }
 
+        // 預設收合列表，確保彈窗底部按鈕不被遮擋
         historyGroup.style.display = 'block';
+        if (toggleContent) toggleContent.style.display = 'none';
+        if (toggleTrigger) toggleTrigger.classList.remove('open');
         historyList.innerHTML = '';
 
         // 尋找引用此課卡的排程
         const usedSchedules = schedules.filter(s => !s.isCard && String(s.linkedCardId) === String(cardId));
 
+        if (countSpan) countSpan.textContent = usedSchedules.length;
+
         if (usedSchedules.length === 0) {
             historyList.innerHTML = `<div style="font-size: 13px; color: var(--text-secondary); text-align: center; padding: 6px 0;">尚無抵扣排程紀錄</div>`;
-            return;
+        } else {
+            // 依日期由新到舊排序
+            usedSchedules.sort((a, b) => {
+                const dateA = normalizeDateStr(a.date) + (a.time || '00:00');
+                const dateB = normalizeDateStr(b.date) + (b.time || '00:00');
+                return dateB.localeCompare(dateA);
+            });
+
+            usedSchedules.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'usage-history-item';
+                
+                const dateDisplay = normalizeDateStr(s.date);
+                const timeDisplay = s.time ? ` ${s.time}` : '';
+                const titleDisplay = s.displayTitle || s.type;
+                const colorConfig = typeColors[s.type] || defaultTypeColor;
+
+                if (colorConfig.cardBg) {
+                    item.style.backgroundColor = colorConfig.cardBg;
+                } else {
+                    item.style.backgroundColor = '#ffffff';
+                }
+
+                item.innerHTML = `
+                    <span class="usage-date-info">${dateDisplay}${timeDisplay}</span>
+                    <span class="usage-tag" style="background-color: ${colorConfig.bg}; color: ${colorConfig.text};">
+                        ${titleDisplay}
+                    </span>
+                `;
+                historyList.appendChild(item);
+            });
         }
 
-        // 依日期由新到舊排序
-        usedSchedules.sort((a, b) => {
-            const dateA = normalizeDateStr(a.date) + (a.time || '00:00');
-            const dateB = normalizeDateStr(b.date) + (b.time || '00:00');
-            return dateB.localeCompare(dateA);
-        });
+        // 綁定 toggle 點擊展開/收合事件
+        if (toggleTrigger && !toggleTrigger.dataset.bound) {
+            toggleTrigger.dataset.bound = 'true';
+            toggleTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const content = document.getElementById('card-usage-history-content');
+                if (!content) return;
+                const isOpen = content.style.display !== 'none';
+                if (isOpen) {
+                    content.style.display = 'none';
+                    toggleTrigger.classList.remove('open');
+                } else {
+                    content.style.display = 'block';
+                    toggleTrigger.classList.add('open');
+                }
+            });
+        }
+    }
 
-        usedSchedules.forEach(s => {
-            const item = document.createElement('div');
-            item.className = 'usage-history-item';
-            
-            const dateDisplay = normalizeDateStr(s.date);
-            const timeDisplay = s.time ? ` ${s.time}` : '';
-            const titleDisplay = s.displayTitle || s.type;
-            const colorConfig = typeColors[s.type] || defaultTypeColor;
-
-            if (colorConfig.cardBg) {
-                item.style.backgroundColor = colorConfig.cardBg;
-            } else {
-                item.style.backgroundColor = '#ffffff';
-            }
-
-            item.innerHTML = `
-                <span class="usage-date-info">${dateDisplay}${timeDisplay}</span>
-                <span class="usage-tag" style="background-color: ${colorConfig.bg}; color: ${colorConfig.text};">
-                    ${titleDisplay}
-                </span>
-            `;
-            historyList.appendChild(item);
-        });
+    function ensureBodyUnlocked() {
+        const activeModals = document.querySelectorAll(
+            '.modal-overlay.show, #search-overlay.show, .modal.show, #breakdown-modal-overlay.show, #type-prompt-modal-overlay.show'
+        );
+        if (activeModals.length === 0) {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
+            document.body.style.touchAction = '';
+        }
     }
 
     function showModalOverlay(overlayEl) {
         if (!overlayEl) return;
         document.body.classList.add('modal-open');
         overlayEl.classList.add('show');
-        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; z-index: 1000 !important;';
+        overlayEl.style.cssText = 'display: flex !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; z-index: 1000 !important; align-items: center !important; justify-content: center !important; padding: 20px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px !important; overflow-y: auto !important; box-sizing: border-box !important; height: 100dvh !important;';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
-            modalEl.style.cssText = 'display: block !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important;';
+            modalEl.style.cssText = 'display: flex !important; flex-direction: column !important; opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; max-height: 80dvh !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; box-sizing: border-box !important; margin: auto !important; padding: 22px 20px 24px 20px !important;';
+            modalEl.scrollTop = 0;
         }
     }
 
     function hideModalOverlay(overlayEl) {
         if (!overlayEl) return;
-        document.body.classList.remove('modal-open');
         overlayEl.classList.remove('show');
         overlayEl.style.cssText = '';
         const modalEl = overlayEl.querySelector('.modal');
         if (modalEl) {
             modalEl.style.cssText = '';
         }
+        ensureBodyUnlocked();
     }
 
     function openCardModalForEdit(schedule) {
@@ -2087,7 +2274,6 @@ function startApp() {
         
         updateCardOptions(schedule.price);
         
-        if (cardNote) cardNote.value = schedule.note || '';
         renderCardUsageHistory(schedule.id);
         if (cardDeleteBtn) cardDeleteBtn.style.display = 'block';
         showModalOverlay(cardModalOverlay);
@@ -2193,6 +2379,7 @@ function startApp() {
 
         const closePrompt = () => {
             overlay.classList.remove('show');
+            ensureBodyUnlocked();
         };
 
         const handleCancel = (e) => {
@@ -2340,7 +2527,7 @@ function startApp() {
                             s.type = cleanName;
                         }
                     });
-                    saveSchedules();
+                    saveSchedules(schedules);
 
                     renderSettingsScheduleTypes();
                     renderScheduleTypePills(cleanName);
@@ -2541,8 +2728,8 @@ function startApp() {
     }
 
     function closeSearchModal() {
-        document.body.classList.remove('modal-open');
         if (searchOverlay) searchOverlay.classList.remove('show');
+        ensureBodyUnlocked();
     }
 
     if (searchBtn) searchBtn.addEventListener('click', openSearchModal);
@@ -2563,9 +2750,13 @@ function startApp() {
             const filtered = schedules.filter(s => {
                 const searchTarget = [
                     s.type,
+                    s.title,
+                    s.name,
                     s.displayTitle,
                     s.note,
                     s.date,
+                    s.startDate,
+                    s.endDate,
                     s.coachLevel,
                     s.price
                 ].filter(Boolean).join(' ').toLowerCase();
@@ -2584,7 +2775,7 @@ function startApp() {
                 item.style.cursor = 'pointer';
                 
                 const typeSpan = document.createElement('span');
-                typeSpan.textContent = schedule.displayTitle || schedule.type;
+                typeSpan.textContent = schedule.isShopping ? `購物：${schedule.type}` : (schedule.isOther ? `活動：${schedule.type}` : (schedule.displayTitle || schedule.type));
                 typeSpan.style.display = 'inline-block';
                 typeSpan.style.padding = '2px 6px';
                 typeSpan.style.borderRadius = '4px';
@@ -2599,7 +2790,14 @@ function startApp() {
                 infoSpan.style.fontSize = '14px';
                 infoSpan.style.color = 'var(--text-primary)';
                 const timeStr = schedule.time ? ` ${schedule.time}` : '';
-                const displayDate = schedule.date ? normalizeDateStr(schedule.date) : '';
+                
+                let dateDisplay = '';
+                if (schedule.isOther && schedule.startDate && schedule.endDate) {
+                    dateDisplay = schedule.startDate === schedule.endDate ? schedule.startDate : `${schedule.startDate}~${schedule.endDate}`;
+                } else {
+                    dateDisplay = schedule.date ? normalizeDateStr(schedule.date) : '';
+                }
+                
                 let extraInfo = '';
                 
                 if (schedule.isCard && CARD_RULES[schedule.type]) {
@@ -2618,7 +2816,10 @@ function startApp() {
                     }
                 }
                 
-                infoSpan.textContent = `${displayDate}${timeStr} - ${schedule.note || '無備註'}${extraInfo}`;
+                const mainLabel = schedule.name || schedule.title || '';
+                const notePart = schedule.note ? ` - ${schedule.note}` : '';
+                const labelPart = mainLabel ? ` [${mainLabel}]` : '';
+                infoSpan.textContent = `${dateDisplay}${timeStr}${labelPart}${notePart}${extraInfo}`;
 
                 item.appendChild(typeSpan);
                 item.appendChild(infoSpan);
@@ -2630,6 +2831,8 @@ function startApp() {
                         openCardModalForEdit(schedule);
                     } else if (schedule.isShopping) {
                         openShoppingModalForEdit(schedule);
+                    } else if (schedule.isOther) {
+                        openOtherModalForEdit(schedule);
                     } else {
                         openScheduleModalForEdit(schedule);
                     }
@@ -2934,17 +3137,11 @@ function startApp() {
     }
 
     function closeCardModal() {
-        if (cardModalOverlay) {
-            cardModalOverlay.classList.remove('show');
-            cardModalOverlay.style.cssText = '';
-        }
-        const modalEl = cardModalOverlay ? cardModalOverlay.querySelector('.modal') : null;
-        if (modalEl) {
-            modalEl.style.cssText = '';
-        }
+        hideModalOverlay(cardModalOverlay);
         if (cardForm) cardForm.reset();
         updateCardOptions();
         editingScheduleId = null;
+        ensureBodyUnlocked();
     }
 
     if (cardCancelBtn) cardCancelBtn.addEventListener('click', closeCardModal);
@@ -2960,7 +3157,6 @@ function startApp() {
             const cardType = safeGetRadioValue('card-type');
             const startDate = document.getElementById('card-start-date').value;
             const endDate = document.getElementById('card-end-date').value;
-            const note = cardNote.value;
 
             const normalizedStartDate = normalizeDateStr(startDate);
             const normalizedEndDate = normalizeDateStr(endDate);
@@ -2990,7 +3186,7 @@ function startApp() {
                     schedules[scheduleIndex].displayTitle = displayTitle;
                     schedules[scheduleIndex].coachLevel = coachLevel;
                     schedules[scheduleIndex].price = price;
-                    schedules[scheduleIndex].note = note;
+                    delete schedules[scheduleIndex].note;
                     schedules[scheduleIndex].isCard = true;
                     schedules[scheduleIndex].time = '';
                 } else {
@@ -3002,7 +3198,6 @@ function startApp() {
                         displayTitle: displayTitle,
                         coachLevel: coachLevel,
                         price: price,
-                        note: note,
                         isCard: true,
                         time: ''
                     });
@@ -3016,7 +3211,6 @@ function startApp() {
                     displayTitle: displayTitle,
                     coachLevel: coachLevel,
                     price: price,
-                    note: note,
                     isCard: true,
                     time: ''
                 };
@@ -3310,6 +3504,7 @@ function startApp() {
                     }
                 }
             }
+            return 0;
         } else if (schedule.type === '單次入場') {
             const isHoliday = isHolidayDate(schedule.date);
             return isHoliday ? 220 : 200;
@@ -3332,7 +3527,7 @@ function startApp() {
         const endM = endD.getMonth();
         
         const totalMonths = (endY - startY) * 12 + (endM - startM);
-        const count = totalMonths > 0 ? totalMonths : 1;
+        const count = Math.max(1, totalMonths + 1);
         
         const months = [];
         for (let i = 0; i < count; i++) {
@@ -3412,44 +3607,77 @@ function startApp() {
                 row.style.cursor = 'pointer';
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                let titleHtml = '';
-                let subtitleHtml = '';
-                let rightSideHtml = '';
-
+                let cardHtml = '';
                 if (item.isCard) {
                     const price = parseCleanPrice(item.price);
-                    titleHtml = `購課：${item.type}`;
-                    subtitleHtml = item.note || '購課紀錄';
-                    rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57;">NT$ ${price.toLocaleString()}</div>`;
+                    const endDate = normalizeDateStr(item.date);
+                    const rule = getCardRule(item);
+                    let statusHtml = '';
+                    if (item.type === '單次入場') {
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">單次抵扣卡</span>`;
+                    } else if (rule) {
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+                    }
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: `${item.displayTitle || item.type} 到期`,
+                        colors: colors,
+                        timeStr: `到期日：${endDate}`,
+                        durationStr: '',
+                        noteStr: '',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
                 } else if (item.isShopping) {
                     const price = parseCleanPrice(item.price);
-                    titleHtml = `購物：${item.type}`;
-                    subtitleHtml = item.name || item.note || '購物紀錄';
-                    rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57;">NT$ ${price.toLocaleString()}</div>`;
+                    let linkHtml = '';
                     if (item.url) {
-                        const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
-                        rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
                     }
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: normalizeDateStr(item.date),
+                        durationStr: '',
+                        noteStr: item.name || item.note || '購物紀錄',
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
+                } else if (item.isOther) {
+                    const title = item.name || item.title || item.type;
+                    const startStr = normalizeDateStr(item.startDate || item.date);
+                    const endStr = normalizeDateStr(item.endDate || item.date);
+                    const rangeStr = (startStr === endStr) ? startStr : `${startStr} ~ ${endStr}`;
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type || '比賽',
+                        colors: colors,
+                        timeStr: rangeStr,
+                        durationStr: '',
+                        noteStr: item.note ? `${title} · ${item.note}` : title,
+                        priceStr: '0'
+                    });
                 } else {
                     const hrs = calculateScheduleHours(item);
                     const cost = getDefaultCost(item);
                     const timeRange = item.time ? (item.endTime ? `${item.time}~${item.endTime}` : item.time) : '全天';
-                    
-                    titleHtml = `${item.title || item.type} ${timeRange}`;
-                    subtitleHtml = `${item.note || '無備註'} (${hrs.toFixed(1)}h)`;
-                    rightSideHtml = `<div style="font-weight: 700; font-size: 15px; color: #715a57;">NT$ ${cost.toLocaleString()}</div>`;
+                    let statusHtml = '';
+                    if (item.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(item.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #be9595; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
+                    }
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type,
+                        colors: colors,
+                        timeStr: `${normalizeDateStr(item.date)} ${timeRange}`,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: item.note || item.title || '無備註',
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
                 }
 
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type}</span>
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 15px;">${titleHtml}</div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${subtitleHtml}</div>
-                        </div>
-                    </div>
-                    ${rightSideHtml}
-                `;
+                row.innerHTML = cardHtml;
 
                 row.addEventListener('click', () => {
                     editingScheduleId = item.id;
@@ -3472,6 +3700,103 @@ function startApp() {
         renderGroup('課卡', cardSchedules);
         renderGroup('購物', shoppingSchedules);
         renderGroup('其他', otherSchedules);
+    }
+
+    // 統一微方型紀錄卡片 HTML 生成器 (第1行:類型, 第2行:時間與時長, 第3行:備註, 第4行:價格, 第5行:課卡狀態)
+    function buildStatsRecordCardHtml({ type, colors, timeStr, durationStr, noteStr, priceStr, statusHtml, extraActionsHtml }) {
+        const c = colors || defaultTypeColor;
+        const typeBadge = `<span style="background-color: ${c.bg}; color: ${c.text}; padding: 4px 12px; border-radius: 9999px; font-size: 12.5px; font-weight: 600; display: inline-block;">${type || '紀錄'}</span>`;
+        
+        // 第 1 行：排程/課卡類型
+        let row1 = `<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            ${typeBadge}
+            ${extraActionsHtml ? extraActionsHtml : ''}
+        </div>`;
+
+        // 第 2 行：時間，時長在時間後面
+        let row2 = `<div style="font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; width: 100%; margin-top: 2px;">
+            <span>${timeStr || ''}</span>
+            ${durationStr ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 400;">(${durationStr})</span>` : ''}
+        </div>`;
+
+        // 第 3 行：備註 (若無備註則不顯示該行)
+        let row3 = (noteStr !== undefined && noteStr !== null && noteStr !== '') ? `<div style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; word-break: break-word; width: 100%;">
+            ${noteStr}
+        </div>` : '';
+
+        // 第 4 行：價格
+        let row4 = (priceStr !== undefined && priceStr !== null && priceStr !== '') ? `<div style="font-size: 15px; font-weight: 700; color: #715a57; width: 100%;">
+            NT$ ${priceStr}
+        </div>` : '';
+
+        // 第 5 行：課卡狀態
+        let row5 = statusHtml ? `<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 2px;">
+            ${statusHtml}
+        </div>` : '';
+
+        return `${row1}${row2}${row3}${row4}${row5}`;
+    }
+
+    // 取得課卡狀態資訊輔助函式
+    function getCardStatusInfo(item) {
+        let usageText = '';
+        let statusBadgeHtml = '';
+        const todayStr = formatLocalDate(new Date());
+
+        const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
+        const endDate = item.date ? normalizeDateStr(item.date) : '';
+        const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無日期');
+        const endDateStr = normalizeDateStr(item.date);
+        const isExpired = endDateStr ? (endDateStr < todayStr) : false;
+
+        const rule = getCardRule(item);
+        if (item.type === '單次入場') {
+            const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
+            if (usedSchedule) {
+                usageText = `已於 ${normalizeDateStr(usedSchedule.date)} 抵扣`;
+                statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
+            } else if (isExpired) {
+                usageText = `未使用`;
+                statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
+            } else {
+                usageText = `可抵扣入場 1 次`;
+                statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+            }
+        } else if (rule) {
+            const usage = getCardUsage(item.id);
+            const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+            if (isInfinite) {
+                usageText = `期限內不限次數`;
+                if (isExpired) {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
+                } else {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+                }
+            } else {
+                const totalQuota = rule.maxClasses + rule.maxPractices;
+                const usedTotal = usage.classes + usage.practices;
+                
+                let parts = [];
+                if (rule.maxClasses > 0) parts.push(`課堂 ${usage.classes}/${rule.maxClasses}`);
+                if (rule.maxPractices > 0) parts.push(`練習 ${usage.practices}/${rule.maxPractices}`);
+                usageText = parts.join(' | ');
+
+                if (usedTotal >= totalQuota) {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
+                } else if (isExpired) {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
+                } else {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+                }
+            }
+        } else {
+            usageText = item.note || '購課紀錄';
+            statusBadgeHtml = isExpired 
+                ? `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`
+                : `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+        }
+
+        return { dateStr, usageText, statusBadgeHtml, isExpired };
     }
 
     function setupBreakdownModal(elementId, titleText, dataArray, totalText) {
@@ -3514,7 +3839,7 @@ function startApp() {
                 totalDisplay.textContent = totalText;
             }
             
-            modal.classList.add('show');
+            showModalOverlay(modal);
         };
     }
 
@@ -3654,11 +3979,11 @@ function startApp() {
                 let ruleText = '';
                 
                 if (isExpired) {
-                    singleCost = price / totalUsed;
+                    singleCost = totalUsed > 0 ? (price / totalUsed) : 0;
                     ruleText = '已過期 (依實際使用計單價)';
                 } else {
                     const maxQuota = rule.maxClasses + rule.maxPractices;
-                    singleCost = price / maxQuota;
+                    singleCost = (maxQuota > 0 && maxQuota !== Infinity) ? (price / maxQuota) : (totalUsed > 0 ? (price / totalUsed) : 0);
                     ruleText = '使用中 (依總額度計單價)';
                 }
                 
@@ -3864,19 +4189,33 @@ function startApp() {
                     const timeRange = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '全天';
                     const colors = typeColors[s.type] || defaultTypeColor;
 
+                    let statusHtml = '';
+                    if (s.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #be9595; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
+                    row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px;">${normalizeDateStr(s.date)} ${timeRange}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary);">${s.note || '無備註'} (${hrs.toFixed(1)}h)</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 15px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: s.type,
+                        colors: colors,
+                        timeStr: `${normalizeDateStr(s.date)} ${timeRange}`,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: s.note || s.title || '無備註',
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
+
+                    row.addEventListener('click', () => {
+                        editingScheduleId = s.id;
+                        openScheduleModalForEdit(s);
+                    });
+
                     statsLogList.appendChild(row);
                 });
             }
@@ -3894,7 +4233,6 @@ function startApp() {
             if (monthCardRecords.length === 0) {
                 statsCardList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px; font-size: 13px;">本月尚無購課紀錄</div>';
             } else {
-                const todayStr = formatLocalDate(new Date());
                 monthCardRecords.sort((a, b) => {
                     const dateA = normalizeDateStr(a.startDate || a.date || '');
                     const dateB = normalizeDateStr(b.startDate || b.date || '');
@@ -3902,80 +4240,23 @@ function startApp() {
                 }).forEach(item => {
                     const price = parseCleanPrice(item.price);
                     const colors = typeColors[item.type] || defaultTypeColor;
-                    
-                    let usageText = '';
-                    let statusBadgeHtml = '';
-
-                    const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
-                    const endDate = item.date ? normalizeDateStr(item.date) : '';
-                    const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無日期');
-                    const endDateStr = normalizeDateStr(item.date);
-                    const isExpired = endDateStr ? (endDateStr < todayStr) : false;
-
-                    const rule = getCardRule(item);
-                    if (item.type === '單次入場') {
-                        const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
-                        if (usedSchedule) {
-                            usageText = `已於 ${normalizeDateStr(usedSchedule.date)} 抵扣`;
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                        } else if (isExpired) {
-                            usageText = `未使用`;
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                        } else {
-                            usageText = `可抵扣入場 1 次`;
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                        }
-                    } else if (rule) {
-                        const usage = getCardUsage(item.id);
-                        const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
-                        if (isInfinite) {
-                            usageText = `期限內不限次數`;
-                            if (isExpired) {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                            } else {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                            }
-                        } else {
-                            const totalQuota = rule.maxClasses + rule.maxPractices;
-                            const usedTotal = usage.classes + usage.practices;
-                            
-                            let parts = [];
-                            if (rule.maxClasses > 0) parts.push(`課堂 ${usage.classes}/${rule.maxClasses}`);
-                            if (rule.maxPractices > 0) parts.push(`練習 ${usage.practices}/${rule.maxPractices}`);
-                            usageText = parts.join(' | ');
-
-                            if (usedTotal >= totalQuota) {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                            } else if (isExpired) {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                            } else {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                            }
-                        }
-                    } else {
-                        usageText = item.note || '購課紀錄';
-                    }
+                    const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(item);
+                    const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${dateStr}</span>
-                                    ${statusBadgeHtml}
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                    ${usageText}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: '',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusLineHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4002,26 +4283,26 @@ function startApp() {
                     const price = parseCleanPrice(item.price);
                     const colors = typeColors[item.type] || defaultTypeColor;
                     const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
+
+                    let linkHtml = '';
+                    if (item.url) {
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    }
                     
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                            <div>
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${dateStr}</span>
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                    ${item.name || item.note || '購物紀錄'}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4036,7 +4317,6 @@ function startApp() {
 
     const statsPrevBtn = document.getElementById('stats-prev-month');
     const statsNextBtn = document.getElementById('stats-next-month');
-    const statsAllTimeBtn = document.getElementById('stats-all-time-btn');
 
     if (statsPrevBtn) {
         statsPrevBtn.addEventListener('click', () => {
@@ -4185,7 +4465,7 @@ function startApp() {
 
                 if (activeMonthsInYear.length > 0) {
                     yearCardDetailsCount++;
-                    const monthlyCostShare = price / coveredMonths.length;
+                    const monthlyCostShare = coveredMonths.length > 0 ? (price / coveredMonths.length) : 0;
                     const yearCostShare = monthlyCostShare * activeMonthsInYear.length;
                     totalCost += yearCostShare;
 
@@ -4381,27 +4661,30 @@ function startApp() {
                     const cost = getDefaultCost(s);
                     const colors = typeColors[s.type] || defaultTypeColor;
                     const dateStr = s.date ? normalizeDateStr(s.date) : '無日期';
-                    const title = s.title || s.type;
                     const timeStr = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '';
+
+                    let statusHtml = '';
+                    if (s.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #be9595; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
+                    }
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <span>${title}</span>
-                                    ${timeStr ? `<span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(${timeStr})</span>` : ''}
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr} · ${hrs.toFixed(1)} 小時</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: s.type,
+                        colors: colors,
+                        timeStr: timeStr ? `${dateStr} ${timeStr}` : dateStr,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: s.title && s.title !== s.type ? (s.note ? `${s.title} · ${s.note}` : s.title) : (s.note || '無備註'),
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = s.id;
@@ -4428,24 +4711,23 @@ function startApp() {
                 yearCardRecords.sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(card => {
                     const price = parseCleanPrice(card.price);
                     const colors = typeColors[card.type] || defaultTypeColor;
-                    const dateStr = card.date ? normalizeDateStr(card.date) : '無日期';
-                    const displayTitle = card.displayTitle || card.type;
+                    const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(card);
+                    const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${card.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px;">${displayTitle}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">到期日: ${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: card.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: '',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusLineHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = card.id;
@@ -4467,23 +4749,25 @@ function startApp() {
                     const colors = typeColors[item.type] || defaultTypeColor;
                     const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
 
+                    let linkHtml = '';
+                    if (item.url) {
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${item.name || item.type || '購物'}</span>
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4773,27 +5057,30 @@ function startApp() {
                     const cost = getDefaultCost(s);
                     const colors = typeColors[s.type] || defaultTypeColor;
                     const dateStr = s.date ? normalizeDateStr(s.date) : '無日期';
-                    const title = s.title || s.type;
                     const timeStr = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '';
+
+                    let statusHtml = '';
+                    if (s.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #b09ba3; color: #efdede; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 4px 10px; border-radius: 9999px; background-color: #be9595; color: #741b47; font-weight: 600;">尚未抵扣</span>`;
+                    }
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <span>${title}</span>
-                                    ${timeStr ? `<span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(${timeStr})</span>` : ''}
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr} · ${hrs.toFixed(1)} 小時</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: s.type,
+                        colors: colors,
+                        timeStr: timeStr ? `${dateStr} ${timeStr}` : dateStr,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: s.title && s.title !== s.type ? (s.note ? `${s.title} · ${s.note}` : s.title) : (s.note || '無備註'),
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = s.id;
@@ -4813,24 +5100,23 @@ function startApp() {
                 [...allCards].sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(card => {
                     const price = parseCleanPrice(card.price);
                     const colors = typeColors[card.type] || defaultTypeColor;
-                    const dateStr = card.date ? normalizeDateStr(card.date) : '無日期';
-                    const displayTitle = card.displayTitle || card.type;
+                    const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(card);
+                    const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${card.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px;">${displayTitle}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">到期日: ${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: card.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: '',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusLineHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = card.id;
@@ -4852,23 +5138,25 @@ function startApp() {
                     const colors = typeColors[item.type] || defaultTypeColor;
                     const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
 
+                    let linkHtml = '';
+                    if (item.url) {
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${item.name || item.type || '購物'}</span>
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4969,83 +5257,23 @@ function startApp() {
             cardRecords.forEach(item => {
                 const price = parseCleanPrice(item.price);
                 const colors = typeColors[item.type] || defaultTypeColor;
-                
-                let usageText = '';
-                let statusBadgeHtml = '';
-
-                const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
-                const endDate = item.date ? normalizeDateStr(item.date) : '';
-                const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無日期');
-                const endDateStr = normalizeDateStr(item.date);
-                const isExpired = endDateStr ? (endDateStr < todayStr) : false;
-
-                const rule = getCardRule(item);
-                if (item.type === '單次入場') {
-                    const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
-                    if (usedSchedule) {
-                        usageText = `已於 ${normalizeDateStr(usedSchedule.date)} 抵扣`;
-                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                    } else if (isExpired) {
-                        usageText = `未使用`;
-                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                    } else {
-                        usageText = `可抵扣入場 1 次`;
-                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                    }
-                } else if (rule) {
-                    const usage = getCardUsage(item.id);
-                    const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
-                    if (isInfinite) {
-                        usageText = `期限內不限次數`;
-                        if (isExpired) {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                        } else {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                        }
-                    } else {
-                        const totalQuota = rule.maxClasses + rule.maxPractices;
-                        const usedTotal = usage.classes + usage.practices;
-                        
-                        let parts = [];
-                        if (rule.maxClasses > 0) parts.push(`課堂 ${usage.classes}/${rule.maxClasses}`);
-                        if (rule.maxPractices > 0) parts.push(`練習 ${usage.practices}/${rule.maxPractices}`);
-                        usageText = parts.join(' | ');
-
-                        if (usedTotal >= totalQuota) {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                        } else if (isExpired) {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                        } else {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                        }
-                    }
-                } else {
-                    usageText = item.note || '購課紀錄';
-                    statusBadgeHtml = isExpired 
-                        ? `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`
-                        : `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                }
+                const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(item);
+                const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                 const row = document.createElement('div');
                 row.className = 'stats-log-item';
                 row.style.cursor = 'pointer';
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
                 
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.displayTitle || item.type}</span>
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                <span>${dateStr}</span>
-                                ${statusBadgeHtml}
-                            </div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                ${usageText}${item.note ? ' · ' + item.note : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <div style="font-weight: 700; font-size: 16px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                `;
+                row.innerHTML = buildStatsRecordCardHtml({
+                    type: item.displayTitle || item.type,
+                    colors: colors,
+                    timeStr: dateStr,
+                    durationStr: '',
+                    noteStr: '',
+                    priceStr: price.toLocaleString(),
+                    statusHtml: statusLineHtml
+                });
 
                 row.addEventListener('click', () => {
                     editingScheduleId = item.id;
@@ -5066,31 +5294,25 @@ function startApp() {
                 const colors = typeColors[item.type] || defaultTypeColor;
                 const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
                 
+                let linkHtml = '';
+                if (item.url) {
+                    linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                }
+
                 const row = document.createElement('div');
                 row.className = 'stats-log-item';
                 row.style.cursor = 'pointer';
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                let rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>`;
-                if (item.url) {
-                    const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
-                    rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
-                }
-
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                <span>${dateStr}</span>
-                            </div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                ${item.name || item.note || '購物紀錄'}
-                            </div>
-                        </div>
-                    </div>
-                    ${rightSideHtml}
-                `;
+                row.innerHTML = buildStatsRecordCardHtml({
+                    type: item.type || '購物',
+                    colors: colors,
+                    timeStr: dateStr,
+                    durationStr: '',
+                    noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                    priceStr: price.toLocaleString(),
+                    extraActionsHtml: linkHtml
+                });
 
                 row.addEventListener('click', () => {
                     editingScheduleId = item.id;
@@ -5597,9 +5819,10 @@ function startApp() {
     initCustomSelect('video-category-trigger', 'video-category-menu', 'video-category-wrapper', 'video-category-select', 'video-category-display');
 
     function closeVideoModal() {
-        if (videoModalOverlay) videoModalOverlay.classList.remove('show');
+        hideModalOverlay(videoModalOverlay);
         if (videoForm) videoForm.reset();
         editingVideoId = null;
+        ensureBodyUnlocked();
     }
 
     function openVideoModal() {
@@ -5608,7 +5831,7 @@ function startApp() {
         if (videoDeleteBtn) videoDeleteBtn.style.display = 'none';
         if (videoForm) videoForm.reset();
         safeSetRadioValue('video-category', '跳躍');
-        if (videoModalOverlay) videoModalOverlay.classList.add('show');
+        showModalOverlay(videoModalOverlay);
     }
 
     function openVideoModalForEdit(video) {
@@ -5627,7 +5850,7 @@ function startApp() {
         if (noteInput) noteInput.value = video.note || '';
 
         safeSetRadioValue('video-category', video.category || '跳躍');
-        if (videoModalOverlay) videoModalOverlay.classList.add('show');
+        showModalOverlay(videoModalOverlay);
     }
 
     if (addVideoBtn) addVideoBtn.addEventListener('click', openVideoModal);
@@ -5676,6 +5899,7 @@ function startApp() {
     if (videoDeleteBtn) {
         videoDeleteBtn.addEventListener('click', () => {
             if (editingVideoId) {
+                if (!confirm('確定要刪除這部動作練習影片嗎？此操作無法復原。')) return;
                 videos = videos.filter(v => String(v.id) !== String(editingVideoId));
                 saveVideos(videos);
                 renderDatabaseView();
@@ -5833,9 +6057,10 @@ function startApp() {
     initCustomSelect('bookmark-category-trigger', 'bookmark-category-menu', 'bookmark-category-wrapper', 'bookmark-category-select', 'bookmark-category-display');
 
     function closeBookmarkModal() {
-        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.remove('show');
+        hideModalOverlay(bookmarkModalOverlay);
         if (bookmarkForm) bookmarkForm.reset();
         editingBookmarkId = null;
+        ensureBodyUnlocked();
     }
 
     function openBookmarkModal() {
@@ -5844,7 +6069,7 @@ function startApp() {
         if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'none';
         if (bookmarkForm) bookmarkForm.reset();
         safeSetRadioValue('bookmark-category', '跳躍');
-        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+        showModalOverlay(bookmarkModalOverlay);
     }
 
     function openBookmarkModalForEdit(bm) {
@@ -5863,7 +6088,7 @@ function startApp() {
         if (noteInput) noteInput.value = bm.note || '';
 
         safeSetRadioValue('bookmark-category', bm.category || '跳躍');
-        if (bookmarkModalOverlay) bookmarkModalOverlay.classList.add('show');
+        showModalOverlay(bookmarkModalOverlay);
     }
 
     if (addBookmarkBtn) addBookmarkBtn.addEventListener('click', openBookmarkModal);
@@ -5912,6 +6137,7 @@ function startApp() {
     if (bookmarkDeleteBtn) {
         bookmarkDeleteBtn.addEventListener('click', () => {
             if (editingBookmarkId) {
+                if (!confirm('確定要刪除這筆參考資料網址嗎？此操作無法復原。')) return;
                 bookmarks = bookmarks.filter(b => String(b.id) !== String(editingBookmarkId));
                 saveBookmarks(bookmarks);
                 renderBookmarkView();
@@ -5930,13 +6156,24 @@ function startApp() {
             let currentVideos = [];
             try {
                 const storedVids = localStorage.getItem('skating_videos_db');
-                currentVideos = storedVids ? JSON.parse(storedVids) : (window.skatingVideos || []);
+                currentVideos = storedVids ? JSON.parse(storedVids) : (videos || []);
             } catch (e) {
-                currentVideos = window.skatingVideos || [];
+                currentVideos = videos || [];
             }
+
+            let currentBookmarks = [];
+            try {
+                const storedBms = localStorage.getItem('skating_bookmarks_db');
+                currentBookmarks = storedBms ? JSON.parse(storedBms) : (bookmarks || []);
+            } catch (e) {
+                currentBookmarks = bookmarks || [];
+            }
+
             const dataToExport = {
                 schedules: schedules,
-                videos: currentVideos
+                videos: currentVideos,
+                bookmarks: currentBookmarks,
+                customScheduleTypes: getScheduleTypes()
             };
             const jsonStr = JSON.stringify(dataToExport, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -5973,12 +6210,18 @@ function startApp() {
                     }
                     
                     if (importedData.videos && Array.isArray(importedData.videos)) {
-                        window.skatingVideos = importedData.videos;
-                        if (typeof saveVideosToStorage === 'function') {
-                            saveVideosToStorage(window.skatingVideos);
-                        } else {
-                            localStorage.setItem('skating_videos_db', JSON.stringify(window.skatingVideos));
-                        }
+                        videos = importedData.videos;
+                        saveVideos(videos);
+                    }
+
+                    if (importedData.bookmarks && Array.isArray(importedData.bookmarks)) {
+                        bookmarks = importedData.bookmarks;
+                        saveBookmarks(bookmarks);
+                    }
+
+                    if (importedData.customScheduleTypes && Array.isArray(importedData.customScheduleTypes)) {
+                        saveScheduleTypes(importedData.customScheduleTypes);
+                        renderScheduleTypePills();
                     }
                     
                     alert('資料匯入成功！系統將為您重新載入畫面。');
@@ -6001,14 +6244,16 @@ function startApp() {
     if (closeBreakdownModalBtn) {
         closeBreakdownModalBtn.addEventListener('click', () => {
             if (breakdownModalOverlay) {
-                breakdownModalOverlay.classList.remove('show');
+                hideModalOverlay(breakdownModalOverlay);
             }
+            ensureBodyUnlocked();
         });
     }
     if (breakdownModalOverlay) {
         breakdownModalOverlay.addEventListener('click', (e) => {
             if (e.target === breakdownModalOverlay) {
-                breakdownModalOverlay.classList.remove('show');
+                hideModalOverlay(breakdownModalOverlay);
+                ensureBodyUnlocked();
             }
         });
     }
@@ -6019,9 +6264,19 @@ function startApp() {
         item.addEventListener('click', () => {
             const tab = item.dataset.tab;
             if (!tab) return;
+            const prevTab = currentTab;
             currentTab = tab;
             bottomNavItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+
+            // 當從其他分頁跳回主畫面月曆，或點擊月曆分頁時，月曆時間跳回目前月份
+            if (tab === 'calendar') {
+                currentDate = new Date();
+                currentViewMode = 'month';
+                isInitialScrolling = true;
+                window.scrollTo(0, 0);
+            }
+
             renderView();
         });
     });

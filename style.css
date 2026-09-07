@@ -34,6 +34,22 @@
     height: 0;
 }
 
+/* 全域所有膠囊 / 標籤 (Capsule Pills & Badges) 文字居中對齊與高度提升 */
+span[style*="border-radius: 9999px"],
+span[style*="border-radius:9999px"],
+div[style*="border-radius: 9999px"],
+div[style*="border-radius:9999px"],
+.usage-tag,
+.type-tag span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+}
+
 * {
     scrollbar-width: thin;
     scrollbar-color: #d7c9c9 transparent;
@@ -276,12 +292,18 @@ body {
     width: 32px;
     height: 32px;
     padding: 4px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
 }
 
 .top-action-dock .icon-btn {
     width: 38px;
     height: 38px;
     padding: 6px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
 }
 
 .month-title-wrapper {
@@ -293,18 +315,35 @@ body {
     padding: 3px 10px;
     border-radius: 9999px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.15s;
+    background-color: transparent;
+    transition: background-color 0.2s ease, transform 0.15s ease;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
     outline: none !important;
 }
 
-.month-title-wrapper:hover,
-.month-title-wrapper:active {
-    background-color: rgba(215, 201, 201, 0.55);
+.month-title-wrapper:focus,
+.month-title-wrapper:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
+/* 大標題 DOCK 與搜尋新增 DOCK 瞬態灰紫色聚焦特效 (點擊當下即時反饋，放開後自動淡出消失，絕不殘留) */
+.month-title-wrapper.dock-active,
 .month-title-wrapper:active {
+    background-color: rgba(215, 201, 201, 0.55) !important;
     transform: scale(0.96);
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.top-month-dock .icon-btn.dock-active,
+.top-month-dock .icon-btn:active,
+.top-action-dock .icon-btn.dock-active,
+.top-action-dock .icon-btn:active {
+    background-color: rgba(215, 201, 201, 0.55) !important;
+    transform: scale(0.92);
     outline: none !important;
     box-shadow: none !important;
 }
@@ -449,15 +488,23 @@ body {
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s, transform 0.12s;
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
 }
 
-.icon-btn:hover,
+@media (hover: hover) and (pointer: fine) {
+    .icon-btn:hover {
+        background-color: rgba(215, 201, 201, 0.35);
+    }
+}
+
 .icon-btn:active {
     background-color: rgba(215, 201, 201, 0.55);
+    transform: scale(0.92);
 }
 
 /* 星期列 (固定頂部，加大與上方懸浮 Dock 陰影的距離) */
@@ -849,9 +896,11 @@ body {
     user-select: none;
 }
 
-.bottom-nav-item:hover {
-    opacity: 0.9;
-    background-color: rgba(215, 201, 201, 0.35);
+@media (hover: hover) and (pointer: fine) {
+    .bottom-nav-item:hover {
+        opacity: 0.9;
+        background-color: rgba(215, 201, 201, 0.35);
+    }
 }
 
 .bottom-nav-item:active {
@@ -1192,40 +1241,35 @@ body {
 .stats-log-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    max-height: 240px;
+    gap: 10px;
+    max-height: 380px;
     overflow-y: auto;
-    margin-right: -12px;
-    padding-right: 8px;
+    margin-right: -6px;
+    padding-right: 6px;
 }
 
 .stats-log-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 11px 16px;
-    background: #fdfaf9;
-    border-radius: 9999px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 13px 16px;
+    background: #ffffff;
+    border-radius: 14px;
     border: none;
-    font-size: 14.5px;
-    gap: 10px;
+    box-shadow: 0 2px 6px rgba(113, 90, 87, 0.04);
+    font-size: 14px;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* 最前方運動類型 Tag/Pill 標籤 (強制不換行、防壓縮) */
-.stats-log-item span[style*="border-radius"] {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
+.stats-log-item:hover {
+    box-shadow: 0 4px 12px rgba(113, 90, 87, 0.08);
 }
 
-/* 中間內容區塊 (允許彈性微調) */
-.stats-log-item > div:first-child {
-    min-width: 0;
-}
-
-/* 最後方金額價格標籤 (強制不換行、防壓縮) */
-.stats-log-item > div:last-child {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
+.stats-log-item:active {
+    transform: scale(0.99);
 }
 
 /* 右下角 AI 助理按鈕 (避開底欄) */
@@ -1326,30 +1370,45 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
     background-color: rgba(0,0,0,0.5);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px 14px calc(24px + env(safe-area-inset-bottom, 0px)) 14px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s;
+    pointer-events: none;
+    transition: opacity 0.2s, visibility 0.2s;
     z-index: 300;
 }
 
 .modal-overlay.show {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .modal {
     background-color: #f7f5f3;
-    padding: 24px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 22px 20px 24px 20px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 80vh;
+    max-height: 80dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.18);
     transform: translateY(20px);
     transition: transform 0.2s;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-overlay.show .modal {
@@ -1357,8 +1416,17 @@ body {
 }
 
 .modal h2 {
+    margin-top: 0;
     margin-bottom: 16px;
     font-size: 18px;
+    color: var(--text-main);
+    flex-shrink: 0;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .form-group {
@@ -1588,16 +1656,50 @@ textarea:focus {
     color: rgba(113, 90, 87, 0.85);
 }
 
-/* 課卡 Modal 使用紀錄清單樣式 (與本月課程與練習紀錄 stats-log-item 統一為長橢圓) */
+/* 課卡 Modal 使用紀錄可收合摺疊 Toggle 樣式 */
+.usage-history-toggle-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 16px 4px 0;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    user-select: none;
+    outline: none !important;
+}
+
+.usage-history-toggle-trigger:hover {
+    background: transparent !important;
+    color: var(--text-primary);
+}
+
+.usage-history-toggle-trigger .custom-select-arrow {
+    transition: transform 0.2s ease;
+    color: #715a57;
+}
+
+.usage-history-toggle-trigger.open .custom-select-arrow {
+    transform: rotate(180deg);
+}
+
+.usage-history-toggle-content {
+    margin-top: 6px;
+}
+
 .card-usage-history-list {
-    max-height: 180px;
+    max-height: 140px;
     overflow-y: auto;
     background: transparent;
     padding: 4px 2px;
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-top: 6px;
 }
 
 .usage-history-item {
@@ -1627,13 +1729,22 @@ textarea:focus {
     white-space: nowrap;
 }
 
-
+.modal form .form-group:last-of-type {
+    margin-bottom: 0 !important;
+}
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 10px !important;
+    padding-top: 10px !important;
+    padding-bottom: 2px !important;
+    border-top: 1px solid rgba(113, 90, 87, 0.1);
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .btn {
@@ -1902,6 +2013,53 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     font-weight: 500;
 }
 
+.form-group textarea {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 16px; /* 16px 防止 iOS / Android 鍵盤開起時畫面自動拉近放大 */
+    line-height: 1.5 !important;
+    color: var(--text-primary);
+    transition: outline 0.2s, border-color 0.2s;
+    resize: vertical;
+    box-sizing: border-box;
+    height: calc(3 * 1.5em + 20px) !important;
+    min-height: calc(3 * 1.5em + 20px) !important;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: #d7c9c9 !important;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4) !important;
+}
+
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.custom-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background-color: var(--bg-color);
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-primary);
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
 .dp-time-inputs {
     display: flex;
     align-items: center;
@@ -1911,22 +2069,27 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .custom-time-select-wrapper {
     position: relative;
     display: inline-block;
+    width: 175px;
 }
 
 .custom-time-input-group {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border: 1px solid var(--border-color);
-    border-radius: 12px;
+    border-radius: 9999px !important;
     background-color: var(--bg-color);
-    padding: 2px 6px 2px 10px;
-    min-width: 140px;
+    padding: 2px 8px 2px 12px;
+    width: 175px !important;
+    min-width: 175px !important;
+    box-sizing: border-box;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .custom-time-input-group:focus-within {
     border-color: #d7c9c9;
     box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4);
+    border-radius: 9999px !important;
 }
 
 .custom-time-editable-input {
@@ -1934,11 +2097,24 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     background: transparent !important;
     font-size: 14px;
     color: var(--text-primary);
-    width: 48px;
+    width: 52px !important;
     padding: 4px 0 !important;
     outline: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    border-radius: 9999px !important;
     font-family: 'NumberFont', 'Times New Roman', serif !important;
     text-align: center;
+}
+
+.custom-time-editable-input:focus,
+.custom-time-editable-input:focus-visible {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 9999px !important;
 }
 
 .custom-time-btn {
@@ -1953,6 +2129,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     border-radius: 50%;
     margin-left: auto;
     transition: background-color 0.15s;
+    outline: none !important;
+}
+
+.custom-time-btn:focus,
+.custom-time-btn:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .custom-time-btn:hover {
@@ -2316,11 +2499,20 @@ label {
     padding: 0 20px;
     box-shadow: 0 2px 8px rgba(113, 90, 87, 0.05);
     line-height: 1.5;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
-.video-search-box input {
+.video-search-box:focus-within {
+    border-color: #d7c9c9 !important;
+    box-shadow: 0 0 0 2px rgba(215, 201, 201, 0.4), 0 2px 8px rgba(113, 90, 87, 0.05) !important;
+    background-color: #ffffff;
+}
+
+.video-search-box input,
+.video-search-box input:focus {
     border: none !important;
     outline: none !important;
+    box-shadow: none !important;
     background: transparent !important;
     font-size: 15px;
     width: 100%;
@@ -2679,10 +2871,6 @@ label {
 /* 彈窗/搜尋打開時鎖定背景禁止滾動 */
 body.modal-open {
     overflow: hidden !important;
-    touch-action: none !important;
-    position: fixed;
-    width: 100%;
-    height: 100%;
 }
 
 
