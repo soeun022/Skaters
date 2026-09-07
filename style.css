@@ -1656,14 +1656,19 @@ textarea:focus {
     color: rgba(113, 90, 87, 0.85);
 }
 
-/* 課卡 Modal 使用紀錄可收合摺疊 Toggle 樣式 */
+/* 課卡 Modal 使用紀錄可收合摺疊 Toggle 樣式 - 與其他參數標題、顏色、間距完全統一 */
+#card-usage-history-group {
+    margin-bottom: 16px;
+}
+
 .usage-history-toggle-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     box-sizing: border-box;
-    padding: 4px 16px 4px 0;
+    padding: 0;
+    margin-bottom: 8px;
     background: transparent !important;
     border: none !important;
     cursor: pointer;
@@ -1674,14 +1679,20 @@ textarea:focus {
     outline: none !important;
 }
 
-.usage-history-toggle-trigger:hover {
-    background: transparent !important;
+.usage-history-toggle-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.usage-history-toggle-trigger:hover .usage-history-toggle-title {
     color: var(--text-primary);
 }
 
 .usage-history-toggle-trigger .custom-select-arrow {
     transition: transform 0.2s ease;
-    color: #715a57;
+    color: var(--text-secondary);
 }
 
 .usage-history-toggle-trigger.open .custom-select-arrow {
@@ -1689,17 +1700,21 @@ textarea:focus {
 }
 
 .usage-history-toggle-content {
-    margin-top: 6px;
+    margin-top: 0;
 }
 
 .card-usage-history-list {
-    max-height: 140px;
+    max-height: 160px;
     overflow-y: auto;
-    background: transparent;
-    padding: 4px 2px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(113, 90, 87, 0.06);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    box-sizing: border-box;
 }
 
 .usage-history-item {
@@ -1707,12 +1722,11 @@ textarea:focus {
     align-items: center;
     justify-content: space-between;
     font-size: 13px;
-    padding: 9px 16px;
-    background: #ffffff;
-    border-radius: 9999px;
-    box-shadow: 0 2px 6px rgba(113, 90, 87, 0.05);
-    border: none;
-    transition: transform 0.15s ease;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(113, 90, 87, 0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
 .usage-history-item .usage-date-info {
@@ -1723,13 +1737,14 @@ textarea:focus {
 
 .usage-history-item .usage-tag {
     font-size: 12px;
-    padding: 4px 14px;
+    padding: 4px 10px;
     border-radius: 9999px;
     font-weight: 500;
     white-space: nowrap;
 }
 
 .modal form .form-group:has(+ .modal-actions),
+.modal form #card-usage-history-group:has(+ .modal-actions),
 .modal form .form-group:has(+ .form-group[style*="display: none"] + .modal-actions),
 .modal form .form-group:has(+ #card-usage-history-group + .modal-actions),
 .modal form .form-group:last-child,
