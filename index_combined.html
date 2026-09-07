@@ -319,17 +319,24 @@ body {
     padding: 3px 10px;
     border-radius: 9999px;
     cursor: pointer;
-    transition: background-color 0.2s, transform 0.15s;
+    background-color: transparent;
+    transition: background-color 0.15s ease, transform 0.15s ease;
     user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
     outline: none !important;
 }
 
 .month-title-wrapper:hover,
-.month-title-wrapper:active {
-    background-color: rgba(215, 201, 201, 0.55);
+.month-title-wrapper:focus,
+.month-title-wrapper:focus-visible {
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 .month-title-wrapper:active {
+    background-color: rgba(215, 201, 201, 0.55);
     transform: scale(0.96);
     outline: none !important;
     box-shadow: none !important;
@@ -475,15 +482,23 @@ body {
     cursor: pointer;
     padding: 8px;
     border-radius: 50%;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s, transform 0.12s;
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    outline: none !important;
 }
 
-.icon-btn:hover,
+@media (hover: hover) and (pointer: fine) {
+    .icon-btn:hover {
+        background-color: rgba(215, 201, 201, 0.35);
+    }
+}
+
 .icon-btn:active {
     background-color: rgba(215, 201, 201, 0.55);
+    transform: scale(0.92);
 }
 
 /* 星期列 (固定頂部，加大與上方懸浮 Dock 陰影的距離) */
@@ -875,9 +890,11 @@ body {
     user-select: none;
 }
 
-.bottom-nav-item:hover {
-    opacity: 0.9;
-    background-color: rgba(215, 201, 201, 0.35);
+@media (hover: hover) and (pointer: fine) {
+    .bottom-nav-item:hover {
+        opacity: 0.9;
+        background-color: rgba(215, 201, 201, 0.35);
+    }
 }
 
 .bottom-nav-item:active {
@@ -3207,7 +3224,7 @@ body.modal-open {
                 <img src="Skater icon.png" alt="Skaters" class="settings-app-icon">
             </div>
             <h4 class="settings-app-name">Skaters</h4>
-            <p class="settings-app-version">Version 1.0.2</p>
+            <p class="settings-app-version">Version 1.0.3</p>
             <p class="settings-copyright">© 2026 Skaters All Rights Reserved.</p>
         </div>
     </div>
