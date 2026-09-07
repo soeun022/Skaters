@@ -2186,12 +2186,6 @@ function startApp() {
                 const titleDisplay = s.displayTitle || s.type;
                 const colorConfig = typeColors[s.type] || defaultTypeColor;
 
-                if (colorConfig.cardBg) {
-                    item.style.backgroundColor = colorConfig.cardBg;
-                } else {
-                    item.style.backgroundColor = '#ffffff';
-                }
-
                 item.innerHTML = `
                     <span class="usage-date-info">${dateDisplay}${timeDisplay}</span>
                     <span class="usage-tag" style="background-color: ${colorConfig.bg}; color: ${colorConfig.text};">
@@ -2470,7 +2464,7 @@ function startApp() {
         types.forEach(t => {
             const cardBg = getSoftCardBg(t.bg);
             html += `
-                <div class="settings-type-item" style="background-color: ${cardBg};">
+                <div class="settings-type-item">
                     <div class="settings-type-info">
                         <span class="settings-type-badge" style="background-color: ${t.bg}; color: ${t.text};">${t.name}</span>
                     </div>
@@ -5533,21 +5527,21 @@ function startApp() {
                 id: 'bm1',
                 title: 'ISU 花式滑冰單人滑與雙人滑技術規則指南',
                 url: 'https://www.isu.org/figure-skating/rules/sandp-handbooks-faq',
-                category: '跳躍',
+                category: '官網',
                 note: '包含跳躍週數（Under-rotated / Downgraded）判定標準與 GOE 加減分細節。'
             },
             {
                 id: 'bm2',
                 title: 'U.S. Figure Skating 官方練習與訓練技巧教學資料庫',
                 url: 'https://www.usfigureskating.org/skate/skills-and-levels',
-                category: '步法',
+                category: '學習資料',
                 note: '提供 Moves in the Field 各等級步法刃邊（Edges）與壓步訓練建議。'
             },
             {
                 id: 'bm3',
                 title: '陸上轉體與花滑核心爆發力訓練專題',
                 url: 'https://www.skatingfirst.com/off-ice-training-guide',
-                category: '陸上訓練',
+                category: '學習資料',
                 note: '適合居家練習的垂直跳躍、旋轉軸心與伸展拉筋技巧教學。'
             }
         ];
@@ -6068,7 +6062,7 @@ function startApp() {
         if (bookmarkModalTitle) bookmarkModalTitle.textContent = '新增網址書籤';
         if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'none';
         if (bookmarkForm) bookmarkForm.reset();
-        safeSetRadioValue('bookmark-category', '跳躍');
+        safeSetRadioValue('bookmark-category', '官網');
         showModalOverlay(bookmarkModalOverlay);
     }
 
@@ -6087,7 +6081,7 @@ function startApp() {
         if (coverInput) coverInput.value = bm.cover || '';
         if (noteInput) noteInput.value = bm.note || '';
 
-        safeSetRadioValue('bookmark-category', bm.category || '跳躍');
+        safeSetRadioValue('bookmark-category', bm.category || '官網');
         showModalOverlay(bookmarkModalOverlay);
     }
 

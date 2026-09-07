@@ -159,10 +159,36 @@ div[style*="border-radius:9999px"],
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    background-color: #f7f5f3;
+    padding: 10px 18px;
     border-radius: 9999px;
-    border: none;
+    border: 1px solid transparent !important;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.25), rgba(247, 237, 235, 0.25)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 25%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0.85) 100%) border-box !important;
+    backdrop-filter: blur(1.5px) saturate(200%) contrast(125%) brightness(90%);
+    -webkit-backdrop-filter: blur(1.5px) saturate(200%) contrast(125%) brightness(90%);
+    box-shadow: 
+        0 4px 14px rgba(113, 90, 87, 0.05),
+        0 1px 4px rgba(0, 0, 0, 0.02);
+    position: relative;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.settings-type-item > * {
+    position: relative;
+    z-index: 2;
+}
+
+.settings-type-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 18px rgba(113, 90, 87, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.settings-type-item:active {
+    transform: scale(0.98);
 }
 
 .settings-type-info {
@@ -184,21 +210,21 @@ div[style*="border-radius:9999px"],
 }
 
 .settings-type-btn {
-    background-color: #9c9c9c;
-    border: 1px solid #9c9c9c;
+    background-color: #e3cfcf;
+    border: 1px solid #e3cfcf;
     padding: 5px 14px;
     border-radius: 9999px;
     font-size: 12.5px;
     font-weight: 500;
-    color: #efdede;
+    color: #666666;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .settings-type-btn:hover {
-    background-color: #888888;
-    border-color: #888888;
-    color: #ffffff;
+    background-color: #d6baba;
+    border-color: #d6baba;
+    color: #555555;
 }
 
 .settings-type-btn:active {
@@ -206,15 +232,15 @@ div[style*="border-radius:9999px"],
 }
 
 .settings-type-btn.delete {
-    background-color: #9c9c9c;
-    color: #efdede;
-    border-color: #9c9c9c;
+    background-color: #e3cfcf;
+    border: 1px solid #e3cfcf;
+    color: #666666;
 }
 
 .settings-type-btn.delete:hover {
-    background-color: #888888;
-    border-color: #888888;
-    color: #ffffff;
+    background-color: #d6baba;
+    border-color: #d6baba;
+    color: #555555;
 }
 
 .settings-type-btn.delete:active {
@@ -884,7 +910,10 @@ body {
 .top-month-dock::after,
 .top-action-dock::after,
 .dashboard-month-selector::after,
-.video-add-btn::after {
+.video-add-btn::after,
+.settings-type-item::after,
+.usage-history-item::after,
+.stats-mode-trigger::after {
     content: '';
     position: absolute;
     inset: 1px;
@@ -1558,9 +1587,16 @@ textarea:focus {
 }
 
 .stats-mode-trigger {
-    background: #d7c9c9;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.25), rgba(247, 237, 235, 0.25)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 25%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0.85) 100%) border-box !important;
+    backdrop-filter: blur(1.5px) saturate(200%) contrast(125%) brightness(90%);
+    -webkit-backdrop-filter: blur(1.5px) saturate(200%) contrast(125%) brightness(90%);
+    box-shadow: 
+        0 4px 14px rgba(113, 90, 87, 0.05),
+        0 1px 4px rgba(0, 0, 0, 0.02);
     color: #715a57;
-    border: none;
+    border: 1px solid transparent !important;
     padding: 6px 14px;
     border-radius: 9999px;
     font-size: 13px;
@@ -1571,17 +1607,25 @@ textarea:focus {
     gap: 4px;
     transition: all 0.2s ease;
     user-select: none;
+    position: relative;
+}
+
+.stats-mode-trigger > * {
+    position: relative;
+    z-index: 2;
 }
 
 .stats-mode-trigger:hover,
 .stats-mode-wrapper.open .stats-mode-trigger {
-    background: #666666;
-    color: #efdede;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.4), rgba(247, 237, 235, 0.4)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 25%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0.85) 100%) border-box !important;
+    color: #715a57;
 }
 
 .stats-mode-trigger:hover .custom-select-arrow,
 .stats-mode-wrapper.open .stats-mode-trigger .custom-select-arrow {
-    color: #efdede;
+    color: #715a57;
 }
 
 .custom-select-menu {
@@ -1748,11 +1792,32 @@ textarea:focus {
     align-items: center;
     justify-content: space-between;
     font-size: 13px;
-    padding: 8px 12px;
-    border-radius: 12px;
-    border: 1px solid rgba(113, 90, 87, 0.08);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-    transition: transform 0.15s ease, background-color 0.15s ease;
+    padding: 11px 18px;
+    border-radius: 9999px;
+    border: 1px solid transparent !important;
+    background: 
+        linear-gradient(rgba(247, 237, 235, 0.25), rgba(247, 237, 235, 0.25)) padding-box,
+        linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 25%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.35) 75%, rgba(255, 255, 255, 0.85) 100%) border-box !important;
+    backdrop-filter: blur(1.5px) saturate(200%) contrast(125%) brightness(90%);
+    -webkit-backdrop-filter: blur(1.5px) saturate(200%) contrast(125%) brightness(90%);
+    box-shadow: 
+        0 4px 14px rgba(113, 90, 87, 0.05),
+        0 1px 4px rgba(0, 0, 0, 0.02);
+    position: relative;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.usage-history-item > * {
+    position: relative;
+    z-index: 2;
+}
+
+.usage-history-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 6px 18px rgba(113, 90, 87, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .usage-history-item .usage-date-info {
@@ -1772,9 +1837,7 @@ textarea:focus {
 .modal form .form-group:has(+ .modal-actions),
 .modal form #card-usage-history-group:has(+ .modal-actions),
 .modal form .form-group:has(+ .form-group[style*="display: none"] + .modal-actions),
-.modal form .form-group:has(+ #card-usage-history-group + .modal-actions),
-.modal form .form-group:last-child,
-.modal form .form-group:last-of-type {
+.modal form .form-group:has(+ #card-usage-history-group[style*="display: none"] + .modal-actions) {
     margin-bottom: 0 !important;
 }
 
@@ -2597,9 +2660,9 @@ label {
 
 .video-cat-pill:hover,
 .video-cat-pill.active {
-    background: #666666;
-    color: #e3cfcf;
-    border-color: #666666;
+    background: #9c9c9c;
+    color: #efdede;
+    border-color: #9c9c9c;
 }
 
 /* 影片網格 Grid */
@@ -3063,11 +3126,9 @@ body.modal-open {
                 
                 <div class="video-category-pills" id="bookmark-category-pills">
                     <button class="video-cat-pill active" data-category="ALL">全部</button>
-                    <button class="video-cat-pill" data-category="跳躍">跳躍</button>
-                    <button class="video-cat-pill" data-category="旋轉">旋轉</button>
-                    <button class="video-cat-pill" data-category="步法">步法</button>
-                    <button class="video-cat-pill" data-category="滑行基礎">滑行基礎</button>
-                    <button class="video-cat-pill" data-category="陸上訓練">陸上訓練</button>
+                    <button class="video-cat-pill" data-category="官網">官網</button>
+                    <button class="video-cat-pill" data-category="學習資料">學習資料</button>
+                    <button class="video-cat-pill" data-category="購物收藏">購物收藏</button>
                     <button class="video-cat-pill" data-category="其他">其他</button>
                 </div>
             </div>
@@ -3416,7 +3477,7 @@ body.modal-open {
                 <img src="Skater icon.png" alt="Skaters" class="settings-app-icon">
             </div>
             <h4 class="settings-app-name">Skaters</h4>
-            <p class="settings-app-version">Version 1.0.26</p>
+            <p class="settings-app-version">Version 1.0.37</p>
             <p class="settings-copyright">© 2026 Skaters All Rights Reserved.</p>
         </div>
     </div>
@@ -3799,19 +3860,17 @@ body.modal-open {
                 </div>
 
                 <div class="form-group">
-                    <label>動作分類</label>
+                    <label>網址分類</label>
                     <div class="custom-select-wrapper" id="bookmark-category-wrapper">
-                        <input type="hidden" id="bookmark-category-select" name="bookmark-category" value="跳躍" required>
+                        <input type="hidden" id="bookmark-category-select" name="bookmark-category" value="官網" required>
                         <div class="custom-select-trigger" id="bookmark-category-trigger" tabindex="0">
-                            <span id="bookmark-category-display">跳躍</span>
+                            <span id="bookmark-category-display">官網</span>
                             <svg class="custom-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                         <div class="custom-select-menu" id="bookmark-category-menu">
-                            <div class="custom-select-option selected" data-value="跳躍">跳躍</div>
-                            <div class="custom-select-option" data-value="旋轉">旋轉</div>
-                            <div class="custom-select-option" data-value="步法">步法</div>
-                            <div class="custom-select-option" data-value="滑行基礎">滑行基礎</div>
-                            <div class="custom-select-option" data-value="陸上訓練">陸上訓練</div>
+                            <div class="custom-select-option selected" data-value="官網">官網</div>
+                            <div class="custom-select-option" data-value="學習資料">學習資料</div>
+                            <div class="custom-select-option" data-value="購物收藏">購物收藏</div>
                             <div class="custom-select-option" data-value="其他">其他</div>
                         </div>
                     </div>
@@ -6164,12 +6223,6 @@ function startApp() {
                 const titleDisplay = s.displayTitle || s.type;
                 const colorConfig = typeColors[s.type] || defaultTypeColor;
 
-                if (colorConfig.cardBg) {
-                    item.style.backgroundColor = colorConfig.cardBg;
-                } else {
-                    item.style.backgroundColor = '#ffffff';
-                }
-
                 item.innerHTML = `
                     <span class="usage-date-info">${dateDisplay}${timeDisplay}</span>
                     <span class="usage-tag" style="background-color: ${colorConfig.bg}; color: ${colorConfig.text};">
@@ -6448,7 +6501,7 @@ function startApp() {
         types.forEach(t => {
             const cardBg = getSoftCardBg(t.bg);
             html += `
-                <div class="settings-type-item" style="background-color: ${cardBg};">
+                <div class="settings-type-item">
                     <div class="settings-type-info">
                         <span class="settings-type-badge" style="background-color: ${t.bg}; color: ${t.text};">${t.name}</span>
                     </div>
@@ -9511,21 +9564,21 @@ function startApp() {
                 id: 'bm1',
                 title: 'ISU 花式滑冰單人滑與雙人滑技術規則指南',
                 url: 'https://www.isu.org/figure-skating/rules/sandp-handbooks-faq',
-                category: '跳躍',
+                category: '官網',
                 note: '包含跳躍週數（Under-rotated / Downgraded）判定標準與 GOE 加減分細節。'
             },
             {
                 id: 'bm2',
                 title: 'U.S. Figure Skating 官方練習與訓練技巧教學資料庫',
                 url: 'https://www.usfigureskating.org/skate/skills-and-levels',
-                category: '步法',
+                category: '學習資料',
                 note: '提供 Moves in the Field 各等級步法刃邊（Edges）與壓步訓練建議。'
             },
             {
                 id: 'bm3',
                 title: '陸上轉體與花滑核心爆發力訓練專題',
                 url: 'https://www.skatingfirst.com/off-ice-training-guide',
-                category: '陸上訓練',
+                category: '學習資料',
                 note: '適合居家練習的垂直跳躍、旋轉軸心與伸展拉筋技巧教學。'
             }
         ];
@@ -10046,7 +10099,7 @@ function startApp() {
         if (bookmarkModalTitle) bookmarkModalTitle.textContent = '新增網址書籤';
         if (bookmarkDeleteBtn) bookmarkDeleteBtn.style.display = 'none';
         if (bookmarkForm) bookmarkForm.reset();
-        safeSetRadioValue('bookmark-category', '跳躍');
+        safeSetRadioValue('bookmark-category', '官網');
         showModalOverlay(bookmarkModalOverlay);
     }
 
@@ -10065,7 +10118,7 @@ function startApp() {
         if (coverInput) coverInput.value = bm.cover || '';
         if (noteInput) noteInput.value = bm.note || '';
 
-        safeSetRadioValue('bookmark-category', bm.category || '跳躍');
+        safeSetRadioValue('bookmark-category', bm.category || '官網');
         showModalOverlay(bookmarkModalOverlay);
     }
 
