@@ -1225,40 +1225,35 @@ body {
 .stats-log-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    max-height: 240px;
+    gap: 10px;
+    max-height: 380px;
     overflow-y: auto;
-    margin-right: -12px;
-    padding-right: 8px;
+    margin-right: -6px;
+    padding-right: 6px;
 }
 
 .stats-log-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 11px 16px;
-    background: #fdfaf9;
-    border-radius: 9999px;
-    border: none;
-    font-size: 14.5px;
-    gap: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 13px 16px;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid rgba(113, 90, 87, 0.08);
+    box-shadow: 0 2px 6px rgba(113, 90, 87, 0.04);
+    font-size: 14px;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* 最前方運動類型 Tag/Pill 標籤 (強制不換行、防壓縮) */
-.stats-log-item span[style*="border-radius"] {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
+.stats-log-item:hover {
+    box-shadow: 0 4px 12px rgba(113, 90, 87, 0.08);
 }
 
-/* 中間內容區塊 (允許彈性微調) */
-.stats-log-item > div:first-child {
-    min-width: 0;
-}
-
-/* 最後方金額價格標籤 (強制不換行、防壓縮) */
-.stats-log-item > div:last-child {
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
+.stats-log-item:active {
+    transform: scale(0.99);
 }
 
 /* 右下角 AI 助理按鈕 (避開底欄) */

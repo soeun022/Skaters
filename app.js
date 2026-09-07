@@ -3509,53 +3509,79 @@ function startApp() {
                 row.style.cursor = 'pointer';
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                let titleHtml = '';
-                let subtitleHtml = '';
-                let rightSideHtml = '';
-
+                let cardHtml = '';
                 if (item.isCard) {
                     const price = parseCleanPrice(item.price);
-                    titleHtml = `購課：${item.type}`;
-                    subtitleHtml = item.note || '購課紀錄';
-                    rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57;">NT$ ${price.toLocaleString()}</div>`;
+                    const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
+                    const endDate = item.date ? normalizeDateStr(item.date) : '';
+                    const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無期限');
+                    const rule = getCardRule(item);
+                    let statusHtml = '';
+                    if (item.type === '單次入場') {
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">單次抵扣卡</span>`;
+                    } else if (rule) {
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+                    }
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.note || '購課紀錄',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
                 } else if (item.isShopping) {
                     const price = parseCleanPrice(item.price);
-                    titleHtml = `購物：${item.type}`;
-                    subtitleHtml = item.name || item.note || '購物紀錄';
-                    rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57;">NT$ ${price.toLocaleString()}</div>`;
+                    let linkHtml = '';
                     if (item.url) {
-                        const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
-                        rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
                     }
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: normalizeDateStr(item.date),
+                        durationStr: '',
+                        noteStr: item.name || item.note || '購物紀錄',
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
                 } else if (item.isOther) {
                     const title = item.name || item.title || item.type;
                     const startStr = normalizeDateStr(item.startDate || item.date);
                     const endStr = normalizeDateStr(item.endDate || item.date);
                     const rangeStr = (startStr === endStr) ? startStr : `${startStr} ~ ${endStr}`;
-                    
-                    titleHtml = `${title}`;
-                    subtitleHtml = item.note ? `${item.note} (${rangeStr})` : rangeStr;
-                    rightSideHtml = `<div style="font-weight: 600; font-size: 14px; color: #715a57;">活動行程</div>`;
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type || '比賽',
+                        colors: colors,
+                        timeStr: rangeStr,
+                        durationStr: '',
+                        noteStr: item.note ? `${title} · ${item.note}` : title,
+                        priceStr: '0'
+                    });
                 } else {
                     const hrs = calculateScheduleHours(item);
                     const cost = getDefaultCost(item);
                     const timeRange = item.time ? (item.endTime ? `${item.time}~${item.endTime}` : item.time) : '全天';
-                    
-                    titleHtml = `${item.title || item.type} ${timeRange}`;
-                    subtitleHtml = `${item.note || '無備註'} (${hrs.toFixed(1)}h)`;
-                    rightSideHtml = `<div style="font-weight: 700; font-size: 15px; color: #715a57;">NT$ ${cost.toLocaleString()}</div>`;
+                    let statusHtml = '';
+                    if (item.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(item.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                    }
+                    cardHtml = buildStatsRecordCardHtml({
+                        type: item.type,
+                        colors: colors,
+                        timeStr: `${normalizeDateStr(item.date)} ${timeRange}`,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: item.note || item.title || '無備註',
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
                 }
 
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type}</span>
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 15px;">${titleHtml}</div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${subtitleHtml}</div>
-                        </div>
-                    </div>
-                    ${rightSideHtml}
-                `;
+                row.innerHTML = cardHtml;
 
                 row.addEventListener('click', () => {
                     editingScheduleId = item.id;
@@ -3578,6 +3604,103 @@ function startApp() {
         renderGroup('課卡', cardSchedules);
         renderGroup('購物', shoppingSchedules);
         renderGroup('其他', otherSchedules);
+    }
+
+    // 統一微方型紀錄卡片 HTML 生成器 (第1行:類型, 第2行:時間與時長, 第3行:備註, 第4行:價格, 第5行:課卡狀態)
+    function buildStatsRecordCardHtml({ type, colors, timeStr, durationStr, noteStr, priceStr, statusHtml, extraActionsHtml }) {
+        const c = colors || defaultTypeColor;
+        const typeBadge = `<span style="background-color: ${c.bg}; color: ${c.text}; padding: 4px 12px; border-radius: 9999px; font-size: 12.5px; font-weight: 600; display: inline-block;">${type || '紀錄'}</span>`;
+        
+        // 第 1 行：排程/課卡類型
+        let row1 = `<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            ${typeBadge}
+            ${extraActionsHtml ? extraActionsHtml : ''}
+        </div>`;
+
+        // 第 2 行：時間，時長在時間後面
+        let row2 = `<div style="font-size: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; width: 100%; margin-top: 2px;">
+            <span>${timeStr || ''}</span>
+            ${durationStr ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 400;">(${durationStr})</span>` : ''}
+        </div>`;
+
+        // 第 3 行：備註
+        let row3 = `<div style="font-size: 13px; color: var(--text-secondary); line-height: 1.4; word-break: break-word; width: 100%;">
+            ${noteStr || '無備註'}
+        </div>`;
+
+        // 第 4 行：價格
+        let row4 = (priceStr !== undefined && priceStr !== null && priceStr !== '') ? `<div style="font-size: 15px; font-weight: 700; color: #715a57; width: 100%;">
+            NT$ ${priceStr}
+        </div>` : '';
+
+        // 第 5 行：課卡狀態
+        let row5 = statusHtml ? `<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; width: 100%; margin-top: 2px;">
+            ${statusHtml}
+        </div>` : '';
+
+        return `${row1}${row2}${row3}${row4}${row5}`;
+    }
+
+    // 取得課卡狀態資訊輔助函式
+    function getCardStatusInfo(item) {
+        let usageText = '';
+        let statusBadgeHtml = '';
+        const todayStr = formatLocalDate(new Date());
+
+        const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
+        const endDate = item.date ? normalizeDateStr(item.date) : '';
+        const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無日期');
+        const endDateStr = normalizeDateStr(item.date);
+        const isExpired = endDateStr ? (endDateStr < todayStr) : false;
+
+        const rule = getCardRule(item);
+        if (item.type === '單次入場') {
+            const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
+            if (usedSchedule) {
+                usageText = `已於 ${normalizeDateStr(usedSchedule.date)} 抵扣`;
+                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
+            } else if (isExpired) {
+                usageText = `未使用`;
+                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
+            } else {
+                usageText = `可抵扣入場 1 次`;
+                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+            }
+        } else if (rule) {
+            const usage = getCardUsage(item.id);
+            const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
+            if (isInfinite) {
+                usageText = `期限內不限次數`;
+                if (isExpired) {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
+                } else {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+                }
+            } else {
+                const totalQuota = rule.maxClasses + rule.maxPractices;
+                const usedTotal = usage.classes + usage.practices;
+                
+                let parts = [];
+                if (rule.maxClasses > 0) parts.push(`課堂 ${usage.classes}/${rule.maxClasses}`);
+                if (rule.maxPractices > 0) parts.push(`練習 ${usage.practices}/${rule.maxPractices}`);
+                usageText = parts.join(' | ');
+
+                if (usedTotal >= totalQuota) {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
+                } else if (isExpired) {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
+                } else {
+                    statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+                }
+            }
+        } else {
+            usageText = item.note || '購課紀錄';
+            statusBadgeHtml = isExpired 
+                ? `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`
+                : `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
+        }
+
+        return { dateStr, usageText, statusBadgeHtml, isExpired };
     }
 
     function setupBreakdownModal(elementId, titleText, dataArray, totalText) {
@@ -3970,19 +4093,33 @@ function startApp() {
                     const timeRange = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '全天';
                     const colors = typeColors[s.type] || defaultTypeColor;
 
+                    let statusHtml = '';
+                    if (s.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
+                    row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px;">${normalizeDateStr(s.date)} ${timeRange}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary);">${s.note || '無備註'} (${hrs.toFixed(1)}h)</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 15px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: s.type,
+                        colors: colors,
+                        timeStr: `${normalizeDateStr(s.date)} ${timeRange}`,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: s.note || s.title || '無備註',
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
+
+                    row.addEventListener('click', () => {
+                        editingScheduleId = s.id;
+                        openScheduleModalForEdit(s);
+                    });
+
                     statsLogList.appendChild(row);
                 });
             }
@@ -4000,7 +4137,6 @@ function startApp() {
             if (monthCardRecords.length === 0) {
                 statsCardList.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px; font-size: 13px;">本月尚無購課紀錄</div>';
             } else {
-                const todayStr = formatLocalDate(new Date());
                 monthCardRecords.sort((a, b) => {
                     const dateA = normalizeDateStr(a.startDate || a.date || '');
                     const dateB = normalizeDateStr(b.startDate || b.date || '');
@@ -4008,80 +4144,23 @@ function startApp() {
                 }).forEach(item => {
                     const price = parseCleanPrice(item.price);
                     const colors = typeColors[item.type] || defaultTypeColor;
-                    
-                    let usageText = '';
-                    let statusBadgeHtml = '';
-
-                    const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
-                    const endDate = item.date ? normalizeDateStr(item.date) : '';
-                    const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無日期');
-                    const endDateStr = normalizeDateStr(item.date);
-                    const isExpired = endDateStr ? (endDateStr < todayStr) : false;
-
-                    const rule = getCardRule(item);
-                    if (item.type === '單次入場') {
-                        const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
-                        if (usedSchedule) {
-                            usageText = `已於 ${normalizeDateStr(usedSchedule.date)} 抵扣`;
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                        } else if (isExpired) {
-                            usageText = `未使用`;
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                        } else {
-                            usageText = `可抵扣入場 1 次`;
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                        }
-                    } else if (rule) {
-                        const usage = getCardUsage(item.id);
-                        const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
-                        if (isInfinite) {
-                            usageText = `期限內不限次數`;
-                            if (isExpired) {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                            } else {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                            }
-                        } else {
-                            const totalQuota = rule.maxClasses + rule.maxPractices;
-                            const usedTotal = usage.classes + usage.practices;
-                            
-                            let parts = [];
-                            if (rule.maxClasses > 0) parts.push(`課堂 ${usage.classes}/${rule.maxClasses}`);
-                            if (rule.maxPractices > 0) parts.push(`練習 ${usage.practices}/${rule.maxPractices}`);
-                            usageText = parts.join(' | ');
-
-                            if (usedTotal >= totalQuota) {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                            } else if (isExpired) {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                            } else {
-                                statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                            }
-                        }
-                    } else {
-                        usageText = item.note || '購課紀錄';
-                    }
+                    const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(item);
+                    const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${dateStr}</span>
-                                    ${statusBadgeHtml}
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                    ${usageText}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.note || item.displayTitle || '購課紀錄',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusLineHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4108,26 +4187,26 @@ function startApp() {
                     const price = parseCleanPrice(item.price);
                     const colors = typeColors[item.type] || defaultTypeColor;
                     const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
+
+                    let linkHtml = '';
+                    if (item.url) {
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    }
                     
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                            <div>
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${dateStr}</span>
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                    ${item.name || item.note || '購物紀錄'}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4486,27 +4565,30 @@ function startApp() {
                     const cost = getDefaultCost(s);
                     const colors = typeColors[s.type] || defaultTypeColor;
                     const dateStr = s.date ? normalizeDateStr(s.date) : '無日期';
-                    const title = s.title || s.type;
                     const timeStr = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '';
+
+                    let statusHtml = '';
+                    if (s.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                    }
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <span>${title}</span>
-                                    ${timeStr ? `<span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(${timeStr})</span>` : ''}
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr} · ${hrs.toFixed(1)} 小時</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: s.type,
+                        colors: colors,
+                        timeStr: timeStr ? `${dateStr} ${timeStr}` : dateStr,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: s.title && s.title !== s.type ? (s.note ? `${s.title} · ${s.note}` : s.title) : (s.note || '無備註'),
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = s.id;
@@ -4533,24 +4615,23 @@ function startApp() {
                 yearCardRecords.sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(card => {
                     const price = parseCleanPrice(card.price);
                     const colors = typeColors[card.type] || defaultTypeColor;
-                    const dateStr = card.date ? normalizeDateStr(card.date) : '無日期';
-                    const displayTitle = card.displayTitle || card.type;
+                    const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(card);
+                    const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${card.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px;">${displayTitle}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">到期日: ${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: card.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: card.note || card.displayTitle || '購課紀錄',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusLineHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = card.id;
@@ -4572,23 +4653,25 @@ function startApp() {
                     const colors = typeColors[item.type] || defaultTypeColor;
                     const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
 
+                    let linkHtml = '';
+                    if (item.url) {
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${item.name || item.type || '購物'}</span>
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -4878,27 +4961,30 @@ function startApp() {
                     const cost = getDefaultCost(s);
                     const colors = typeColors[s.type] || defaultTypeColor;
                     const dateStr = s.date ? normalizeDateStr(s.date) : '無日期';
-                    const title = s.title || s.type;
                     const timeStr = s.time ? (s.endTime ? `${s.time}~${s.endTime}` : s.time) : '';
+
+                    let statusHtml = '';
+                    if (s.linkedCardId) {
+                        const linkedCard = schedules.find(c => c.isCard && String(c.id) === String(s.linkedCardId));
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">已由課卡抵扣 (${linkedCard ? linkedCard.type : '已抵扣'})</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #f0eae7; color: var(--text-secondary); font-weight: 500;">自費項目</span>`;
+                    }
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${s.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <span>${title}</span>
-                                    ${timeStr ? `<span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">(${timeStr})</span>` : ''}
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr} · ${hrs.toFixed(1)} 小時</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${cost.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: s.type,
+                        colors: colors,
+                        timeStr: timeStr ? `${dateStr} ${timeStr}` : dateStr,
+                        durationStr: `${hrs.toFixed(1)}小時`,
+                        noteStr: s.title && s.title !== s.type ? (s.note ? `${s.title} · ${s.note}` : s.title) : (s.note || '無備註'),
+                        priceStr: cost.toLocaleString(),
+                        statusHtml: statusHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = s.id;
@@ -4918,24 +5004,23 @@ function startApp() {
                 [...allCards].sort((a, b) => (b.date || '').localeCompare(a.date || '')).forEach(card => {
                     const price = parseCleanPrice(card.price);
                     const colors = typeColors[card.type] || defaultTypeColor;
-                    const dateStr = card.date ? normalizeDateStr(card.date) : '無日期';
-                    const displayTitle = card.displayTitle || card.type;
+                    const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(card);
+                    const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${card.type}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px;">${displayTitle}</div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">到期日: ${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: card.type,
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: card.note || card.displayTitle || '購課紀錄',
+                        priceStr: price.toLocaleString(),
+                        statusHtml: statusLineHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = card.id;
@@ -4957,23 +5042,25 @@ function startApp() {
                     const colors = typeColors[item.type] || defaultTypeColor;
                     const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
 
+                    let linkHtml = '';
+                    if (item.url) {
+                        linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                    }
+
                     const row = document.createElement('div');
                     row.className = 'stats-log-item';
                     row.style.cursor = 'pointer';
                     if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                    row.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                            <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                            <div style="min-width: 0; flex: 1;">
-                                <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                    <span>${item.name || item.type || '購物'}</span>
-                                </div>
-                                <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                            </div>
-                        </div>
-                        <div style="font-weight: 700; font-size: 16px; color: #715a57; text-align: right; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                    `;
+                    row.innerHTML = buildStatsRecordCardHtml({
+                        type: item.type || '購物',
+                        colors: colors,
+                        timeStr: dateStr,
+                        durationStr: '',
+                        noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                        priceStr: price.toLocaleString(),
+                        extraActionsHtml: linkHtml
+                    });
 
                     row.addEventListener('click', () => {
                         editingScheduleId = item.id;
@@ -5074,83 +5161,23 @@ function startApp() {
             cardRecords.forEach(item => {
                 const price = parseCleanPrice(item.price);
                 const colors = typeColors[item.type] || defaultTypeColor;
-                
-                let usageText = '';
-                let statusBadgeHtml = '';
-
-                const startDate = item.startDate ? normalizeDateStr(item.startDate) : '';
-                const endDate = item.date ? normalizeDateStr(item.date) : '';
-                const dateStr = startDate ? (endDate && endDate !== startDate ? `${startDate} ~ ${endDate}` : startDate) : (endDate || '無日期');
-                const endDateStr = normalizeDateStr(item.date);
-                const isExpired = endDateStr ? (endDateStr < todayStr) : false;
-
-                const rule = getCardRule(item);
-                if (item.type === '單次入場') {
-                    const usedSchedule = schedules.find(s => !s.isCard && String(s.linkedCardId) === String(item.id));
-                    if (usedSchedule) {
-                        usageText = `已於 ${normalizeDateStr(usedSchedule.date)} 抵扣`;
-                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                    } else if (isExpired) {
-                        usageText = `未使用`;
-                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                    } else {
-                        usageText = `可抵扣入場 1 次`;
-                        statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                    }
-                } else if (rule) {
-                    const usage = getCardUsage(item.id);
-                    const isInfinite = rule.maxClasses === Infinity || rule.maxPractices === Infinity;
-                    if (isInfinite) {
-                        usageText = `期限內不限次數`;
-                        if (isExpired) {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                        } else {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                        }
-                    } else {
-                        const totalQuota = rule.maxClasses + rule.maxPractices;
-                        const usedTotal = usage.classes + usage.practices;
-                        
-                        let parts = [];
-                        if (rule.maxClasses > 0) parts.push(`課堂 ${usage.classes}/${rule.maxClasses}`);
-                        if (rule.maxPractices > 0) parts.push(`練習 ${usage.practices}/${rule.maxPractices}`);
-                        usageText = parts.join(' | ');
-
-                        if (usedTotal >= totalQuota) {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #c1b3b3; color: #514646; font-weight: 600;">使用完畢</span>`;
-                        } else if (isExpired) {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`;
-                        } else {
-                            statusBadgeHtml = `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                        }
-                    }
-                } else {
-                    usageText = item.note || '購課紀錄';
-                    statusBadgeHtml = isExpired 
-                        ? `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #e9cfcb; color: #984f4f; font-weight: 600;">已過期</span>`
-                        : `<span style="font-size: 11px; padding: 2px 8px; border-radius: 9999px; background-color: #cad0c8; color: #5e6859; font-weight: 600;">有效使用中</span>`;
-                }
+                const { dateStr, usageText, statusBadgeHtml } = getCardStatusInfo(item);
+                const statusLineHtml = `${statusBadgeHtml}${usageText ? `<span style="font-size: 12.5px; color: var(--text-secondary); font-weight: 500;">${usageText}</span>` : ''}`;
 
                 const row = document.createElement('div');
                 row.className = 'stats-log-item';
                 row.style.cursor = 'pointer';
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
                 
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.displayTitle || item.type}</span>
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                <span>${dateStr}</span>
-                                ${statusBadgeHtml}
-                            </div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                ${usageText}${item.note ? ' · ' + item.note : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <div style="font-weight: 700; font-size: 16px; color: #715a57; flex-shrink: 0; white-space: nowrap; margin-left: 8px;">NT$ ${price.toLocaleString()}</div>
-                `;
+                row.innerHTML = buildStatsRecordCardHtml({
+                    type: item.displayTitle || item.type,
+                    colors: colors,
+                    timeStr: dateStr,
+                    durationStr: '',
+                    noteStr: item.note || '購課紀錄',
+                    priceStr: price.toLocaleString(),
+                    statusHtml: statusLineHtml
+                });
 
                 row.addEventListener('click', () => {
                     editingScheduleId = item.id;
@@ -5171,31 +5198,25 @@ function startApp() {
                 const colors = typeColors[item.type] || defaultTypeColor;
                 const dateStr = item.date ? normalizeDateStr(item.date) : '無日期';
                 
+                let linkHtml = '';
+                if (item.url) {
+                    linkHtml = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
+                }
+
                 const row = document.createElement('div');
                 row.className = 'stats-log-item';
                 row.style.cursor = 'pointer';
                 if (colors.cardBg) row.style.backgroundColor = colors.cardBg;
 
-                let rightSideHtml = `<div style="font-weight: 700; font-size: 16px; color: #715a57; white-space: nowrap;">NT$ ${price.toLocaleString()}</div>`;
-                if (item.url) {
-                    const linkIcon = `<a href="javascript:void(0)" onclick="event.stopPropagation(); safeOpenUrl('${item.url.replace(/'/g, "\\'")}');" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: rgba(113, 90, 87, 0.1); border-radius: 50%; color: #715a57; text-decoration: none; margin-left: 8px;" title="開啟連結"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>`;
-                    rightSideHtml = `<div style="display: flex; align-items: center;">${rightSideHtml}${linkIcon}</div>`;
-                }
-
-                row.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                        <span style="background-color: ${colors.bg}; color: ${colors.text}; padding: 5px 14px; border-radius: 9999px; font-size: 13px; font-weight: 600; flex-shrink: 0; white-space: nowrap;">${item.type || '購物'}</span>
-                        <div style="min-width: 0; flex: 1;">
-                            <div style="font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                                <span>${dateStr}</span>
-                            </div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 2px;">
-                                ${item.name || item.note || '購物紀錄'}
-                            </div>
-                        </div>
-                    </div>
-                    ${rightSideHtml}
-                `;
+                row.innerHTML = buildStatsRecordCardHtml({
+                    type: item.type || '購物',
+                    colors: colors,
+                    timeStr: dateStr,
+                    durationStr: '',
+                    noteStr: item.name ? (item.note ? `${item.name} · ${item.note}` : item.name) : (item.note || '購物紀錄'),
+                    priceStr: price.toLocaleString(),
+                    extraActionsHtml: linkHtml
+                });
 
                 row.addEventListener('click', () => {
                     editingScheduleId = item.id;
