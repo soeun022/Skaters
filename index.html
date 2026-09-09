@@ -517,7 +517,7 @@
                 <img src="Skater icon.png" alt="Skaters" class="settings-app-icon">
             </div>
             <h4 class="settings-app-name">Skaters</h4>
-            <p class="settings-app-version">Version 1.0.37</p>
+            <p class="settings-app-version">Version 1.0.39</p>
             <p class="settings-copyright">© 2026 Skaters All Rights Reserved.</p>
         </div>
     </div>
@@ -982,6 +982,27 @@
                     <button type="submit" id="type-prompt-submit-btn" class="btn btn-primary">確認</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- 通用自訂風格確認提醒彈窗 Confirm Modal (符合整體莫蘭迪風格) -->
+    <div id="custom-confirm-modal-overlay" class="modal-overlay" style="z-index: 3600; display: none;">
+        <div class="modal" style="max-width: 360px; padding: 26px 22px 20px 22px; text-align: center;">
+            <div style="display: flex; justify-content: center; margin-bottom: 14px;">
+                <div style="width: 46px; height: 46px; border-radius: 50%; background-color: rgba(201, 122, 126, 0.15); display: flex; align-items: center; justify-content: center; color: #b06b6f;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </div>
+            </div>
+            <h2 id="custom-confirm-title" style="font-size: 17px; font-weight: 700; color: #715a57; margin-bottom: 8px;">確認刪除</h2>
+            <p id="custom-confirm-message" style="font-size: 14px; color: #887472; line-height: 1.6; margin-bottom: 22px; word-break: break-word;">確定要刪除這筆資料嗎？此操作無法復原。</p>
+            <div class="modal-actions" style="justify-content: center; gap: 12px; border-top: none; padding-top: 0 !important; margin-top: 0 !important;">
+                <button type="button" id="custom-confirm-cancel-btn" class="btn btn-secondary" style="min-width: 96px; padding: 9px 18px;">取消</button>
+                <button type="button" id="custom-confirm-submit-btn" class="btn btn-danger" style="min-width: 96px; padding: 9px 18px; background-color: #d6baba; color: #555555; font-weight: 600;">確定刪除</button>
+            </div>
         </div>
     </div>
 

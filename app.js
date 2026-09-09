@@ -653,6 +653,11 @@ function startApp() {
         return { open, close, setValue };
     })();
 
+    // ---- 防止瀏覽器預設捲動還原打亂月曆目標定位 ----
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+
     // ---- 全域狀態與視圖模式 ----
     let currentDate = new Date();
     let currentViewMode = 'month'; // 'month' | 'year'
@@ -661,6 +666,26 @@ function startApp() {
     let editingScheduleId = null;
     let activeFocusedScheduleId = null;
     let selectedDayDate = new Date();
+
+    window.addEventListener('load', () => {
+        if (currentTab === 'calendar' && currentViewMode === 'month') {
+            const activeBlock = document.querySelector(`.month-block[data-year="${currentDate.getFullYear()}"][data-month="${currentDate.getMonth()}"]`);
+            if (activeBlock) {
+                const headerEl = document.querySelector('header.navbar');
+                const weekdaysEl = document.querySelector('.weekdays');
+                const headerOffset = (headerEl ? headerEl.offsetHeight : 0) + (weekdaysEl ? weekdaysEl.offsetHeight : 0) + 12;
+                let targetTop = 0;
+                let el = activeBlock;
+                while (el) {
+                    targetTop += el.offsetTop || 0;
+                    el = el.offsetParent;
+                }
+                if (targetTop > 0) {
+                    window.scrollTo({ top: Math.max(0, targetTop - headerOffset), behavior: 'auto' });
+                }
+            }
+        }
+    });
 
     function clearFocus() {
         document.querySelectorAll('.schedule-item.focused').forEach(el => el.classList.remove('focused'));
@@ -1032,12 +1057,13 @@ function startApp() {
                 } else {
                     currentViewMode = 'month';
                     isInitialScrolling = true;
-                    window.scrollTo(0, 0);
                 }
                 renderView();
             } else if (currentTab === 'day-view') {
                 currentTab = 'calendar';
-                currentDate = new Date(selectedDayDate); // 將月曆視圖設定為剛剛查看的該天所在月份
+                currentDate = new Date(selectedDayDate.getFullYear(), selectedDayDate.getMonth(), 1); // 將月曆視圖設定為剛剛查看的該天所在月份
+                currentViewMode = 'month';
+                isInitialScrolling = true;
                 const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
                 bottomNavItems.forEach(i => {
                     if (i.dataset.tab === 'calendar') i.classList.add('active');
@@ -1435,34 +1461,41 @@ function startApp() {
             const weekdaysEl = document.querySelector('.weekdays');
             const headerOffset = (headerEl ? headerEl.offsetHeight : 0) + (weekdaysEl ? weekdaysEl.offsetHeight : 0) + 12;
 
-            const blockRect = currentActiveBlock.getBoundingClientRect();
-            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-            const targetScrollY = currentScrollY + blockRect.top - headerOffset;
+            let targetTop = 0;
+            let el = currentActiveBlock;
+            while (el) {
+                targetTop += el.offsetTop || 0;
+                el = el.offsetParent;
+            }
+            if (targetTop === 0) {
+                const blockRect = currentActiveBlock.getBoundingClientRect();
+                const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+                targetTop = currentScrollY + blockRect.top;
+            }
+
+            const targetScrollY = Math.max(0, targetTop - headerOffset);
 
             window.scrollTo({
-                top: Math.max(0, targetScrollY),
+                top: targetScrollY,
                 behavior: 'auto'
             });
-
-            if (typeof currentActiveBlock.scrollIntoView === 'function') {
-                currentActiveBlock.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }
 
             if (monthTitle && targetTitle) {
                 monthTitle.textContent = targetTitle;
             }
         };
 
-        // 雙重 requestAnimationFrame 確保瀏覽器完成 display 切換與 Reflow 佈局
+        // 立即執行一次定位，並透過雙重 requestAnimationFrame 與延遲確保完成 Reflow 與佈局鎖定
+        performScrollToActiveBlock();
         requestAnimationFrame(() => {
             performScrollToActiveBlock();
             requestAnimationFrame(() => {
                 performScrollToActiveBlock();
                 setupMonthObserver();
-                // 延長保護窗口至 400ms，徹底防止初始滾動誤觸覆蓋目標月份
                 setTimeout(() => {
+                    performScrollToActiveBlock();
                     isInitialScrolling = false;
-                }, 400);
+                }, 300);
             });
         });
     }
@@ -1485,7 +1518,7 @@ function startApp() {
             const rect = block.getBoundingClientRect();
             const top = Math.max(viewportTop, rect.top);
             const bottom = Math.min(viewportBottom, rect.bottom);
-            const visibleHeight = bottom - top;
+            const visibleHeight = bottom > top ? (bottom - top) : 0;
 
             if (visibleHeight > maxVisibleHeight) {
                 maxVisibleHeight = visibleHeight;
@@ -1921,7 +1954,6 @@ function startApp() {
                 currentDate = new Date(year, m, 1);
                 currentViewMode = 'month';
                 isInitialScrolling = true;
-                window.scrollTo(0, 0);
                 renderView();
             });
 
@@ -2217,7 +2249,7 @@ function startApp() {
 
     function ensureBodyUnlocked() {
         const activeModals = document.querySelectorAll(
-            '.modal-overlay.show, #search-overlay.show, .modal.show, #breakdown-modal-overlay.show, #type-prompt-modal-overlay.show'
+            '.modal-overlay.show, #search-overlay.show, .modal.show, #breakdown-modal-overlay.show, #type-prompt-modal-overlay.show, #custom-confirm-modal-overlay.show'
         );
         if (activeModals.length === 0) {
             document.body.classList.remove('modal-open');
@@ -2407,6 +2439,77 @@ function startApp() {
         }, 50);
     }
 
+    // ---- 自訂風格通用 Confirm 確認提醒彈窗 ----
+    function showCustomConfirmModal({ title = '確認刪除', message = '確定要刪除這筆資料嗎？此操作無法復原。', confirmText = '確定刪除', cancelText = '取消', onConfirm, onCancel }) {
+        let overlay = document.getElementById('custom-confirm-modal-overlay');
+        if (!overlay) {
+            const overlayHtml = `
+                <div id="custom-confirm-modal-overlay" class="modal-overlay" style="z-index: 3600; display: none;">
+                    <div class="modal" style="max-width: 360px; padding: 26px 22px 20px 22px; text-align: center;">
+                        <div style="display: flex; justify-content: center; margin-bottom: 14px;">
+                            <div style="width: 46px; height: 46px; border-radius: 50%; background-color: rgba(201, 122, 126, 0.15); display: flex; align-items: center; justify-content: center; color: #b06b6f;">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                            </div>
+                        </div>
+                        <h2 id="custom-confirm-title" style="font-size: 17px; font-weight: 700; color: #715a57; margin-bottom: 8px;">確認刪除</h2>
+                        <p id="custom-confirm-message" style="font-size: 14px; color: #887472; line-height: 1.6; margin-bottom: 22px; word-break: break-word;">確定要刪除這筆資料嗎？此操作無法復原。</p>
+                        <div class="modal-actions" style="justify-content: center; gap: 12px; border-top: none; padding-top: 0 !important; margin-top: 0 !important;">
+                            <button type="button" id="custom-confirm-cancel-btn" class="btn btn-secondary" style="min-width: 96px; padding: 9px 18px;">取消</button>
+                            <button type="button" id="custom-confirm-submit-btn" class="btn btn-danger" style="min-width: 96px; padding: 9px 18px; background-color: #d6baba; color: #555555; font-weight: 600;">確定刪除</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', overlayHtml);
+            overlay = document.getElementById('custom-confirm-modal-overlay');
+        }
+
+        const titleEl = document.getElementById('custom-confirm-title');
+        const messageEl = document.getElementById('custom-confirm-message');
+        const confirmBtn = document.getElementById('custom-confirm-submit-btn');
+        const cancelBtn = document.getElementById('custom-confirm-cancel-btn');
+
+        if (titleEl) titleEl.textContent = title || '確認刪除';
+        if (messageEl) messageEl.textContent = message || '確定要刪除這筆資料嗎？此操作無法復原。';
+        if (confirmBtn) confirmBtn.textContent = confirmText || '確定刪除';
+        if (cancelBtn) cancelBtn.textContent = cancelText || '取消';
+
+        const closeConfirm = () => {
+            overlay.classList.remove('show');
+            overlay.style.display = 'none';
+            ensureBodyUnlocked();
+        };
+
+        const handleCancel = (e) => {
+            if (e) e.preventDefault();
+            closeConfirm();
+            if (onCancel) onCancel();
+        };
+
+        const handleConfirm = (e) => {
+            if (e) e.preventDefault();
+            closeConfirm();
+            if (onConfirm) onConfirm();
+        };
+
+        if (cancelBtn) cancelBtn.onclick = handleCancel;
+        if (confirmBtn) confirmBtn.onclick = handleConfirm;
+
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                handleCancel(e);
+            }
+        };
+
+        document.body.classList.add('modal-open');
+        overlay.style.display = 'flex';
+        overlay.classList.add('show');
+    }
+
     function handleAddNewScheduleType() {
         showCustomPromptModal({
             title: '新增排程類型',
@@ -2532,15 +2635,21 @@ function startApp() {
     }
 
     function handleDeleteScheduleType(typeId, name) {
-        if (!confirm(`確定要刪除「${name}」排程類型嗎？`)) return;
+        showCustomConfirmModal({
+            title: '刪除排程類型',
+            message: `確定要刪除「${name}」排程類型嗎？`,
+            confirmText: '確定刪除',
+            cancelText: '取消',
+            onConfirm: () => {
+                let types = getScheduleTypes();
+                types = types.filter(t => t.id !== typeId && t.name !== name);
+                saveScheduleTypes(types);
 
-        let types = getScheduleTypes();
-        types = types.filter(t => t.id !== typeId && t.name !== name);
-        saveScheduleTypes(types);
-
-        renderSettingsScheduleTypes();
-        renderScheduleTypePills();
-        renderView();
+                renderSettingsScheduleTypes();
+                renderScheduleTypePills();
+                renderView();
+            }
+        });
     }
 
     function openCardModal(prefillDateStr) {
@@ -5893,11 +6002,18 @@ function startApp() {
     if (videoDeleteBtn) {
         videoDeleteBtn.addEventListener('click', () => {
             if (editingVideoId) {
-                if (!confirm('確定要刪除這部動作練習影片嗎？此操作無法復原。')) return;
-                videos = videos.filter(v => String(v.id) !== String(editingVideoId));
-                saveVideos(videos);
-                renderDatabaseView();
-                closeVideoModal();
+                showCustomConfirmModal({
+                    title: '刪除影片',
+                    message: '確定要刪除這部動作練習影片嗎？此操作無法復原。',
+                    confirmText: '確定刪除',
+                    cancelText: '取消',
+                    onConfirm: () => {
+                        videos = videos.filter(v => String(v.id) !== String(editingVideoId));
+                        saveVideos(videos);
+                        renderDatabaseView();
+                        closeVideoModal();
+                    }
+                });
             }
         });
     }
@@ -6131,11 +6247,18 @@ function startApp() {
     if (bookmarkDeleteBtn) {
         bookmarkDeleteBtn.addEventListener('click', () => {
             if (editingBookmarkId) {
-                if (!confirm('確定要刪除這筆參考資料網址嗎？此操作無法復原。')) return;
-                bookmarks = bookmarks.filter(b => String(b.id) !== String(editingBookmarkId));
-                saveBookmarks(bookmarks);
-                renderBookmarkView();
-                closeBookmarkModal();
+                showCustomConfirmModal({
+                    title: '刪除參考資料',
+                    message: '確定要刪除這筆參考資料網址嗎？此操作無法復原。',
+                    confirmText: '確定刪除',
+                    cancelText: '取消',
+                    onConfirm: () => {
+                        bookmarks = bookmarks.filter(b => String(b.id) !== String(editingBookmarkId));
+                        saveBookmarks(bookmarks);
+                        renderBookmarkView();
+                        closeBookmarkModal();
+                    }
+                });
             }
         });
     }
@@ -6263,12 +6386,15 @@ function startApp() {
             bottomNavItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
 
-            // 當從其他分頁跳回主畫面月曆，或點擊月曆分頁時，月曆時間跳回目前月份
+            // 當從每日模式回到主畫面月曆時，跳回和每日模式一樣的月份；從其他分頁或再次點擊月曆時，月曆時間跳回目前月份
             if (tab === 'calendar') {
-                currentDate = new Date();
+                if (prevTab === 'day-view') {
+                    currentDate = new Date(selectedDayDate.getFullYear(), selectedDayDate.getMonth(), 1);
+                } else {
+                    currentDate = new Date();
+                }
                 currentViewMode = 'month';
                 isInitialScrolling = true;
-                window.scrollTo(0, 0);
             }
 
             renderView();
